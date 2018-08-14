@@ -73,23 +73,24 @@ module.exports = {
    */
   deploy: {
     production: {
-      user: 'node',
-      host: '212.83.163.1',
+      "key": "/home/max/.ssh/keysvirginia.pem",
+      user: 'ubuntu',
+      host: '34.229.181.14',
       ref: 'origin/master',
-      repo: 'git@github.com:repo.git',
-      path: '/var/www/production',
+      repo: 'https://github.com/modestemax/m24-crypto-micro-project',
+      path: '/home/ubuntu/m24/prod',
       'post-deploy': 'npm install && pm2 reload ecosystem.config.js --env production'
     },
     dev: {
-      user: 'node',
-      host: '212.83.163.1',
-      ref: 'origin/master',
-      repo: 'git@github.com:repo.git',
-      path: '/var/www/development',
-      'post-deploy': 'npm install && pm2 reload ecosystem.config.js --env dev',
-      env: {
-        NODE_ENV: 'dev'
-      }
+      // user: 'node',
+      // host: '212.83.163.1',
+      // ref: 'origin/master',
+      // repo: 'git@github.com:repo.git',
+      // path: '/var/www/development',
+      // 'post-deploy': 'npm install && pm2 reload ecosystem.config.js --env dev',
+      // env: {
+      //   NODE_ENV: 'dev'
+      // }
     }
   }
 };
