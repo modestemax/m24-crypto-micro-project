@@ -11,7 +11,6 @@
   "dependencies": {
     "binance-api-node": "^0.8.2",
     "bluebird": "^3.5.1",
-    "common": "file:../common",
     "debug": "^3.1.0",
     "lodash": "^4.17.10",
     "redis": "^2.8.0"
