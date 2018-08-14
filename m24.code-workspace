@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "common"
+		},
+		{
+			"path": "A.compile"
+		},
+		{
+			"path": "B.build"
+		},
+		{
+			"path": "C.publish"
+		},
+		{
+			"path": "D.run"
+		},
+		{
+			"path": "E.monitor"
+		},
+		{
+			"path": "F.telegram"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {}
+}
