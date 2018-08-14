@@ -1,0 +1,30 @@
+{
+  "name": "m24",
+  "version": "1.0.0",
+  "description": "crypto trading",
+  "main": "ecosystem.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "installAll":"npm run installCommon && npm run installA && npm run installB && npm run installC && npm run installD && npm run installF",
+    "installCommon":"cd common && npm install",
+    "installA":"cd A.compile && npm install",
+    "installB":"cd B.build && npm install",
+    "installC":"cd C.publish && npm install",
+    "installD":"cd D.run && npm install",
+    "installF":"cd F.telegram && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/modestemax/m24-crypto-micro-project.git"
+  },
+  "keywords": [
+    "crypto",
+    "trading"
+  ],
+  "author": "Max",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/modestemax/m24-crypto-micro-project/issues"
+  },
+  "homepage": "https://github.com/modestemax/m24-crypto-micro-project#readme"
+}
