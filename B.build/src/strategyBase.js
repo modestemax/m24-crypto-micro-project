@@ -6,7 +6,7 @@ const redisClient = redisLib.createClient();
 const redis = Promise.promisifyAll(redisClient);
 const redisPub = redisClient.duplicate();
 
-const tvLoader = require('A.compile/src/tv-loader');
+const {tradingView} = require('common');
 
 module.exports = class Strategy {
 
@@ -60,7 +60,7 @@ module.exports = class Strategy {
     }
 
     async getTicker({ exchange: exchangeId, symbolId }) {
-        let tick = await tvLoader({ filter: symbolId, exchangeId });
+        let tick = await tradingView({ filter: symbolId, exchangeId });
         return tick[symbolId]
     }
 

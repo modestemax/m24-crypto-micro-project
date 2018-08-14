@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "telega": "^2.1.0"
+   
   }
 }
