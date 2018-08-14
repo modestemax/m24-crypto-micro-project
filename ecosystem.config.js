@@ -60,7 +60,7 @@ module.exports = {
         SYMBOLS_FILTER: 'btc$',
         // SYMBOLS_FILTER: '(eth|xrp|bcc|ltc|eos|ada|xlm|miota|trx|neo|tusd|bcn|xmr|dash|xem|ven|bnb|etc|qtum|ont)btc$',
         EXCHANGE: 'binance',
-        TIMEFRAMES: '15,60,240'
+        TIMEFRAMES: '60,240'
       },
       env_production: {
         NODE_ENV: 'production'
