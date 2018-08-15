@@ -1,4 +1,4 @@
-const debug = require('debug')('analyse');
+const debug = require('debug')('builders');
 const _ = require('lodash');
 const isSorted = require('is-sorted');
 const trend = require('trend');
@@ -31,7 +31,7 @@ module.exports = function ({ env, appEmitter }) {
             //     let signal = markets[symbolId];
             //     if (signal) {
             // _.extend(signal, { timeframe });
-            await  build({ signal: markets[symbolId] });
+            await build({ signal: markets[symbolId] });
             // }
             // });
         })
@@ -77,7 +77,7 @@ module.exports = function ({ env, appEmitter }) {
                     points.push(signal);
                     points.splice(0, points.length - limitPointCount);
                 }
-                (async () => await  redis.setAsync(`points:${symbolId}:${timeframe}`, JSON.stringify(points), 'EX', timeframe * 60 + 30))()
+                (async () => await redis.setAsync(`points:${symbolId}:${timeframe}`, JSON.stringify(points), 'EX', timeframe * 60 + 30))()
             }
         }
 
@@ -90,11 +90,11 @@ module.exports = function ({ env, appEmitter }) {
         }
 
         function getLastPoints({ symbolId, timeframe }) {
-            let points = backupLastPoints.tendances [symbolId] [timeframe] = backupLastPoints.tendances [symbolId] [timeframe];
+            let points = backupLastPoints.tendances[symbolId][timeframe];
             if (!points) {
                 redis.getAsync(`points:${symbolId}:${timeframe}`).then(points => {
                     points = JSON.parse(points || '[]');
-                    backupLastPoints.tendances [symbolId] [timeframe] = points;
+                    backupLastPoints.tendances[symbolId][timeframe] = points;
                 })
             }
             return points
@@ -105,7 +105,7 @@ module.exports = function ({ env, appEmitter }) {
         //     return backupLastPoints.pivot [symbolId] [timeframe] = backupLastPoints.pivot [symbolId] [timeframe] || {};
         // }
 
-        _.defaults(backupLastPoints, { getLastPoints, /*getPivotPoint */});
+        _.defaults(backupLastPoints, { getLastPoints, /*getPivotPoint */ });
     }
 
     function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQuote = 3 / 4 }) {
@@ -115,8 +115,8 @@ module.exports = function ({ env, appEmitter }) {
         // _.forEach(timeframes, (timeframe) => {
         const data = buildSpecialData(timeframe);
         data && appEmitter.emit('analyse:newData', data);
-        const gainers = buildIndicators.gainers;
-        gainers && appEmitter.emit('analyse:newGainers', gainers);
+        // const gainers = buildIndicators.gainers;
+        // gainers && appEmitter.emit('analyse:newGainers', gainers)&&debug("new gainers",gainers);
 
         // });
 
@@ -126,8 +126,9 @@ module.exports = function ({ env, appEmitter }) {
             // const pivot = backupLastPoints.getPivotPoint({ symbolId, timeframe });
             // const points = backupLast3Points.getLast3UniqPoints({ symbol, timeframe, uniqCount: timeframe < 60 ? 3 : 2 });
             // const [last] = points.slice(-1);
-            const last = _.last(points);
+            const [last, prev] = (points || []).concat().reverse();
             if (last) {
+
                 const specialData = getSpecialData({ symbolId, timeframe });
 
                 _.extend(specialData, { points, candle: last });
@@ -139,6 +140,7 @@ module.exports = function ({ env, appEmitter }) {
                 stochastic();
                 stochasticRSI();
                 momentum();
+                bollingerBand();
                 // topGainers();
 
                 return specialData;
@@ -174,14 +176,14 @@ module.exports = function ({ env, appEmitter }) {
 
                 function ema() {
                     _.extend(specialData, {
-                            ema10Above20: last.ema10 > last.ema20,
-                            ema10BelowPrice: last.ema10 < last.close,
-                            ema10AbovePrice: last.ema10 > last.close,
-                            ema20AbovePrice: last.ema20 > last.close,
-                            ema20BelowPrice: last.ema20 < last.close,
-                            ema10CloseDistance: getChangePercentage({ high: last.close, low: last.ema10 }),
-                            ema10Ema20Distance: getChangePercentage({ high: last.ema10, low: last.ema20 })
-                        },
+                        ema10Above20: last.ema10 > last.ema20,
+                        ema10BelowPrice: last.ema10 < last.close,
+                        ema10AbovePrice: last.ema10 > last.close,
+                        ema20AbovePrice: last.ema20 > last.close,
+                        ema20BelowPrice: last.ema20 < last.close,
+                        ema10CloseDistance: getChangePercentage({ high: last.close, low: last.ema10 }),
+                        ema10Ema20Distance: getChangePercentage({ high: last.ema10, low: last.ema20 })
+                    },
                         getTrendStatus({ trendingQuote, indicator: 'ema10', points }),
                         getTrendStatus({ trendingQuote, indicator: 'ema20', points }),
                         getCrossingPoint({ indicatorUp: 'ema10', indicatorDown: 'ema20', points }),
@@ -195,12 +197,12 @@ module.exports = function ({ env, appEmitter }) {
                     const RSi_LOW_REF = 30;
                     _.defaults(buildIndicators, { RSi_HIGH_REF, RSi_LOW_REF });
                     _.extend(specialData, {
-                            rsiAboveHighRef: last.rsi > RSi_HIGH_REF,
-                            rsiBelowHighRef: last.rsi < RSi_HIGH_REF,
-                            rsiAboveLowRef: last.rsi > RSi_LOW_REF,
-                            rsiBelowLowRef: last.rsi < RSi_LOW_REF,
-                            maxRsi: last.rsi < RSi_HIGH_REF ? null : _.max([last.rsi, specialData.maxRsi]),
-                        },
+                        rsiAboveHighRef: last.rsi > RSi_HIGH_REF,
+                        rsiBelowHighRef: last.rsi < RSi_HIGH_REF,
+                        rsiAboveLowRef: last.rsi > RSi_LOW_REF,
+                        rsiBelowLowRef: last.rsi < RSi_LOW_REF,
+                        maxRsi: last.rsi < RSi_HIGH_REF ? null : _.max([last.rsi, specialData.maxRsi]),
+                    },
                         getTrendStatus({ trendingQuote, indicator: 'rsi', points }),
                         getCrossingPoint({ indicatorUp: 'rsi', indicatorDown: 'point60', points, indicatorDownValue: 60 }),
                         getCrossingPoint({
@@ -221,7 +223,7 @@ module.exports = function ({ env, appEmitter }) {
                         rsiEstAGauche: (
                             rsi_point60CrossingDistance > 0 && rsiBelowHighRef && (!rsiCrossingHighRefDistance || rsiCrossingHighRefDistance > 0)
                         )
-                        || (rsiAboveHighRef && last.rsi === specialData.maxRsi)
+                            || (rsiAboveHighRef && last.rsi === specialData.maxRsi)
                     });
 
                 }
@@ -229,12 +231,12 @@ module.exports = function ({ env, appEmitter }) {
                 function macd() {
 
                     _.extend(specialData, {
-                            macdAboveSignal: last.macd > last.macdSignal,
-                            macdBelowSignal: last.macd < last.macdSignal,
-                            macdAboveZero: last.macd > 0,
-                            macdBelowZero: last.macd < 0,
-                            macdSignalAboveZero: last.macdSignal > 0,
-                        },
+                        macdAboveSignal: last.macd > last.macdSignal,
+                        macdBelowSignal: last.macd < last.macdSignal,
+                        macdAboveZero: last.macd > 0,
+                        macdBelowZero: last.macd < 0,
+                        macdSignalAboveZero: last.macdSignal > 0,
+                    },
                         getTrendStatus({ trendingQuote, indicator: 'macd', points }),
                         getTrendStatus({ trendingQuote, indicator: 'macdSignal', points }),
                         getCrossingPoint({ indicatorUp: 'macd', indicatorDown: 'macdSignal', points }),
@@ -246,23 +248,23 @@ module.exports = function ({ env, appEmitter }) {
                     const ADX_REF = 25;
                     _.defaults(buildIndicators, { ADX_REF });
                     _.extend(specialData, {
-                            plusDiAboveMinusDi: last.plusDi > last.minusDi,
-                            plusDiAboveAdxRef: last.plusDi > ADX_REF,
-                            minusDiBelowAdxRef: last.plusDi < ADX_REF,
-                            plusDiAboveAdx: last.plusDi > last.adx,
-                            diDistance: last.plusDi - last.minusDi,
-                        },
+                        plusDiAboveMinusDi: last.plusDi > last.minusDi,
+                        plusDiAboveAdxRef: last.plusDi > ADX_REF,
+                        minusDiBelowAdxRef: last.plusDi < ADX_REF,
+                        plusDiAboveAdx: last.plusDi > last.adx,
+                        diDistance: last.plusDi - last.minusDi,
+                    },
                         getTrendStatus({ trendingQuote, indicator: 'plusDi', points }),
                         getTrendStatus({ trendingQuote, indicator: 'minusDi', points }),
                         getCrossingPoint({ indicatorUp: 'plusDi', indicatorDown: 'minusDi', points }),
                     );
 
                     _.extend(specialData, {
-                            adxAboveRef: last.adx > ADX_REF,
-                            minusDiBelowAdxRef: last.plusDi < ADX_REF,
-                            plusDiAboveAdx: last.plusDi > last.adx,
-                            diDistance: last.plusDi - last.minusDi,
-                        },
+                        adxAboveRef: last.adx > ADX_REF,
+                        minusDiBelowAdxRef: last.plusDi < ADX_REF,
+                        plusDiAboveAdx: last.plusDi > last.adx,
+                        diDistance: last.plusDi - last.minusDi,
+                    },
                         getTrendStatus({ trendingQuote, indicator: 'adx', points }),
                         getCrossingPoint({ indicatorUp: 'adx', indicatorDown: 'adxRef', points, indicatorDownValue: ADX_REF }),
                     );
@@ -273,13 +275,13 @@ module.exports = function ({ env, appEmitter }) {
                     const STOCHASTIC_HIGH_REF = 80;
                     _.defaults(buildIndicators, { STOCHASTIC_LOW_REF, STOCHASTIC_HIGH_REF });
                     _.extend(specialData, {
-                            stochasticKAboveD: last.stochasticK > last.stochasticD,
-                            stochasticKBelowD: last.stochasticK < last.stochasticD,
-                            stochasticKAboveHighRef: last.stochasticK > STOCHASTIC_HIGH_REF,
-                            stochasticKBelowHighRef: last.stochasticK < STOCHASTIC_HIGH_REF,
-                            stochasticKAboveLowRef: last.stochasticK > STOCHASTIC_LOW_REF,
-                            stochasticKBelowLowRef: last.stochasticK < STOCHASTIC_LOW_REF,
-                        },
+                        stochasticKAboveD: last.stochasticK > last.stochasticD,
+                        stochasticKBelowD: last.stochasticK < last.stochasticD,
+                        stochasticKAboveHighRef: last.stochasticK > STOCHASTIC_HIGH_REF,
+                        stochasticKBelowHighRef: last.stochasticK < STOCHASTIC_HIGH_REF,
+                        stochasticKAboveLowRef: last.stochasticK > STOCHASTIC_LOW_REF,
+                        stochasticKBelowLowRef: last.stochasticK < STOCHASTIC_LOW_REF,
+                    },
                         getTrendStatus({ trendingQuote, indicator: 'stochasticK', points }),
                         getTrendStatus({ trendingQuote, indicator: 'stochasticD', points }),
                         getCrossingPoint({ indicatorUp: 'stochasticK', indicatorDown: 'stochasticD', points }),
@@ -303,14 +305,14 @@ module.exports = function ({ env, appEmitter }) {
                     const STOCHASTICRSI_HIGH_REF = 80;
                     _.defaults(buildIndicators, { STOCHASTICRSI_LOW_REF, STOCHASTICRSI_HIGH_REF });
                     _.extend(specialData, {
-                            stochasticRSIKAboveD: last.stochasticRSIK > last.stochasticRSID,
-                            stochasticRSIKBelowD: last.stochasticRSIK < last.stochasticRSID,
-                            stochasticRSIKAboveHighRef: last.stochasticRSIK > STOCHASTICRSI_HIGH_REF,
-                            stochasticRSIKBelowHighRef: last.stochasticRSIK < STOCHASTICRSI_HIGH_REF,
-                            stochasticRSIKAboveLowRef: last.stochasticRSIK > STOCHASTICRSI_LOW_REF,
-                            stochasticRSIKBelowLowRef: last.stochasticRSIK < STOCHASTICRSI_LOW_REF,
+                        stochasticRSIKAboveD: last.stochasticRSIK > last.stochasticRSID,
+                        stochasticRSIKBelowD: last.stochasticRSIK < last.stochasticRSID,
+                        stochasticRSIKAboveHighRef: last.stochasticRSIK > STOCHASTICRSI_HIGH_REF,
+                        stochasticRSIKBelowHighRef: last.stochasticRSIK < STOCHASTICRSI_HIGH_REF,
+                        stochasticRSIKAboveLowRef: last.stochasticRSIK > STOCHASTICRSI_LOW_REF,
+                        stochasticRSIKBelowLowRef: last.stochasticRSIK < STOCHASTICRSI_LOW_REF,
 
-                        },
+                    },
                         getTrendStatus({ trendingQuote, indicator: 'stochasticRSIK', points }),
                         getTrendStatus({ trendingQuote, indicator: 'stochasticRSID', points }),
                         getCrossingPoint({ indicatorUp: 'stochasticRSIK', indicatorDown: 'stochasticRSID', points }),
@@ -328,14 +330,13 @@ module.exports = function ({ env, appEmitter }) {
                         }),
                     );
                 }
-
                 function momentum() {
                     const MOMENTUM_MEDIAN = 0
                     _.defaults(buildIndicators, { MOMENTUM_MEDIAN, });
                     _.extend(specialData, {
-                            momentumAboveZero: last.momentum > 0,
-                            momentumBelowZero: last.momentum < 0,
-                        },
+                        momentumAboveZero: last.momentum > 0,
+                        momentumBelowZero: last.momentum < 0,
+                    },
                         getTrendStatus({ trendingQuote, indicator: 'momentum', points }),
                         getCrossingPoint({ indicatorUp: 'rsi', indicatorDown: 'point60', points, indicatorDownValue: 60 }),
                         getCrossingPoint({
@@ -345,6 +346,17 @@ module.exports = function ({ env, appEmitter }) {
                             indicatorDownValue: MOMENTUM_MEDIAN
                         }),
                     );
+                }
+                function bollingerBand() {
+                    _.extend(specialData, {
+                        bbl20: last.bbl20,
+                        bbu20: last.bbu20,
+                        bbb20: (last.bbl20 + last.bbu20) / 2,
+                    }, prev && {
+                        bbl20_1: prev.bbl20,
+                        bbu20_1: prev.bbu20,
+                        bbb20_1: (prev.bbl20 + prev.bbu20) / 2,
+                    });
                 }
             }
         }

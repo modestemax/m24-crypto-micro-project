@@ -14,14 +14,8 @@ const redisSub = getRedis();
 redisSub.on("pmessage", async (pattern, channel, data) => {
   const json = JSON.parse(data);
   switch (channel) {
-    case "crypto-bid":
-      debug('new bid');
-      bid(json);
-      break;
-    case "crypto-ask":
-      debug('sell');
-      ask(json);
-      break;
+    case "crypto-bid": debug('new bid'); bid(json); break;
+    case "crypto-ask": debug('sell'); ask(json); break;
     case "cancelOrder": debug('cancel'); cancelOrder(json); break;
     case "trade:changed": debug('trade changed'); tradeChanged(json); break;
   }

@@ -28,7 +28,7 @@ module.exports = class extends Template {
                         debug(`${symbolId} EMA H1 Trend OK`);
                         let ticker = await this.getTicker({ exchange, symbolId });
                         if (ticker && ticker.bid) {                            
-                            debug(`${symbolId} BID AT ${this.bid}`);
+                            debug(`${symbolId} BID AT ${ticker.bid}`);
                             return Math.min(ticker.bid, signalH4.candle.open);
                         }
                     }

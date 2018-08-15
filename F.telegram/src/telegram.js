@@ -4,9 +4,20 @@ const Bot = require("telega");
 const bot = new Bot("545101798:AAGM1TodXYaS0MreKKimt23KZlXTmmEH_pU"); //m24
 // const bot = new Bot("496655496:AAFmg9mheE9urDt2oCQDIRL5fXjCpGYiAug"); //m24test
 const tme = bot.api;
-const XBTTraderChatId = "475514014";//"@modestemax";
+// const XBTTraderChatId = "475514014";//"@modestemax";
+const XBTTraderChatId = "-1001169214481";//"M24";
 
 module.exports = new class {
+
+  constructor() {
+    tme.sendMessage({
+      chat_id: XBTTraderChatId,
+      text: [
+        "Bot started ",
+      ].join("\n")
+    });
+  }
+
   newOrder(order) {
     const { price: bid, symbolId, newClientOrderId } = order;
     const strategy = newClientOrderId.split("_")[0];
@@ -43,7 +54,7 @@ module.exports = new class {
     const { symbolId, change, strategy, newClientOrderId } = trade;
     const strategyName = newClientOrderId.split("_")[0];
     const targetStatus =
-      change >=strategy.takeProfit ? "Success" : change > 0 ? "Ok" : "Fail";
+      change >= strategy.takeProfit ? "Success" : change > 0 ? "Ok" : "Fail";
 
     tme.sendMessage({
       chat_id: XBTTraderChatId,
@@ -92,8 +103,8 @@ module.exports = new class {
   }
 }();
 
-bot.cmd("/start", function(message) {
-  message.lines(["This bot is for testing inline queries", "Command: /test"]);
+bot.cmd("/start", function (message) {
+  message.lines(["This bot is for trading", "Check: /start"]);
 });
 
 bot.start();

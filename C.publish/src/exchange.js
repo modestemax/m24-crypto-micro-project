@@ -34,6 +34,7 @@ async function buyOder({ strategy, strategyOptions, exchangeId, symbolId, bid })
         const market = exchange.marketsById[symbolId];
         let quantity = exchange.amountToLots(market.symbol, tradeBalance / bid);
         if (quantity) {
+          // createMarketBuyOrder
           let realOrder = await exchange.createLimitBuyOrder(market.symbol, quantity, bid, {
             newClientOrderId,
             timeInForce: strategyOptions.timeInForce
