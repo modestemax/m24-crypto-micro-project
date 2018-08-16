@@ -4,7 +4,8 @@ const Bot = require("telega");
 const bot = new Bot("545101798:AAGM1TodXYaS0MreKKimt23KZlXTmmEH_pU"); //m24
 // const bot = new Bot("496655496:AAFmg9mheE9urDt2oCQDIRL5fXjCpGYiAug"); //m24test
 const tme = bot.api;
-// const XBTTraderChatId = "475514014";//"@modestemax";
+
+const MAXChatId = "475514014";//"@modestemax";
 const XBTTraderChatId = "-1001169214481";//"M24";
 
 module.exports = new class {
@@ -76,14 +77,7 @@ module.exports = new class {
   }
 
   endTrade(trade) {
-    const {
-      price: bid,
-      ask,
-      symbolId,
-      change,
-      target,
-      newClientOrderId
-    } = trade;
+    const { price: bid, ask, symbolId, change, target, newClientOrderId } = trade;
     const strategyName = newClientOrderId.split("_")[0];
     const targetStatus =
       change >= target ? "Success" : change > 0 ? "Ok" : "Fail";
@@ -98,6 +92,15 @@ module.exports = new class {
         `sell : ${ask}`,
         `change : ${change} [${targetStatus}]`,
         `trade result : *${result}*`
+      ].join("\n")
+    });
+  }
+  displayError({ message, stack }) {
+    tme.sendMessage({
+      chat_id: MAXChatId,
+      text: [
+        "Error",
+        message, stack
       ].join("\n")
     });
   }

@@ -8,7 +8,7 @@ const RateLimiter = require("limiter").RateLimiter;
 const limiter = new RateLimiter(10, "second");
 
 const exchange = require("./exchange");
-const { publish, getRedis, psubscribe } = require("common");
+const { publish, getRedis } = require("common");
 const redisSub = getRedis();
 
 redisSub.on("pmessage", async (pattern, channel, data) => {

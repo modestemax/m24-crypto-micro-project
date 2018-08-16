@@ -1,14 +1,12 @@
 console.log('Starting App');
 
 const formatError = require('format-error').format;
-const { timeframesIntervals } = require('common/settings');
 
 const env = {
     PRODUCTION: !!process.env.PRODUCTION,
     TIMEFRAMES: (process.env.TIMEFRAMES || '1,5,15,60').split(','),
     SYMBOLS_FILTER: process.env.SYMBOLS_FILTER || 'BTC$',
     EXCHANGE: process.env.EXCHANGE || 'binance',
-    timeframesIntervals,
 };
 const appEmitter = new class extends (require('events')) {
     constructor() {
@@ -37,5 +35,5 @@ const appEmitter = new class extends (require('events')) {
 
 
 require('./signals')({ env, appEmitter });
-require('./builder')({ env, appEmitter });
-require('./saveIndicator')({ env, appEmitter });
+require('./builder')({ appEmitter });
+require('./saveIndicator')({ appEmitter });

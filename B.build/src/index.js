@@ -1,9 +1,8 @@
 const debug = require('debug')('signals');
-const redisLib = require('redis');
 const _ = require('lodash');
-const redisClient = redisLib.createClient();
-const redisSub = redisClient.duplicate();
 const strategies = require('./strategies');
+const { getRedis } = require('common');
+const redisSub = getRedis();
 
 
 redisSub.on('pmessage', async (pattern, channel, data) => {
@@ -12,7 +11,7 @@ redisSub.on('pmessage', async (pattern, channel, data) => {
         debug('data received', channel);
         const signal = JSON.parse(data);
         for (let strategy in strategies) {
-            debug('checkin strategy', strategy);
+            debug('checkin strategy', strategy, signal.symbolId);
             strategies[strategy].check(signal);
         }
     }

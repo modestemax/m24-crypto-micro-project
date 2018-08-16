@@ -33,15 +33,7 @@ module.exports = {
         stopLoss: -2,
         trailingStop: 3,
         cancelBidAfterSecond: 60 * 60//1hour
-    },
-    timeframesIntervals: {
-        1: 60e3,
-        5: 5 * 60e3,
-        15: 15 * 60e3,
-        60: 60 * 60e3,
-        240: 240 * 60e3,
-        [60 * 24]: 60 * 24 * 60e3,
-    },
+    },  
 };
 
 function filterActive(objects) {

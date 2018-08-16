@@ -2,16 +2,34 @@ const Promise = require("bluebird");
 const _ = require("lodash");
 const ccxt = require("ccxt");
 const redisLib = require("redis");
-const redisClient = redisLib.createClient();
-const redisPubSub = redisLib.createClient();
+const redisClient = redisLib.createClient({ host: process.env.REDIS_HOST });
+const redisPub = redisClient.duplicate();
 const redis = Promise.promisifyAll(redisClient);
 
+
 module.exports = {
+  redisKeysExists, redisGet, redisSet,
   loadOrders, saveTrade, loadTrades, loadTrade, delTrade, saveOder, saveSellOder, delOder /*delExpiredOrders,*/,
   loadOrder, loadSellOrders, loadSellOrder, getFreeBalance, loadMarkets, computeChange,
-  valuePercent, publish, getRedis, psubscribe, saveBalances, loadBalances, saveOderStrategy, loadOrderStrategy
+  valuePercent, publish, getRedis, saveBalances, loadBalances, saveOderStrategy, loadOrderStrategy
 };
+
+
 //---------------------REDIS-------------------------
+
+function redisKeysExists(key) {
+  return redis.existsAsync(key)
+}
+
+function redisGet(key) {
+  return redis.getAsync(key)
+}
+async function redisSet({ key, data, expire }) {
+  const strData = typeof data === 'string' ? data : JSON.stringify(data);
+  let res = await redis.setAsync(key, strData);
+  expire && await redis.expireAsync(key, expire);
+  return res;
+}
 async function loadData({ hKey, filter = {} }) {
   let data = _(await redis.HVALSAsync(hKey)).map(JSON.parse);
   for (let key in filter) {
@@ -148,16 +166,12 @@ async function getBalance({ exchange, symbolId, part }) {
 
 //------------------------PUB/SUB---------------------
 function getRedis() {
-  return Promise.promisifyAll(redisLib.createClient());
+  return Promise.promisifyAll(redisClient.duplicate());
 }
 
 function publish(event, data) {
   let json = typeof data === "string" ? data : JSON.stringify(data);
-  redisPubSub.publish(event, json);
-}
-
-function psubscribe(redis, event) {
-  redis.psubscribe(event);
+  redisPub.publish(event, json);
 }
 
 //--------------------UTILS-----------------------------

@@ -4,16 +4,14 @@ const isSorted = require('is-sorted');
 const trend = require('trend');
 const Promise = require('bluebird');
 
-const redisLib = require('redis');
-const redisClient = redisLib.createClient();
-const redis = Promise.promisifyAll(redisClient);
+const { redisSet, redisGet, candleUtils } = require('common');
+const { getNewCandleId } = candleUtils;
 
 // let { settingsByIndicators: indicatorSettings } = require('./indicators');
 // const { openTrades } = require('../trade')
 // const trader = require('../trade');
 // const { fetchDepth, fetch24HTrend, fetchLongTrend } = require('../utils')();
-module.exports = function ({ env, appEmitter }) {
-    const { TIMEFRAMES, timeframesIntervals, } = env
+module.exports = function ({ appEmitter }) {
 
     // const signals = _.reduce(TIMEFRAMES, (st, tf) => Object.assign(st, { [tf]: {} }), {});
 
@@ -24,25 +22,13 @@ module.exports = function ({ env, appEmitter }) {
 
 
     async function buildAll(markets) {
-
-
         await Promise.each(_.keys(markets), async (symbolId) => {
-            // await Promise.each(TIMEFRAMES, async (timeframe) => {
-            //     let signal = markets[symbolId];
-            //     if (signal) {
-            // _.extend(signal, { timeframe });
             await build({ signal: markets[symbolId] });
-            // }
-            // });
         })
-
-
     }
 
 
     async function build({ signal }) {
-        // const { symbolId } = signal;
-        // const timeframes = TIMEFRAMES;
 
         backupLastPoints({ signal, count: +signal.timeframe === 1 ? 60 : void 0 });
         buildIndicators({ signal, /*timeframes*/ });
@@ -59,14 +45,8 @@ module.exports = function ({ env, appEmitter }) {
         init();
         savePoints();
 
-        // _.forEach(timeframes, savePoints);
-
         function savePoints(/*timeframe*/) {
             const points = getLastPoints({ symbolId, timeframe });
-            // const pivot = getPivotPoint({ symbolId, timeframe });
-            // let signal = signals[timeframe][symbolId];
-
-            // _.extend(pivot, signal);
 
             if (points) {
                 if (_.isEmpty(points)) {
@@ -77,22 +57,19 @@ module.exports = function ({ env, appEmitter }) {
                     points.push(signal);
                     points.splice(0, points.length - limitPointCount);
                 }
-                (async () => await redis.setAsync(`points:${symbolId}:${timeframe}`, JSON.stringify(points), 'EX', timeframe * 60 + 30))()
+                redisSet({ key: `points:${symbolId}:${timeframe}`, data: (points), expire: timeframe * 60 + 30 });
             }
         }
 
         function init() {
             backupLastPoints.tendances = backupLastPoints.tendances || {};
             backupLastPoints.tendances[symbolId] = backupLastPoints.tendances[symbolId] || {};
-            // backupLastPoints.pivot = backupLastPoints.pivot || {};
-            // backupLastPoints.pivot[symbolId] = backupLastPoints.pivot[symbolId] || {};
-
         }
 
         function getLastPoints({ symbolId, timeframe }) {
             let points = backupLastPoints.tendances[symbolId][timeframe];
             if (!points) {
-                redis.getAsync(`points:${symbolId}:${timeframe}`).then(points => {
+                redisGet(`points:${symbolId}:${timeframe}`).then(points => {
                     points = JSON.parse(points || '[]');
                     backupLastPoints.tendances[symbolId][timeframe] = points;
                 })
@@ -434,8 +411,7 @@ module.exports = function ({ env, appEmitter }) {
     function countCandle({ candle, crossingUp }) {
         if (candle) {
             const id = candle.id;
-            const count = 1 + Math.trunc((Date.now() / (timeframesIntervals[candle.timeframe]))) - id;
-
+            const count = 1 + getNewCandleId({ timeframe: candle.timeframe }) - id;
             return crossingUp ? count : -count;
         }
         return null
