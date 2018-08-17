@@ -1,7 +1,7 @@
 const debug = require('debug')('B:strategy-base');
 const _ = require('lodash');
 
-const { tradingView, redisGet, publish, candleUtils, computeChange } = require('common');
+const { tradingView, redisKeysExists, redisGet, redisSet, publish, candleUtils, computeChange } = require('common');
 const { findSignal } = candleUtils;
 
 module.exports = class Strategy {
@@ -41,7 +41,10 @@ module.exports = class Strategy {
 
         const [price, event] = side === 'BUY' ? [bid, 'crypto-bid'] : [ask, 'crypto-ask'];
 
-        publish(`m24:algo`, { side, strategy, symbolId, price, chat_id: strategyOptions.ownerTelegramChatId });
+        publish(`m24:algo`,
+            { side, strategy, symbolId, price, chat_id: strategyOptions.ownerTelegramChatId },
+            { rateLimit: 60 * 5 }
+        );
         if (price) {
             publish(event, order);
             debug(`[strategy:${strategy}] ${side} ${symbolId} at price: ${price}`)

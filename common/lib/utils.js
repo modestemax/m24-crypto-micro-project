@@ -184,7 +184,9 @@ function getRedis() {
   return Promise.promisifyAll(redisClient.duplicate());
 }
 
-function publish(event, data) {
+function publish(event, data,{rateLimit}={}) {
+  // if(rateLimit)
+
   let json = typeof data === "string" ? data : JSON.stringify(data);
   redisPub.publish(event, json);
 }
