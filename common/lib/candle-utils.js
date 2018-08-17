@@ -43,20 +43,16 @@ const $this = module.exports = {
         }
     },
     async findSignal24H({ exchange, symbolId }) {
-        let key = await keyExistsAtPosition({ exchange, symbolId, timeframe: 240, position: 6 });
+        let key = await $this.keyExistsAtPosition({ exchange, symbolId, timeframe: 240, position: 6 });
         if (key) {
             let signal = await redisGet(key);
             return JSON.parse(signal);
         }
     },
     async change24H({ exchange, symbolId }) {
-        let key = await keyExistsAtPosition({ exchange, symbolId, timeframe: 240, position: 6 });
-        if (key) {
-            let signal = await redisGet(key);
-            signal = JSON.parse(signal);
-            if (signal) {
-                return computeChange(signal.candle.open, signal.candle.close);
-            }
+        let signal = await $this.findSignal24H({ exchange, symbolId });
+        if (signal) {
+            return computeChange(signal.candle.open, signal.candle.close);
         }
     },
     async   getLastKey({ exchange, symbolId, timeframe, position = 0 }) {

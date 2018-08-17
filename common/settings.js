@@ -8,7 +8,7 @@ module.exports = {
             stopLoss: -2,
             trailingstop: 0,
             cancelBidAfterSecond: 30,
-            isActive: true,
+            isActive: process.env.NODE_ENV != 'production',
         },
         "emaH1H4": {
             timeInForce: 'GTC',
