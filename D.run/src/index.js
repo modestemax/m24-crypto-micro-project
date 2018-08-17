@@ -77,7 +77,7 @@ function cancelExpiredOrders() {
 async function cancelExpiredOrder(order, strategy) {
   let { orderTime, orderId, symbolId } = order;
   let now = Date.now();
-  strategy = strategy || (await loadOrderStrategy(order));
+  strategy = strategy || (await loadOrderStrategy(order)) || {};
 
   let { cancelBidAfterSecond } = strategy;
   if (now - orderTime > cancelBidAfterSecond * 1e3) {
