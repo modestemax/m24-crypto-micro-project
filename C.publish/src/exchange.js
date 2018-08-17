@@ -28,13 +28,14 @@ async function buyOder({ strategy, strategyOptions, exchangeId, symbolId, bid })
     if (!order && ordersCount < MAX_TRADE_COUNT_PER_STRATEGY) {
       const exchange = (exchanges[exchangeId] = exchanges[exchangeId] || (await loadMarkets({ exchangeId, auth })));
       const balance = await getFreeBalance({ exchange, symbolId });
-      const tradeBalance = balance.quote / (MAX_TRADE_COUNT_PER_STRATEGY * STRATEGIES_COUNT - ordersCount);
+      // const cost = balance.quote / (MAX_TRADE_COUNT_PER_STRATEGY * STRATEGIES_COUNT - ordersCount);
+      const cost = balance.quote / (MAX_TRADE_COUNT_PER_STRATEGY - ordersCount);
 
-      if (tradeBalance) {
+      if (cost) {
         const market = exchange.marketsById[symbolId];
         // let quantity = exchange.amountToLots(market.symbol, tradeBalance / bid);
-        let quantity = (tradeBalance / bid);
-        if (quantity) {
+        let quantity = (cost / bid);
+        if (market.limits.cost.min < cost) {
           // createMarketBuyOrder
           let realOrder = await exchange.createLimitBuyOrder(market.symbol, quantity, bid, {
             newClientOrderId,
