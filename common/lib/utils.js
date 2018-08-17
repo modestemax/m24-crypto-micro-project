@@ -200,18 +200,16 @@ function valuePercent(price, changePercent) {
 const exchanges = {};
 
 async function loadMarkets({ exchangeId, auth }) {
-  exchanges[exchangeId] =
-    exchanges[exchangeId] ||
-    new ccxt[exchangeId]({
-      apiKey: auth.api_key,
-      secret: auth.secret,
-      // verbose: true,
-      options: {
-        adjustForTimeDifference: true,
-        verbose: true, // if needed, not mandatory
-        recvWindow: 10000000 // not really needed
-      }
-    });
+  exchanges[exchangeId] = exchanges[exchangeId] || new ccxt[exchangeId]({
+    apiKey: auth.api_key,
+    secret: auth.secret,
+    // verbose: true,
+    options: {
+      adjustForTimeDifference: true,
+      verbose: true, // if needed, not mandatory
+      recvWindow: 10000000 // not really needed
+    }
+  });
   await exchanges[exchangeId].loadMarkets();
   return exchanges[exchangeId];
 }

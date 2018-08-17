@@ -32,7 +32,8 @@ async function buyOder({ strategy, strategyOptions, exchangeId, symbolId, bid })
 
       if (tradeBalance) {
         const market = exchange.marketsById[symbolId];
-        let quantity = exchange.amountToLots(market.symbol, tradeBalance / bid);
+        // let quantity = exchange.amountToLots(market.symbol, tradeBalance / bid);
+        let quantity = (tradeBalance / bid);
         if (quantity) {
           // createMarketBuyOrder
           let realOrder = await exchange.createLimitBuyOrder(market.symbol, quantity, bid, {
