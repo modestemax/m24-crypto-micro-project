@@ -36,7 +36,7 @@ const $this = module.exports = {
 
     },
     async findSignal({ exchange, symbolId, timeframe, position }) {
-        let key = await keyExistsAtPosition({ exchange, symbolId, timeframe, position });
+        let key = await $this.keyExistsAtPosition({ exchange, symbolId, timeframe, position });
         if (key) {
             let signal = await redisGet(key);
             return JSON.parse(signal);
