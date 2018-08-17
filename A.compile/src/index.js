@@ -34,6 +34,9 @@ const appEmitter = new class extends (require('events')) {
 }();
 
 
+
 require('./signals')({ env, appEmitter });
 require('./builder')({ appEmitter });
 require('./saveIndicator')({ appEmitter });
+
+process.env.STATUS_OK_TEXT = "Tradingview Data loader is OK";

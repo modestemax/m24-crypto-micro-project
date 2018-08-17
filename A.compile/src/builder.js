@@ -1,4 +1,4 @@
-const debug = require('debug')('builders');
+const debug = require('debug')('A:builder');
 const _ = require('lodash');
 const isSorted = require('is-sorted');
 const trend = require('trend');

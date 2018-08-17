@@ -1,4 +1,4 @@
-const debug = require("debug")("bid:order");
+const debug = require("debug")("C:index");
 const _ = require("lodash");
 
 const Mutex = new require("await-mutex").default;
@@ -66,3 +66,5 @@ redisSub.psubscribe("cancelOrder");
 redisSub.psubscribe("trade:changed");
 
 debug("bidder started");
+
+process.env.STATUS_OK_TEXT = "Bider is OK";

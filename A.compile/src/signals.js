@@ -1,20 +1,21 @@
-const debug = require('debug')('signals');
+const debug = require('debug')('A:load-signals');
 const _ = require('lodash');
 const { tradingView, publish } = require('common');
 
 module.exports = function ({ env, appEmitter }) {
-    let { emitException } = appEmitter;
     let { SYMBOLS_FILTER, EXCHANGE, TIMEFRAMES, } = env;
 
     console.log("TIMEFRAMES", TIMEFRAMES)
     TIMEFRAMES.forEach((timeframe) => {
+        //+timeframe++;
 
         //get signal max 1 time per second
         const throttledGetSignals = _.throttle(() =>
             tradingView({ timeframe, filter: SYMBOLS_FILTER, exchangeId: EXCHANGE })
                 .then(
                     data => appEmitter.emit('tv:signals', { markets: data, timeframe }),
-                    ({ message, stack }) => publish('error', { message, stack })
+                    (err) =>
+                        publish('m24:error', { message: typeof err === 'string' ? err : err.message, stack: err.stack })
                 )
             , 10e3);
 

@@ -1,4 +1,4 @@
-const debug = require('debug')('signals');
+const debug = require('debug')('A:save-signal');
 const _ = require('lodash');
 const { candleUtils, publish, redisSet } = require('common');
 const { getKeyById } = candleUtils;
@@ -18,8 +18,5 @@ module.exports = function ({ appEmitter }) {
         await redisSet({ key, data: jsData, expire: 7 * 24 * 60 * 60 }); //last 7 days
         //console.log(key + ' saved');
     });
-
-
-
 };
 

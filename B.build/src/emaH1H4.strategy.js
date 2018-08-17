@@ -1,4 +1,4 @@
-const debug = require('debug')('strategy:emah1h4');
+const debug = require('debug')('B:strategy:emah1h4');
 
 Template = require('./strategyBase');
 

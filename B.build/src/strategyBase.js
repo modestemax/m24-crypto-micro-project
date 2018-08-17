@@ -1,8 +1,8 @@
-const debug = require('debug')('strategy');
+const debug = require('debug')('B:strategy-base');
 const _ = require('lodash');
 
-const { tradingView, redisGet, publish, candleUtils } = require('common');
-const { keyExistsAtPosition } = candleUtils;
+const { tradingView, redisGet, publish, candleUtils, computeChange } = require('common');
+const { findSignal } = candleUtils;
 
 module.exports = class Strategy {
 
@@ -38,21 +38,14 @@ module.exports = class Strategy {
     notify(side) {
         const { name: strategy, options: strategyOptions, ask, bid, exchange, symbolId, timeframe } = this;
         let order = ({ strategy, strategyOptions, bid, ask, exchange, symbolId, timeframe });
-        switch (side) {
-            case 'BUY':
-                if (bid) {
-                    publish('crypto-bid', order);
-                    debug(`[strategy:${strategy}] ${side} ${symbolId} at price: ${bid}`)
-                }
-                break;
-            case 'SELL':
-                if (ask) {
-                    publish('crypto-ask', order);
-                    debug(`[strategy:${strategy}] ${side} ${symbolId} at price: ${ask}`)
-                }
-                break;
-        }
 
+        const [price, event] = side === 'BUY' ? [bid, 'crypto-bid'] : [ask, 'crypto-ask'];
+
+        publish(`m24:algo`, { side, strategy, symbolId, price, chat_id: strategyOptions.ownerTelegramChatId });
+        if (price) {
+            publish(event, order);
+            debug(`[strategy:${strategy}] ${side} ${symbolId} at price: ${price}`)
+        }
     }
 
     async getTicker({ exchange: exchangeId, symbolId }) {
@@ -61,15 +54,11 @@ module.exports = class Strategy {
     }
 
     async findSignal({ exchange, symbolId, timeframe, position }) {
-        let key = await keyExistsAtPosition({ exchange, symbolId, timeframe, position });
-        if (key) {
-            let signal = await redisGet(key);
-            return JSON.parse(signal);
-        }
+        return findSignal({ exchange, symbolId, timeframe, position })
     }
 
     change({ open, close }) {
-        return (close - open) / open * 100;
+        return computeChange(open, close);
     }
 };
 

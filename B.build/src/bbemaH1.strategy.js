@@ -1,4 +1,4 @@
-const debug = require('debug')('strategy:bbemah1');
+const debug = require('debug')('B:strategy:bbemah1');
 
 Template = require('./strategyBase');
 
@@ -43,14 +43,16 @@ module.exports = class extends Template {
             const last = signalH1.candle;
             const signalH1_1 = await this.findSignal({ exchange, symbolId, timeframe: 60, position: 1 });
             const prev = signalH1_1 && signalH1_1.candle;
-            if (prev.ema50 <= prev.bbb20) {
-                if (last.ema50 > last.bbb20) {
-                    if (signalH1.macdBelowSignal) {
-                        if (last.ema200 < last.ema50) {
-                            let ticker = await this.getTicker({ exchange, symbolId });
-                            if (ticker && ticker.bid) {
-                                debug(`${symbolId} ASK AT ${ticker.bid}`);
-                                return ticker.bid
+            if (last && prev) {
+                if (prev.ema50 <= prev.bbb20) {
+                    if (last.ema50 > last.bbb20) {
+                        if (signalH1.macdBelowSignal) {
+                            if (last.ema200 < last.ema50) {
+                                let ticker = await this.getTicker({ exchange, symbolId });
+                                if (ticker && ticker.bid) {
+                                    debug(`${symbolId} ASK AT ${ticker.bid}`);
+                                    return ticker.bid
+                                }
                             }
                         }
                     }

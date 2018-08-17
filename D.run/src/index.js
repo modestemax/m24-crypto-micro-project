@@ -1,24 +1,9 @@
-const debug = require("debug")("trade");
+const debug = require("debug")("D:index");
 const _ = require("lodash");
 const { strategies, exchangeIds } = require("common/settings");
-const {
-  auth,
-  loadOrders,
-  saveOder,
-  saveSellOder,
-  delOder,
-  /* delExpiredOrders,*/ saveTrade,
-  loadOrder,
-  computeChange,
-  getFreeBalance,
-  loadMarkets,
-  loadTrades,
-  loadTrade,
-  loadBalances,
-  delTrade,
-  saveBalances,
-  loadOrderStrategy,
-  publish
+const { auth, loadOrders, saveOder, saveSellOder, delOder,  /* delExpiredOrders,*/ saveTrade,
+  loadOrder, computeChange, getFreeBalance, loadMarkets, loadTrades, loadTrade,
+  loadBalances, delTrade, saveBalances, loadOrderStrategy, publish
 } = require("common");
 
 const Binance = require("binance-api-node").default;
@@ -221,3 +206,5 @@ async function observeTrade(trade) {
     }
   });
 }
+
+process.env.STATUS_OK_TEXT = "Binance User Data Listener is OK";

@@ -1,4 +1,4 @@
-const debug = require("debug")("bid");
+const debug = require("debug")("C:bid-ask");
 const _ = require("lodash");
 
 const { loadOrders, loadSellOrders, loadTrade, saveTrade, saveOder, saveOderStrategy, loadOrderStrategy,

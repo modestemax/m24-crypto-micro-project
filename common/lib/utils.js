@@ -17,6 +17,21 @@ module.exports = {
 
 //---------------------REDIS-------------------------
 
+// redis.on('error',function(){
+//   debugger;
+// })
+// redis.on('connect',function(){
+//   debugger;
+// })
+
+// redis.on('reconnecting',function(){
+//   debugger;
+// })
+
+// redis.on('end',function(){
+//   debugger;
+// })
+
 function redisKeysExists(key) {
   return redis.existsAsync(key)
 }

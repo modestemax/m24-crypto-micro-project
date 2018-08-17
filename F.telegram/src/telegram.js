@@ -1,12 +1,9 @@
+const debug = require("debug")("F:telegram");
 const { valuePercent } = require("common");
 
-const Bot = require("telega");
-const bot = new Bot("545101798:AAGM1TodXYaS0MreKKimt23KZlXTmmEH_pU"); //m24
-// const bot = new Bot("496655496:AAFmg9mheE9urDt2oCQDIRL5fXjCpGYiAug"); //m24test
-const tme = bot.api;
+const { bot, tme, MAXChatId, XBTTraderChatId } = require('./bot');
+const getMessageText = require('./message-builder');
 
-const MAXChatId = "475514014";//"@modestemax";
-const XBTTraderChatId = "-1001169214481";//"M24";
 
 module.exports = new class {
 
@@ -95,19 +92,12 @@ module.exports = new class {
       ].join("\n")
     });
   }
-  displayError({ message, stack }) {
-    tme.sendMessage({
-      chat_id: MAXChatId,
-      text: [
-        "Error",
-        message, stack
-      ].join("\n")
-    });
+  displayMessage(data) {
+    const text = getMessageText(data);
+    debug(text);
+    tme.sendMessage({ chat_id: data.chat_id || MAXChatId, text });
   }
 }();
 
-bot.cmd("/start", function (message) {
-  message.lines(["This bot is for trading", "Check: /start"]);
-});
 
 bot.start();

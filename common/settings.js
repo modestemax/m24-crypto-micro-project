@@ -8,6 +8,7 @@ module.exports = {
             stopLoss: -2,
             trailingstop: 0,
             cancelBidAfterSecond: 30,
+            isActive: true,
         },
         "emaH1H4": {
             timeInForce: 'GTC',
@@ -32,8 +33,9 @@ module.exports = {
         takeProfit: 1,
         stopLoss: -2,
         trailingStop: 3,
-        cancelBidAfterSecond: 60 * 60//1hour
-    },  
+        cancelBidAfterSecond: 60 * 60,//1hour,
+        ownerTelegramChatId: "475514014",//"@modestemax";
+    },
 };
 
 function filterActive(objects) {
