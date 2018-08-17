@@ -11,7 +11,8 @@ module.exports = {
       script: 'F.telegram/src/index.js',
       "exec_mode": "cluster",
       env: {
-        COMMON_VARIABLE: 'true'
+        COMMON_VARIABLE: 'true',
+        "DEBUG": "*"
       },
       env_production: {
         NODE_ENV: 'production'
@@ -22,7 +23,8 @@ module.exports = {
       script: 'D.run/src/index.js',
       "exec_mode": "cluster",
       env: {
-        COMMON_VARIABLE: 'true'
+        COMMON_VARIABLE: 'true',
+        "DEBUG": "*"
       },
       env_production: {
         NODE_ENV: 'production'
@@ -33,7 +35,8 @@ module.exports = {
       script: 'C.publish/src/index.js',
       "exec_mode": "cluster",
       env: {
-        COMMON_VARIABLE: 'true'
+        COMMON_VARIABLE: 'true',
+        "DEBUG": "*"
       },
       env_production: {
         NODE_ENV: 'production'
