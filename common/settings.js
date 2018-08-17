@@ -1,5 +1,5 @@
 module.exports = {
-    MAX_TRADE_COUNT_PER_STRATEGY: 5,
+    MAX_TRADE_COUNT_PER_STRATEGY: 3,
 
     strategies: filterActive({
         "testEma01": {
