@@ -200,7 +200,7 @@ async function observeTrade(trade) {
       trade.maxChange = _.max([trade.maxChange, trade.change]);
       trade.minChange = _.min([trade.minChange, trade.change]);
 
-      if (Math.abs(trade.lastChange - trade.change) > 0.1) {
+      if (Math.abs(trade.lastChange - trade.change) > 0.3) {
         publish("trade:changed", trade);
       }
     }
