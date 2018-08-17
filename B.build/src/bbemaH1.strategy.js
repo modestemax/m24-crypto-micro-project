@@ -4,7 +4,7 @@ Template = require('./strategyBase');
 
 module.exports = class extends Template {
     constructor(options) {
-        super({ name: 'BB EMA H1', options })
+        super({ name: 'BBEMAH1', options })
     }
 
     async canBuy(signalH1) {
