@@ -28,6 +28,7 @@ function onM24(channel, data) {
     case "m24:error": data.type = 'error'; break;
     case `m24:algo:pair_found`: data.type = 'pair_found'; break;
     case `m24:algo:loaded`: data.type = 'algo_loaded'; break;
+    case `m24:timeframe`: data.type = 'timeframe'; break;
   }
   return data.type && displayMessage(data);
 }

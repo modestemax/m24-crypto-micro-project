@@ -26,6 +26,9 @@ module.exports = function getMessageText(data) {
     case 'algo_loaded':
       text = ["Algo loaded", JSON.stringify(data)].join('\n')
       break;
+    case 'timeframe':
+      text = ["Timeframes loaded", JSON.stringify(data)].join('\n')
+      break;
   }
   return text;
 

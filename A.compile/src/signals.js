@@ -6,6 +6,7 @@ module.exports = function ({ env, appEmitter }) {
     let { SYMBOLS_FILTER, EXCHANGE, TIMEFRAMES, } = env;
 
     console.log("TIMEFRAMES", TIMEFRAMES)
+    publish('m24:timeframe', TIMEFRAMES)
     TIMEFRAMES.forEach((timeframe) => {
         //+timeframe++;
 
