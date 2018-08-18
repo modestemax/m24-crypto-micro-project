@@ -11,7 +11,7 @@ redisSub.on('pmessage', async (pattern, channel, data) => {
 redisSub.psubscribe('m24:service_status_check');
 
 process.on('unhandledRejection', (reason, p) => {
-  if (!['400 - [object Object]'].includes(reason.message)) {
+  if (!/\[object Object\]/.test(reason.message)) {
     console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
     let { message, stack } = reason;
     publish('m24:error', { message: APP_NAME + ` Unhandled Rejection ${message}`, stack })
@@ -19,7 +19,7 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 process.on('uncaughtException', (err) => {
-  if (!['400 - [object Object]'].includes(err.message)) {
+  if (!/\[object Object\]/.test(err.message)) {
     console.log(err);
     publish('m24:error', { message: APP_NAME + ' uncaughtException ' + err.toString(), stack: err.stack })
   }
