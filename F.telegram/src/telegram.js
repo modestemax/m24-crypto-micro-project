@@ -1,4 +1,5 @@
 const debug = require("debug")("F:telegram");
+const _=require('lodash');
 const { valuePercent, saveTrade } = require("common");
 
 const { bot, tme, MAXChatId, XBTTraderChatId } = require('./bot');
