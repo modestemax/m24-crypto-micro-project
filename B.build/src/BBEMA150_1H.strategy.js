@@ -16,9 +16,9 @@ module.exports = class extends Template {
                             if (signal.macdAboveSignal) {
                                 if (last.ema100 >= last.close || last.ema50 >= last.close) {
                                     let ticker = await this.getTicker({ exchange, symbolId });
-                                    if (ticker && ticker.bid) {
-                                        debug(`${symbolId} BID AT ${ticker.bid}`);
-                                        return ticker.bid;
+                                    if (ticker && ticker.ask) {
+                                        debug(`${symbolId} BID AT ${ticker.ask}`);
+                                        return ticker.ask;
                                     }
                                 }
                             }
