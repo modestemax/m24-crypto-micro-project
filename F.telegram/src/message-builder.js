@@ -19,9 +19,9 @@ module.exports = function getMessageText(data) {
 
       text = ["Error", message, stackCmd].join("\n")
       break;
-    case 'algo':
+    case 'pair_found':
       const { side, strategy, symbolId, price } = data;
-      text = [`Algo ${strategy} ${side}`, `${symbolId} at ${price}`].join("\n")
+      text = [`Pair found ${strategy} ${side}`, `${symbolId} at ${price}`].join("\n")
       break;
   }
   return text;

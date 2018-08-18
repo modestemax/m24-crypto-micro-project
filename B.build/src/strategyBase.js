@@ -8,6 +8,7 @@ module.exports = class Strategy {
 
     constructor({ name, ...options }) {
         Object.assign(this, { bid: null, name, options });
+        publish('m24:algo:loaded',this)
     }
 
     async check(signal) {
@@ -41,7 +42,7 @@ module.exports = class Strategy {
 
         const [price, event] = side === 'BUY' ? [bid, 'crypto-bid'] : [ask, 'crypto-ask'];
 
-        publish(`m24:algo`,
+        publish(`m24:algo:pair_found`,
             { side, strategy, symbolId, price, chat_id: strategyOptions.ownerTelegramChatId },
             { rateLimit: 60 * 5 }
         );

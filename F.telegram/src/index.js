@@ -26,7 +26,7 @@ redisSub.on("pmessage", async (pattern, channel, data) => {
 function onM24(channel, data) {
   switch (channel) {
     case "m24:error": data.type = 'error'; break;
-    case `m24:algo`: data.type = 'algo'; break;
+    case `m24:algo:pair_found`: data.type = 'pair_found'; break;
   }
   return data.type && displayMessage(data);
 }
