@@ -26,7 +26,7 @@ module.exports = {
             isActive: false,
             bidMarket: true
         },
-        "BBEMA150_15M": {
+        "BBEMA150-15M": {
             timeframe:15,
             timeInForce: 'FOK',
             takeProfit: 5,
@@ -35,7 +35,7 @@ module.exports = {
             isActive: true,
             bidMarket: true
         },
-        "BBEMA150_1H": {
+        "BBEMA150-1H": {
             timeframe:60,
             timeInForce: 'FOK',
             takeProfit: 5,
