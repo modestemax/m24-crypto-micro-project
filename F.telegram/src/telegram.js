@@ -30,7 +30,7 @@ const $this = module.exports = new class {
   }
 
   newTrade(trade) {
-    const { price: bid, symbolId, target, stopLoss, newClientOrderId } = trade;
+    const { price: bid, symbolId, target, trailling, stopLoss, newClientOrderId } = trade;
     const strategyName = newClientOrderId.split("_")[0];
     const targetPrice = valuePercent(bid, target);
     const stopPrice = valuePercent(bid, stopLoss);
@@ -49,9 +49,15 @@ const $this = module.exports = new class {
   }
 
   async tradeChanged(trade) {
-    const { symbolId, change, strategy, newClientOrderId, maxChange, minChange } = trade;
+    const { symbolId, change, newClientOrderId, maxChange, minChange } = trade;
     $this.tradeChanged[newClientOrderId] = $this.tradeChanged[newClientOrderId] || {};
-
+    //--
+    let strategy = trade.strategy || {}
+    strategy.takeProfit = 5
+    strategy.stopLoss = strategy.stopLoss || -2
+    strategy.trailling = strategy.trailling || 2
+    trade.strategy=strategy;
+    //--
     const strategyName = newClientOrderId.split("_")[0];
     const targetStatus =
       change >= strategy.takeProfit ? "Success" : change > 0 ? "Ok" : "Fail";
