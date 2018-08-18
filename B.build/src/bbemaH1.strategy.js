@@ -3,9 +3,9 @@ const debug = require('debug')('B:strategy:bbemah1');
 Template = require('./strategyBase');
 
 module.exports = class extends Template {
-    constructor(options) {
-        super({ name: 'BBEMAH1', options })
-    }
+    // constructor(options) {
+    //     super({ name: 'BBEMAH1', options })
+    // }
 
     async canBuy(signalH1) {
         const { exchange, symbolId, timeframe, } = signalH1.candle;

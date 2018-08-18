@@ -1,9 +1,9 @@
 Template = require('./strategyBase');
 
 module.exports = class extends Template {
-    constructor(options) {
-        super({ name: 'testEma', options })
-    }
+    // constructor(options) {
+    //     super({ name: 'testEma', options })
+    // }
 
     async canBuy(signal) {
         const { exchange, symbolId, timeframe } = signal.candle;

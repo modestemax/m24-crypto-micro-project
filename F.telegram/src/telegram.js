@@ -6,7 +6,7 @@ const getMessageText = require('./message-builder');
 
 
 const $this = module.exports = new class {
-
+  trades = {}
   constructor() {
     tme.sendMessage({
       chat_id: XBTTraderChatId,
@@ -34,7 +34,7 @@ const $this = module.exports = new class {
     const strategyName = newClientOrderId.split("_")[0];
     const targetPrice = valuePercent(bid, target);
     const stopPrice = valuePercent(bid, stopLoss);
-
+    $this.trades[newClientOrderId] = trade;
     tme.sendMessage({
       chat_id: XBTTraderChatId,
       text: [
@@ -50,18 +50,14 @@ const $this = module.exports = new class {
 
   async tradeChanged(trade) {
     const { symbolId, change, newClientOrderId, maxChange, minChange } = trade;
-    $this.tradeChanged[newClientOrderId] = $this.tradeChanged[newClientOrderId] || {};
+    let {message_id} = $this.trades[newClientOrderId] || trade;
     //--
-    let strategy = trade.strategy || {}
-    strategy.takeProfit = 5
-    strategy.stopLoss = strategy.stopLoss || -2
-    strategy.trailling = strategy.trailling || 2
-    trade.strategy=strategy;
+    let strategy = trade.strategy = _.defaults(trade.strategy, { takeProfit: 3, stopLoss: -3, trailling: 2 })
+
     //--
     const strategyName = newClientOrderId.split("_")[0];
     const targetStatus =
       change >= strategy.takeProfit ? "Success" : change > 0 ? "Ok" : "Fail";
-    let message_id = $this.tradeChanged[newClientOrderId].message_id = trade.message_id || $this.tradeChanged[newClientOrderId].message_id;
     let msg = {
       chat_id: XBTTraderChatId,
       message_id,
@@ -73,9 +69,10 @@ const $this = module.exports = new class {
         `change : ${change.toFixed(2)}% [${targetStatus}]`
       ].join("\n")
     };
+    let message_id = trade.message_id || $trade.message_id;
     if (!message_id) {
       let { message_id } = await tme.sendMessage(msg);
-      trade.message_id = $this.tradeChanged[newClientOrderId].message_id = message_id;
+      trade.message_id = $trade.message_id = message_id;
       await saveTrade(trade);
     } else {
       await tme.editMessageText(msg);

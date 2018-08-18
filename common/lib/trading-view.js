@@ -49,6 +49,7 @@ const params = ({ timeframe, filter = 'btc$', exchangeId = 'binance' } = {}) => 
                 , "BB.upper" + timeframeFilter
                 , "EMA200" + timeframeFilter
                 , "EMA50" + timeframeFilter
+                , "EMA100" + timeframeFilter
             ],
             "sort": { "sortBy": "change" + timeframeFilter, "sortOrder": "desc" },
             "options": { "lang": "en" },
@@ -104,7 +105,8 @@ const beautify = (data, timeframe) => {
             bbu20: d[31],
             bbb20: (d[30] + d[31]) / 2,
             ema200: d[32],
-            ema50: d[33]
+            ema50: d[33],
+            ema100: d[34],
         };
 
         function signal(int) {

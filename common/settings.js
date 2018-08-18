@@ -11,12 +11,32 @@ module.exports = {
             isActive: process.env.NODE_ENV != 'production',
         },
         "emaH1H4": {
+            timeframe:4*60,
             timeInForce: 'GTC',
             takeProfit: null,
             trailingStop: 1,
             isActive: true,
         },
         "bbemaH1": {
+            timeframe:60,
+            timeInForce: 'FOK',
+            takeProfit: 5,
+            stopLoss: -3,
+            trailingStop: 2,
+            isActive: false,
+            bidMarket: true
+        },
+        "BBEMA150_15M": {
+            timeframe:15,
+            timeInForce: 'FOK',
+            takeProfit: 5,
+            stopLoss: -3,
+            trailingStop: 2,
+            isActive: true,
+            bidMarket: true
+        },
+        "BBEMA150_1H": {
+            timeframe:60,
             timeInForce: 'FOK',
             takeProfit: 5,
             stopLoss: -3,

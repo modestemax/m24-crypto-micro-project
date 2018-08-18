@@ -6,7 +6,7 @@ const { findSignal } = candleUtils;
 
 module.exports = class Strategy {
 
-    constructor({ name, options }) {
+    constructor({ name, ...options }) {
         Object.assign(this, { bid: null, name, options });
     }
 
