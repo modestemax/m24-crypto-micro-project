@@ -1,11 +1,11 @@
 const debug = require("debug")("F:telegram");
-const { valuePercent } = require("common");
+const { valuePercent, saveTrade } = require("common");
 
 const { bot, tme, MAXChatId, XBTTraderChatId } = require('./bot');
 const getMessageText = require('./message-builder');
 
 
-module.exports = new class {
+const $this = module.exports = new class {
 
   constructor() {
     tme.sendMessage({
@@ -48,20 +48,32 @@ module.exports = new class {
     });
   }
 
-  tradeChanged(trade) {
-    const { symbolId, change, strategy, newClientOrderId } = trade;
+  async tradeChanged(trade) {
+    const { symbolId, change, strategy, newClientOrderId, maxChange, minChange } = trade;
+    $this.tradeChanged[newClientOrderId] = $this.tradeChanged[newClientOrderId] || {};
+
     const strategyName = newClientOrderId.split("_")[0];
     const targetStatus =
       change >= strategy.takeProfit ? "Success" : change > 0 ? "Ok" : "Fail";
-
-    tme.sendMessage({
+    let message_id = $this.tradeChanged[newClientOrderId].message_id = trade.message_id || $this.tradeChanged[newClientOrderId].message_id;
+    let msg = {
       chat_id: XBTTraderChatId,
+      message_id,
       text: [
         "trade changed",
         `${strategyName}, ${symbolId}`,
+        `max ${maxChange.toFixed(2)}% : min ${minChange.toFixed(2)}%`,
         `change : ${change.toFixed(2)}% [${targetStatus}]`
       ].join("\n")
-    });
+    };
+    if (!message_id) {
+      let { message_id } = await tme.sendMessage(msg);
+      trade.message_id = $this.tradeChanged[newClientOrderId].message_id = message_id;
+      await saveTrade(trade);
+    } else {
+     let a=await tme.editMessageText(msg);
+     debugger
+    }
   }
 
   orderExpiredOrCanceled(order) {

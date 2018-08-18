@@ -14,7 +14,7 @@ module.exports = function getMessageText(data) {
       if (stack) {
         const stackId = _.uniqueId();
         redisSet({ key: 'errorstack' + stackId, data: stack, expire: 24 * 60 * 60 }) //24 hour
-        stackCmd = `get error stack at /errorstack providing this id: ${stackId}`;
+        stackCmd = `get error stack at /error_stack providing this id: ${stackId}`;
       }
 
       text = ["Error", message, stackCmd].join("\n")

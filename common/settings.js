@@ -18,9 +18,9 @@ module.exports = {
         },
         "bbemaH1": {
             timeInForce: 'FOK',
-            takeProfit: 15,
-            stopLoss: null,
-            trailingStop: null,
+            takeProfit: 5,
+            stopLoss: -3,
+            trailingStop: 2,
             isActive: true,
             bidMarket: true
         }
