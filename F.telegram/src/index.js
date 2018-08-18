@@ -27,6 +27,7 @@ function onM24(channel, data) {
   switch (channel) {
     case "m24:error": data.type = 'error'; break;
     case `m24:algo:pair_found`: data.type = 'pair_found'; break;
+    case `m24:algo:loaded`: data.type = 'algo_loaded'; break;
   }
   return data.type && displayMessage(data);
 }

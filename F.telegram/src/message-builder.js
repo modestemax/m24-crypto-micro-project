@@ -23,6 +23,9 @@ module.exports = function getMessageText(data) {
       const { side, strategy, symbolId, price } = data;
       text = [`Pair found ${strategy} ${side}`, `${symbolId} at ${price}`].join("\n")
       break;
+    case 'algo_loaded':
+      text = ["Algo loaded", JSON.stringify(data)].join('\n')
+      break;
   }
   return text;
 

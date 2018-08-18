@@ -6,8 +6,9 @@ const getMessageText = require('./message-builder');
 
 
 const $this = module.exports = new class {
-  trades = {}
+
   constructor() {
+    this.trades = {};
     tme.sendMessage({
       chat_id: XBTTraderChatId,
       text: [
@@ -50,7 +51,7 @@ const $this = module.exports = new class {
 
   async tradeChanged(trade) {
     const { symbolId, change, newClientOrderId, maxChange, minChange } = trade;
-    let {message_id} = $this.trades[newClientOrderId] || trade;
+    let { message_id } = $this.trades[newClientOrderId] || trade;
     //--
     let strategy = trade.strategy = _.defaults(trade.strategy, { takeProfit: 3, stopLoss: -3, trailling: 2 })
 
