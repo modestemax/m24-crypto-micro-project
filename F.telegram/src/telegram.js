@@ -63,6 +63,7 @@ const $this = module.exports = new class {
         "trade changed",
         `${strategyName}, ${symbolId}`,
         `max ${maxChange.toFixed(2)}% : min ${minChange.toFixed(2)}%`,
+        `stop ${strategy.stopLoss} : profit ${strategy.takeProfit}`,
         `change : ${change.toFixed(2)}% [${targetStatus}]`
       ].join("\n")
     };
@@ -71,8 +72,7 @@ const $this = module.exports = new class {
       trade.message_id = $this.tradeChanged[newClientOrderId].message_id = message_id;
       await saveTrade(trade);
     } else {
-     let a=await tme.editMessageText(msg);
-     debugger
+      await tme.editMessageText(msg);
     }
   }
 
