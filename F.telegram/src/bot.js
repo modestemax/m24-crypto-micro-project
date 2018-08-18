@@ -9,7 +9,8 @@ if (process.env.NODE_ENV == 'production') {
 } else {
 
     bot = new Bot("496655496:AAFmg9mheE9urDt2oCQDIRL5fXjCpGYiAug"); //m24test
-    MAXChatId = "475514014";//"@modestemax";
+    MAXChatId = "@modestemax";
+    // MAXChatId = "475514014";//"@modestemax";
     XBTTraderChatId = MAXChatId// "-1001169214481";//"M24";
 }
 const tme = bot.api;
