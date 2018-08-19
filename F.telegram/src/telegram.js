@@ -55,6 +55,7 @@ const $this = module.exports = new class {
     let $trade = $this.trades[newClientOrderId] = $this.trades[newClientOrderId] || trade;
     //--
     let strategy = trade.strategy = _.defaults(trade.strategy, { takeProfit: 3, stopLoss: -3, trailling: 2 })
+    let message_id = trade.message_id || $trade.message_id;
 
     //--
     const strategyName = newClientOrderId.split("_")[0];
@@ -71,7 +72,6 @@ const $this = module.exports = new class {
         `change : ${change.toFixed(2)}% [${targetStatus}]`
       ].join("\n")
     };
-    let message_id = trade.message_id || $trade.message_id;
     if (!message_id) {
       let { message_id } = await tme.sendMessage(msg);
       trade.message_id = $trade.message_id = message_id;
