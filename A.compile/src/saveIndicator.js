@@ -15,7 +15,7 @@ module.exports = function ({ appEmitter }) {
         });
         const jsData = (_.omit(signal, ['points']));
         await publish(`newData:m${timeframe}`, jsData);
-        await redisSet({ key, data: jsData, expire: 7 * 24 * 60 * 60 }); //last 7 days
+        // await redisSet({ key, data: jsData, expire: 7 * 24 * 60 * 60 }); //last 7 days
         //console.log(key + ' saved');
     });
 };

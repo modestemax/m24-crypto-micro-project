@@ -12,7 +12,7 @@ module.exports = {
       "exec_mode": "cluster",
       env: {
         COMMON_VARIABLE: 'true',
-        "DEBUG": "*"
+        // "DEBUG": "*"
       },
       env_production: {
         NODE_ENV: 'production'
@@ -24,7 +24,7 @@ module.exports = {
       "exec_mode": "cluster",
       env: {
         COMMON_VARIABLE: 'true',
-        "DEBUG": "*"
+        // "DEBUG": "*"
       },
       env_production: {
         NODE_ENV: 'production'
@@ -36,7 +36,7 @@ module.exports = {
       "exec_mode": "cluster",
       env: {
         COMMON_VARIABLE: 'true',
-        "DEBUG": "*"
+        // "DEBUG": "*"
       },
       env_production: {
         NODE_ENV: 'production'
@@ -48,7 +48,7 @@ module.exports = {
       "exec_mode": "cluster",
       env: {
         COMMON_VARIABLE: 'true',
-        "DEBUG": "*"
+        // "DEBUG": "*"
       },
       env_production: {
         NODE_ENV: 'production'
@@ -59,7 +59,7 @@ module.exports = {
       script: 'A.compile/src/index.js',
       "exec_mode": "cluster",
       env: {
-        DEBUG: '*',
+        // DEBUG: '*',
         SYMBOLS_FILTER: 'btc$',
         // SYMBOLS_FILTER: '(eth|xrp|bcc|ltc|eos|ada|xlm|miota|trx|neo|tusd|bcn|xmr|dash|xem|ven|bnb|etc|qtum|ont)btc$',
         EXCHANGE: 'binance',
