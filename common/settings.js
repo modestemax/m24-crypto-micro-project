@@ -8,7 +8,8 @@ module.exports = {
             stopLoss: -2,
             trailingstop: 0,
             cancelBidAfterSecond: 30,
-            isActive: process.env.NODE_ENV != 'production',
+            // isActive: process.env.NODE_ENV != 'production',
+            isActive:false
         },
         "emaH1H4": {
             timeframe:4*60,
