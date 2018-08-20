@@ -17,11 +17,12 @@ module.exports = class extends Template {
             if (last && prev) {
                 if (prev.ema200 > prev.bbu20) {
                     if (last.ema200 < last.bbu20) {
-                        if (signalH1.macdAboveSignal) {
+                        if (last.macd > last.macdSignal) {
                             if (signalH1.macdAboveZero) {
                                 // if (signalH1.rsiBelowHighRef) {
                                 const signalH4 = await this.findSignal({ exchange, symbolId, timeframe: 4 * 60, position: 0 });
-                                if (signalH4.macdAboveSignal) {
+                                const lastH4 = signalH4.candle;
+                                if (lastH4.macd > lastH4.macdSignal) {
                                     let ticker = await this.getTicker({ exchange, symbolId });
                                     if (ticker && ticker.ask) {
                                         debug(`${symbolId} BID AT ${ticker.ask}`);
