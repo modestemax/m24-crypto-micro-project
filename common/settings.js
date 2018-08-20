@@ -16,7 +16,7 @@ module.exports = {
             timeInForce: 'GTC',
             takeProfit: null,
             trailingStop: 1,
-            isActive: true,
+            isActive: false,
         },
         "bbemaH1": {
             timeframe:60,
@@ -33,10 +33,28 @@ module.exports = {
             takeProfit: 5,
             stopLoss: -3,
             trailingStop: 2,
-            isActive: true,
+            isActive: false,
             bidMarket: true
         },
         "BBEMA150-1H": {
+            timeframe:60,
+            timeInForce: 'FOK',
+            takeProfit: 5,
+            stopLoss: -3,
+            trailingStop: 2,
+            isActive: false,
+            bidMarket: true
+        },
+        "BBEMA180-15M": {
+            timeframe:15,
+            timeInForce: 'FOK',
+            takeProfit: 5,
+            stopLoss: -3,
+            trailingStop: 2,
+            isActive: true,
+            bidMarket: true
+        },
+        "BBEMA180-1H": {
             timeframe:60,
             timeInForce: 'FOK',
             takeProfit: 5,
