@@ -21,7 +21,7 @@ const commands = {
 		message.send("Enter the error stack number!");
 
 		message.answer(async (message) => {
-			let stack = (await redisGet(+'errorstack'+message.text.trim())) || "Error Stack not found";
+			let stack = (await redisGet('errorstack' + message.text.trim())) || "Error Stack not found";
 			message.send(stack)
 		});
 	},

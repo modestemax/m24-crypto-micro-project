@@ -102,10 +102,10 @@ const $this = module.exports = new class {
       text: [
         "trade ended",
         `${strategyName}, ${symbolId}`,
-        `bid : ${bid}`,
-        `sell : ${ask}`,
-        `change : ${change} [${targetStatus}]`,
-        `trade result : *${result}*`
+        // `bid : ${bid}`,
+        // `sell : ${ask}`,
+        // `change : ${change} [${targetStatus}]`,
+        // `trade result : *${result}*`
       ].join("\n")
     });
   }

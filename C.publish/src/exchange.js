@@ -103,6 +103,7 @@ async function controlTrade(trade) {
       }
       if (stopLoss) {
         trade.stopLoss = trade.stopLoss || stopLoss;
+        trade.stopLoss = Math.max(trade.stopLoss, trade.change > 1 ? 1 : trade.stopLoss);
         if (trade.change <= trade.stopLoss) {
           exchange.createMarketSellOrder(market.symbol, quantity, { newClientOrderId });
           return;
@@ -110,7 +111,7 @@ async function controlTrade(trade) {
       }
       if (trailingStop) {
         let trail = Math.trunc(trade.change / trailingStop) * trailingStop;
-        trade.stopLoss = stopLoss + trail;
+        trade.stopLoss = Math.max(trade.stopLoss, stopLoss + trail);
       }
     }
   } finally {
