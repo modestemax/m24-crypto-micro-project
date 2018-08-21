@@ -22,7 +22,7 @@ async function buildAll(markets) {
 
 async function build({ signal }) {
 
-    backupLastPoints({ signal, count: +signal.timeframe === 1 ? 60 : void 0 });
+    backupLastPoints({ signal });
     buildIndicators({ signal, /*timeframes*/ });
 
 }
@@ -32,7 +32,7 @@ function getChangePercentage({ high, low }) {
     return (high - low) / Math.abs(low) * 100;
 }
 
-function backupLastPoints({ limitPointCount = 15, signal, /* timeframes = [5, 15, 60]*/ }) {
+function backupLastPoints({ limitPointCount = 3, signal, /* timeframes = [5, 15, 60]*/ }) {
     const { symbolId, timeframe } = signal;
     init();
     savePoints();
@@ -49,7 +49,7 @@ function backupLastPoints({ limitPointCount = 15, signal, /* timeframes = [5, 15
                 points.push(signal);
                 points.splice(0, points.length - limitPointCount);
             }
-            redisSet({ key: `points:${symbolId}:${timeframe}`, data: (points), expire: timeframe * 60 + 30 });
+            redisSet({ key: `points:${symbolId}:${timeframe}`, data: (points), expire: timeframe * 60 + 5*60 });
         }
     }
 
@@ -100,7 +100,7 @@ function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQuote =
 
             const specialData = getSpecialData({ symbolId, timeframe });
 
-            _.extend(specialData, { points, candle: last });
+            _.extend(specialData, { points, candle: last ,candle_1:prev});
             close();
             ema();
             rsi();
