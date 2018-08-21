@@ -43,6 +43,4 @@ redisSubscribe('crypto:*', {
 
   }
 });
-
-;
-
+ 
