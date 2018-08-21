@@ -1,6 +1,6 @@
 const debug = require('debug')('B:strategy:bbemah1');
 
-Template = require('./strategyBase');
+const Template = require('./strategyBase');
 
 module.exports = class extends Template {
     // constructor(options) {

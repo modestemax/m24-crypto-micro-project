@@ -1,4 +1,4 @@
-Template = require('./strategyBase');
+const Template = require('./strategyBase');
 
 module.exports = class extends Template {
     // constructor(options) {

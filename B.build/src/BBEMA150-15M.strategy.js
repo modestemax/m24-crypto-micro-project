@@ -1,6 +1,6 @@
 const debug = require('debug')('B:strategy:bbema150-15M');
 
-Template = require('./strategyBase');
+const Template = require('./strategyBase');
 
 module.exports = class extends Template {
 

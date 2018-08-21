@@ -56,6 +56,9 @@ module.exports = {
             trailingStop: 2,
             // isActive: true,
             bidMarket: true
+        },
+        "binance_24h": {
+            isActive: true,
         }
     }),
 };
