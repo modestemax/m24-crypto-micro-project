@@ -44,7 +44,7 @@ function subscribe(event, handlers) {
   redis.on('pmessage', async (pattern, channel, data) => {
     const json = JSON.parse(data);
     for (regex in handlers) {
-      if (regex.test(channel)) {
+      if (new RegExp(regex).test(channel)) {
         handlers[regex](json);
       }
     }

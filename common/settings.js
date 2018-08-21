@@ -1,4 +1,4 @@
-const  defaultStrategyOptions= {
+const defaultStrategyOptions = {
     isActive: false,
     timeInForce: 'FOK',
     bidMarket: false,
@@ -11,6 +11,7 @@ const  defaultStrategyOptions= {
 
 module.exports = {
     MAX_TRADE_COUNT_PER_STRATEGY: 3,
+    MAX_TRADE_COUNT: 5,
     defaultStrategyOptions,
     strategies: filterActive({
         "testEma01": {
@@ -19,15 +20,15 @@ module.exports = {
             stopLoss: -2,
             trailingstop: 0,
             cancelBidAfterSecond: 30,
-            // isActive: process.env.NODE_ENV != 'production',
-            isActive: false
+            isActive: process.env.NODE_ENV != 'production',
+            // isActive: false
         },
         "emaH1H4": {
             timeframe: 4 * 60,
             timeInForce: 'GTC',
             takeProfit: null,
             trailingStop: 1,
-            isActive: true,
+            // isActive: true,
         },
         "bbemaH1": {
             timeframe: 60,
@@ -35,7 +36,7 @@ module.exports = {
             takeProfit: 5,
             stopLoss: -3,
             trailingStop: 2,
-            isActive: false,
+            // isActive: false,
             bidMarket: true
         },
         "BBEMA150-15M": {
@@ -44,7 +45,7 @@ module.exports = {
             takeProfit: 5,
             stopLoss: -3,
             trailingStop: 2,
-            isActive: true,
+            // isActive: true,
             bidMarket: true
         },
         "BBEMA150-1H": {
@@ -53,7 +54,7 @@ module.exports = {
             takeProfit: 5,
             stopLoss: -3,
             trailingStop: 2,
-            isActive: true,
+            // isActive: true,
             bidMarket: true
         }
     }),

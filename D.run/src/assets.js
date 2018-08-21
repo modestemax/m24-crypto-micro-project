@@ -12,7 +12,7 @@ const $this = module.exports = {
         let { cancelBidAfterSecond } = strategy;
         let now = Date.now();
         if (now - orderTime > cancelBidAfterSecond * 1e3) {
-          publish("cancelOrder", { orderId });
+          publish("crypto:cancel_order", { orderId });
         } else {
           setTimeout(() => $this.tryToBuy.apply(this, arguments),
             orderTime + cancelBidAfterSecond * 1e3 - now
@@ -29,6 +29,8 @@ const $this = module.exports = {
         strategy: Object.assign({}, strategies[strategyName]),
         openPrice, quantity, stopTick
       }
+    }else{
+      stopTick()
     }
   },
   onSell({ symbolId, clientOrderId, openPrice, quantity, }) {
@@ -64,14 +66,14 @@ function takeADecision(asset) {
   const { takeProfit, stopLoss, trailingStop } = strategy;
   if (takeProfit) {
     if (change >= takeProfit) {
-      publish('asset:sell_market', asset)
+      publish('crypto:sell_market', asset)
       return;
     }
   }
   if (stopLoss) {
     strategy.stopLoss = Math.max(stopLoss, change > 1 ? 1 : stopLoss);
     if (change <= stopLoss) {
-      publish('asset:sell_market', asset)
+      publish('crypto:sell_market', asset)
       return;
     }
   }

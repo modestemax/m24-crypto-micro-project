@@ -15,7 +15,7 @@ function assetChangeManangement() {
     switch (msg.eventType) {
       case "executionReport":
         const order = Object.assign({ symbolId: msg.symbol }, msg);
-        const { symbolId, orderId, newClientOrderId:clientOrderId, price, quantity, orderTime } = order;
+        const { symbolId, orderId, newClientOrderId: clientOrderId, price, quantity, orderTime } = order;
         switch (msg.side) {
           case "BUY":
             switch (msg.orderStatus) {
@@ -23,22 +23,22 @@ function assetChangeManangement() {
                 //new order
                 debug("trying to buy " + order.symbolId);
                 tryToBuy({ orderId, clientOrderId, orderTime });
-                publish("asset:buy:order", order);
+                // publish("asset:buy:order", order);
                 break;
               case "FILLED":
                 //filled bid    
                 debug("buy ok " + order.symbolId);
-                onBuy({ symbolId,clientOrderId, price, quantity, stopTick: listenToPriceChange(symbolId) });
-                publish("asset:buy:success", order);
+                onBuy({ symbolId, clientOrderId, price, quantity, stopTick: listenToPriceChange(symbolId) });
+                // publish("asset:buy:success", order);
                 break;
               case "EXPIRED":
                 //filled bid
                 debug("buy fail " + order.symbolId);
-                publish("asset:buy:oredr_expired", order);
+                // publish("asset:buy:oredr_expired", order);
                 break;
               case "CANCELED":
                 debug("order CANCELED " + order.symbolId);
-                publish("asset:buy:oredr_canceled", order);
+                // publish("asset:buy:oredr_canceled", order);
                 break;
             }
             break;
@@ -54,7 +54,7 @@ function assetChangeManangement() {
                 //filled bid        
                 debug("sell ok " + order.symbolId);
                 onSell(order);
-                publish("asset:sell:success", order);
+                // publish("asset:sell:success", order);
                 break;
               case "REJECTED":
                 switch (msg.orderRejectReason) {
