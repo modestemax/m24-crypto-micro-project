@@ -37,13 +37,12 @@ module.exports = class Strategy {
         this.notify('SELL')
     }
     notify(side) {
-        const { name: strategy, closePrice, openPrice, exchange, symbolId, timeframe } = this;
-        let order = ({ strategy, openPrice: openPrice, closePrice, exchange, symbolId, timeframe });
+        const { name: strategy, ask, bid, symbolId, timeframe } = this;
+        let order = ({ strategy, bid, ask, symbolId, timeframe });
 
-        const [price, event] = side === 'BUY' ?
-            [openPrice, 'crypto:buy_limit'] : [closePrice, 'crypto:sell_limit'];
+        const [price, event] = side === 'BUY' ? [bid, 'crypto-bid'] : [ask, 'crypto-ask'];
 
-        publish(`m24:algo:pair_found`, { side, strategy, symbolId, price, }, { rateLimit: 60 * 5 });
+        publish(`m24:algo:pair_found`, { side, strategy, symbolId, price }, { rateLimit: 60 * 5 });
         if (price) {
             publish(event, order);
             debug(`[strategy:${strategy}] ${side} ${symbolId} at price: ${price}`)
