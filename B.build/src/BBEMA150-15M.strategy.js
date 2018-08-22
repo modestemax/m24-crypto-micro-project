@@ -1,6 +1,6 @@
 const debug = require('debug')('B:strategy:bbema150-15M');
 
-Template = require('./strategyBase');
+const Template = require('./strategyBase');
 
 module.exports = class extends Template {
 
@@ -9,8 +9,9 @@ module.exports = class extends Template {
         //timeframe H1
         if (+timeframe === this.options.timeframe) {
             const last = signal.candle;
-            const signalH1_1 = await this.findSignal({ exchange, symbolId, timeframe: 60, position: 1 });
-            const prev = signalH1_1 && signalH1_1.candle;
+            const prev = signal.candle_1;
+            // const signalH1_1 = await this.findSignal({ exchange, symbolId, timeframe: 60, position: 1 });
+            // const prev = signalH1_1 && signalH1_1.candle;
             if (last && prev) {
                 if (prev.ema50 > prev.bbb20) {
                     if (last.ema100 < last.bbu20) {

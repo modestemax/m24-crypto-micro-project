@@ -1,87 +1,74 @@
+const defaultStrategyOptions = {
+    isActive: false,
+    timeInForce: 'FOK',
+    bidMarket: false,
+    takeProfit: 3,
+    stopLoss: -2,
+    trailingStop: 1.5,
+    cancelBidAfterSecond: 60 * 60,//1hour,
+    ownerTelegramChatId: "475514014",//"@modestemax";
+};
+
 module.exports = {
     MAX_TRADE_COUNT_PER_STRATEGY: 3,
-
+    MAX_TRADE_COUNT: 5,
+    defaultStrategyOptions,
     strategies: filterActive({
         "testEma01": {
-            timeInForce: 'GTC',
-            takeProfit: 1,
-            stopLoss: -2,
-            trailingstop: 0,
+            timeInForce: 'GTC',            
             cancelBidAfterSecond: 30,
-            // isActive: process.env.NODE_ENV != 'production',
-            isActive:false
+            isActive: process.env.NODE_ENV != 'production',
+            // isActive: false
         },
         "emaH1H4": {
-            timeframe:4*60,
+            timeframe: 4 * 60,
             timeInForce: 'GTC',
             takeProfit: null,
             trailingStop: 1,
-            isActive: false,
+            // isActive: true,
         },
         "bbemaH1": {
-            timeframe:60,
-            timeInForce: 'FOK',
-            takeProfit: 5,
-            stopLoss: -3,
-            trailingStop: 2,
-            isActive: false,
+            timeframe: 60,
+            timeInForce: 'FOK',          
+            // isActive: false,
             bidMarket: true
         },
         "BBEMA150-15M": {
-            timeframe:15,
-            timeInForce: 'FOK',
-            takeProfit: 5,
-            stopLoss: -3,
-            trailingStop: 2,
-            isActive: false,
+            timeframe: 15,
+            timeInForce: 'FOK',           
+            // isActive: false,
             bidMarket: true
         },
         "BBEMA150-1H": {
-            timeframe:60,
-            timeInForce: 'FOK',
-            takeProfit: 5,
-            stopLoss: -3,
-            trailingStop: 2,
-            isActive: false,
+            timeframe: 60,
+            timeInForce: 'FOK',          
+            // isActive: false,
             bidMarket: true
         },
         "BBEMA180-15M": {
             timeframe:15,
-            timeInForce: 'FOK',
-            takeProfit: 5,
-            stopLoss: -3,
-            trailingStop: 2,
+            timeInForce: 'FOK',         
             isActive: true,
             bidMarket: true
         },
         "BBEMA180-1H": {
             timeframe:60,
-            timeInForce: 'FOK',
-            takeProfit: 5,
-            stopLoss: -3,
-            trailingStop: 2,
+            timeInForce: 'FOK',          
             isActive: true,
             bidMarket: true
+        },
+        "binance-24h": {
+            isActive: true,
+            timeInForce: 'GTC',
         }
     }),
-
-    defaultStrategyOptions: {
-        isActive: false,
-        timeInForce: 'FOK',
-        bidMarket: false,
-        takeProfit: 1,
-        stopLoss: -2,
-        trailingStop: 3,
-        cancelBidAfterSecond: 60 * 60,//1hour,
-        ownerTelegramChatId: "475514014",//"@modestemax";
-    },
 };
 
 function filterActive(objects) {
     const result = {};
     for (key in objects) {
         if (objects[key].isActive) {
-            result[key] = objects[key];
+            result[key] = Object.assign({}, defaultStrategyOptions, objects[key]);
         }
     }
     return result;

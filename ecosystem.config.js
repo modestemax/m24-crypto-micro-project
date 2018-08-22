@@ -11,7 +11,7 @@ module.exports = {
       script: 'F.telegram/src/index.js',
       "exec_mode": "cluster",
       env: {
-        COMMON_VARIABLE: 'true',
+        APP_NAME:'Telegram IHM',
         // "DEBUG": "*"
       },
       env_production: {
@@ -23,7 +23,7 @@ module.exports = {
       script: 'D.run/src/index.js',
       "exec_mode": "cluster",
       env: {
-        COMMON_VARIABLE: 'true',
+        APP_NAME:'BINANCE Event Listener',
         // "DEBUG": "*"
       },
       env_production: {
@@ -35,7 +35,7 @@ module.exports = {
       script: 'C.publish/src/index.js',
       "exec_mode": "cluster",
       env: {
-        COMMON_VARIABLE: 'true',
+        APP_NAME:'BID/ASK Maker',
         // "DEBUG": "*"
       },
       env_production: {
@@ -47,7 +47,7 @@ module.exports = {
       script: 'B.build/src/index.js',
       "exec_mode": "cluster",
       env: {
-        COMMON_VARIABLE: 'true',
+        APP_NAME:'Strategy Matcher',
         // "DEBUG": "*"
       },
       env_production: {
@@ -60,9 +60,9 @@ module.exports = {
       "exec_mode": "cluster",
       env: {
         // DEBUG: '*',
+        APP_NAME:'Signal Compiler',
         SYMBOLS_FILTER: 'btc$',
         // SYMBOLS_FILTER: '(eth|xrp|bcc|ltc|eos|ada|xlm|miota|trx|neo|tusd|bcn|xmr|dash|xem|ven|bnb|etc|qtum|ont)btc$',
-        EXCHANGE: 'binance',
         TIMEFRAMES: '15,60,240'
       },
       env_production: {

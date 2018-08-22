@@ -1,4 +1,4 @@
-const { redisKeysExists,redisGet, computeChange } = require('./utils');
+const { redisKeysExists, redisGet } = require('./utils');
 
 const $this = module.exports = {
     timeframeDuration: (timeframe) => timeframe * 60e3,
@@ -39,20 +39,20 @@ const $this = module.exports = {
         let key = await $this.keyExistsAtPosition({ exchange, symbolId, timeframe, position });
         if (key) {
             let signal = await redisGet(key);
-            return JSON.parse(signal);
+            return (signal);
         }
     },
     async findSignal24H({ exchange, symbolId }) {
         let key = await $this.keyExistsAtPosition({ exchange, symbolId, timeframe: 240, position: 6 });
         if (key) {
             let signal = await redisGet(key);
-            return JSON.parse(signal);
+            return  (signal);
         }
     },
     async change24H({ exchange, symbolId }) {
         let signal = await $this.findSignal24H({ exchange, symbolId });
         if (signal) {
-            return computeChange(signal.candle.open, signal.candle.close);
+            return $this.computeChange(signal.candle.open, signal.candle.close);
         }
     },
     async   getLastKey({ exchange, symbolId, timeframe, position = 0 }) {
@@ -63,4 +63,10 @@ const $this = module.exports = {
             return $this.getLastKey({ exchange, symbolId, timeframe, position: position + 1 })
         }
     },
+    computeChange(openPrice, closePrice) {
+        return ((closePrice - openPrice) / openPrice) * 100;
+    },
+    valuePercent(price, changePercent) {
+        return price * (1 + changePercent);
+    }
 }

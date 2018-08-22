@@ -1,14 +1,14 @@
 const debug = require('debug')('B:strategy-base');
 const _ = require('lodash');
 
-const { tradingView, redisKeysExists, redisGet, redisSet, publish, candleUtils, computeChange } = require('common');
+const { tradingView, publish, candleUtils, computeChange } = require('common');
 const { findSignal } = candleUtils;
 
 module.exports = class Strategy {
 
     constructor({ name, ...options }) {
         Object.assign(this, { bid: null, name, options });
-        publish('m24:algo:loaded',this)
+        publish('m24:algo:loaded', this)
     }
 
     async check(signal) {
@@ -37,18 +37,15 @@ module.exports = class Strategy {
         this.notify('SELL')
     }
     notify(side) {
-        const { name: strategy, options: strategyOptions, ask, bid, exchange, symbolId, timeframe } = this;
-        let order = ({ strategy, strategyOptions, bid, ask, exchange, symbolId, timeframe });
+        const { name: strategyName, ask: closePrice, bid: openPrice, symbolId, timeframe } = this;
+        let order = ({ strategyName, openPrice, closePrice, symbolId, timeframe });
 
-        const [price, event] = side === 'BUY' ? [bid, 'crypto-bid'] : [ask, 'crypto-ask'];
+        const [price, event] = side === 'BUY' ? [openPrice, 'crypto:buy_limit'] : [closePrice, 'crypto:sell_limit'];
 
-        publish(`m24:algo:pair_found`,
-            { side, strategy, symbolId, price, chat_id: strategyOptions.ownerTelegramChatId },
-            { rateLimit: 60 * 5 }
-        );
+        publish(`m24:algo:pair_found`, { side, strategyName, symbolId, price }, { rateLimit: 60 * 5 });
         if (price) {
             publish(event, order);
-            debug(`[strategy:${strategy}] ${side} ${symbolId} at price: ${price}`)
+            debug(`[strategy:${strategyName}] ${side} ${symbolId} at price: ${price}`)
         }
     }
 

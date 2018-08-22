@@ -9,8 +9,7 @@ module.exports = class extends Template {
         //timeframe H1
         if (+timeframe === this.options.timeframe) {
             const last = signal.candle;
-            const signalH1_1 = await this.findSignal({ exchange, symbolId, timeframe: 60, position: 1 });
-            const prev = signalH1_1 && signalH1_1.candle;
+            const prev = signal.candle_1;
             if (last && prev) {
                 if (prev.ema100 >= prev.ema10) {
                     if (last.ema100 < last.ema10) {
