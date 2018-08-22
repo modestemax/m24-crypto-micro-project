@@ -9,4 +9,4 @@ redisSubscribe('m24:*', require('./m24-events'));
 
 redisSubscribe('asset:*', require('./assets-events'));
 
-debug('telegram bot started')
+console.log(process.env.APP_NAME+ ' Running '+ new Date());

@@ -14,4 +14,4 @@ redisSubscribe('newData:.*', {
     }
 });
 
-debug('Strategies Running');
+console.log(process.env.APP_NAME+ ' Running '+ new Date());

@@ -13,4 +13,4 @@ redisSubscribe('asset:*', {
 });
 
 assetChangeManangement();
-publish('asset:load');
+publish('asset:load',"");

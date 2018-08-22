@@ -1,14 +1,10 @@
-const { getRedis, publish } = require('./utils');
+const { getRedis, subscribe, publish } = require('./redis');
 const redisSub = getRedis();
 const APP_NAME = process.env.APP_NAME || process.argv[1];
 
-redisSub.on('pmessage', async (pattern, channel, data) => {
-
-  if (channel === 'm24:service_status_check') {
-    publish('m24:service_status', Object.assign(JSON.parse(data), { text: process.env.STATUS_OK_TEXT || APP_NAME }))
-  }
+subscribe('m24:service_status_check', async (data) => {
+  publish('m24:service_status', Object.assign(JSON.parse(data), { text: APP_NAME + ' OK' }))
 });
-redisSub.psubscribe('m24:service_status_check');
 
 process.on('unhandledRejection', (reason, p) => {
   if (!/\[object Object\]/.test(reason.message)) {
