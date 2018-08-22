@@ -63,6 +63,7 @@ function backupLastPoints({ limitPointCount = 3, signal, /* timeframes = [5, 15,
         if (!points) {
             redisGet(`points:${symbolId}:${timeframe}`).then(points => {
                 points = points || [];
+                if(!points.push)points=[];
                 backupLastPoints.tendances[symbolId][timeframe] = points;
             })
         }
