@@ -1,6 +1,8 @@
+const _ = require('lodash');
 const { strategies } = require('common/settings');
-const { valuePercent, computeChange } = require("common").candleUtils;
-
+const { candleUtils, redis } = require("common");
+const { valuePercent, computeChange } = candleUtils;
+const { publish } = redis;
 const assets = {};
 
 const $this = module.exports = {
@@ -29,28 +31,37 @@ const $this = module.exports = {
         strategy: Object.assign({}, strategies[strategyName]),
         openPrice, quantity, stopTick
       }
-    }else{
+    } else {
       stopTick()
     }
   },
-  onSell({ symbolId, clientOrderId, openPrice, quantity, }) {
+  onSell({ symbolId, clientOrderId, price, quantity, }) {
     debugger
-    delete assets[clientOrderId]
+    const asset = assets[clientOrderId];
+    if (asset) {
+      asset.stopTick();
+      delete assets[clientOrderId];
+      // $this.onPriceChanged({ symbolId: asset.symbolId, lastPrice: price });
+      publish("asset:sell:success", asset);
+    } else {
+      publish("asset:sell:success", { symbolId, clientOrderId, price, quantity });
+    }
+
   },
   onBalanceChanged(balances) { },
-  onPriceChanged({ symbolId, closePrice }) {
+  onPriceChanged({ symbolId, lastPrice }) {
     const assetsChanged = _.filter(assets, { symbolId })
     _.forEach(assetsChanged, asset => {
       if (asset) {
-        asset.closePrice = closePrice
+        asset.closePrice = lastPrice
         asset.prevChange = asset.change;
         asset.change = computeChange(asset.openPrice, asset.closePrice);
-        if (asset.change !== asset.lastChange) {
+        if (asset.change !== asset.prevChange) {
           asset.maxChange = _.max([asset.maxChange, asset.change]);
           asset.minChange = _.min([asset.minChange, asset.change]);
 
-          if (Math.abs(asset.lastChange - asset.change) > 0.1) {
-            publish("trade:changed", asset);
+          if (Math.abs(asset.prevChange - asset.change) > 0.1) {
+            publish("asset:value_changed", asset);
           }
         }
         takeADecision(asset);

@@ -39,14 +39,14 @@ const $this = module.exports = {
         let key = await $this.keyExistsAtPosition({ exchange, symbolId, timeframe, position });
         if (key) {
             let signal = await redisGet(key);
-            return JSON.parse(signal);
+            return (signal);
         }
     },
     async findSignal24H({ exchange, symbolId }) {
         let key = await $this.keyExistsAtPosition({ exchange, symbolId, timeframe: 240, position: 6 });
         if (key) {
             let signal = await redisGet(key);
-            return JSON.parse(signal);
+            return  (signal);
         }
     },
     async change24H({ exchange, symbolId }) {

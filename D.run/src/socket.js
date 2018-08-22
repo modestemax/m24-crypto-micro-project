@@ -15,6 +15,7 @@ function assetChangeManangement() {
     switch (msg.eventType) {
       case "executionReport":
         const order = Object.assign({ symbolId: msg.symbol }, msg);
+        order.clientOrderId = order.clientOrderId || order.newClientOrderId;
         const { symbolId, orderId, newClientOrderId: clientOrderId, price, quantity, orderTime } = order;
         switch (msg.side) {
           case "BUY":
@@ -23,22 +24,22 @@ function assetChangeManangement() {
                 //new order
                 debug("trying to buy " + order.symbolId);
                 tryToBuy({ orderId, clientOrderId, orderTime });
-                // publish("asset:buy:order", order);
+                publish("asset:buy:order_new", order);
                 break;
               case "FILLED":
                 //filled bid    
                 debug("buy ok " + order.symbolId);
-                onBuy({ symbolId, clientOrderId, price, quantity, stopTick: listenToPriceChange(symbolId) });
-                // publish("asset:buy:success", order);
+                onBuy({ symbolId, clientOrderId, openPrice: price, quantity, stopTick: listenToPriceChange(symbolId) });
+                publish("asset:buy:success", order);
                 break;
               case "EXPIRED":
                 //filled bid
                 debug("buy fail " + order.symbolId);
-                // publish("asset:buy:oredr_expired", order);
+                publish("asset:buy:order_expired", order);
                 break;
               case "CANCELED":
                 debug("order CANCELED " + order.symbolId);
-                // publish("asset:buy:oredr_canceled", order);
+                publish("asset:buy:order_canceled", order);
                 break;
             }
             break;
@@ -48,7 +49,7 @@ function assetChangeManangement() {
                 //new order
                 // debug("new sell order detected " + order.symbolId);
                 // createSellOrder(order);
-                // publish("trade:new", order);
+                publish("asset:sell:order_new", order);
                 break;
               case "FILLED":
                 //filled bid        

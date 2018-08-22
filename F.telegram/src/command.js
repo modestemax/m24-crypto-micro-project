@@ -1,7 +1,8 @@
 const debug = require('debug')('F;commands');
-const { bot, tme, MAXChatId, XBTTraderChatId } = require('./bot');
+const { bot, tme, M24_LOG_CHAT_ID, M24_CHAT_ID } = require('./bot');
 const { redisSet, redisGet, candleUtils, getRedis, publish } = require('common');
 const { change24H } = candleUtils;
+const { resetMessage } = require("./assets-messages");
 
 serviceStatusHandler();
 
@@ -12,6 +13,10 @@ const commands = {
 			"Get Error Stack: /error_stack",
 			"Get 24h change buy symbol: /24h"
 		]);
+	},
+	"reset"(message) {
+		resetMessage();
+		message.lines(["Messages Reset OK"])
 	},
 	"check_services"(message) {
 		message.send("Checking Services Status")

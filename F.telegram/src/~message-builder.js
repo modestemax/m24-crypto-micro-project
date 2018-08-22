@@ -2,8 +2,8 @@
 const _ = require('lodash');
 const { redisSet, redisGet, candleUtils } = require('common');
 
-const MAXChatId = "475514014";//"@modestemax";
-const XBTTraderChatId = "-1001169214481";//"M24";
+const M24_LOG_CHAT_ID = "475514014";//"@modestemax";
+const M24_CHAT_ID = "-1001169214481";//"M24";
 
 module.exports = function getMessageText(data) {
   let text;

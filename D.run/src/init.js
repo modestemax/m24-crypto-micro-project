@@ -4,8 +4,8 @@ const { subscribe: redisSubscribe, publish } = require('common/redis');
 
 
 redisSubscribe('asset:*', {
-  'asset:track': function ({ symbolId,clientOrderId, price, quantity }) {    
-    trackAsset({ symbolId,clientOrderId, price, quantity, stopTick: listenToPriceChange(symbolId) });
+  'asset:track': function ({ symbolId, clientOrderId, openPrice, quantity }) {
+    trackAsset({ symbolId, clientOrderId, openPrice, quantity, stopTick: listenToPriceChange(symbolId) });
   },
   'asset:tryToBuy': function ({ orderId, clientOrderId, orderTime }) {
     tryToBuy({ orderId, clientOrderId, orderTime })
@@ -13,4 +13,4 @@ redisSubscribe('asset:*', {
 });
 
 assetChangeManangement();
-
+publish('asset:load');

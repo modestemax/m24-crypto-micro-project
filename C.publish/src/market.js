@@ -30,7 +30,10 @@ const $this = module.exports = {
       let symbol = asset + '/BTC';
       let price = prices[symbol];
       return price && balance.free * price.close > 0.001 ?
-        Object.assign(assets, { [asset]: Object.assign(balance, { btc: balance.total * price.close }) }) : assets
+        Object.assign(assets, { [asset]: Object.assign(balance, { btc: balance.total * price.close }) })
+        : asset === 'BTC' ?
+          Object.assign(assets, { [asset]: Object.assign(balance, { btc: balance.total }) })
+          : assets
     }, {});
 
   },
@@ -39,19 +42,19 @@ const $this = module.exports = {
 
     let myAssets = await $this.getAssets();
 
-    return Promise.all(_.map(myAssets, async (balance, asset) => {
+    return Promise.all(_.map(_.omit(myAssets, ['BTC', 'BNB']), async (balance, asset) => {
       let orders = await exchange.fetchClosedOrders(asset + '/BTC');
       let order = _(orders).filter({ side: 'buy', status: 'closed' }).last();
       return {
         symbolId: order.info.symbol,
         clientOrderId: order.info.clientOrderId,
-        price: order.price,
+        openPrice: order.price,
         quantity: order.filled
       }
     }))
   },
   async estimatedValue(assets) {
     let myAssets = assets || await $this.getAssets();
-    return _.sumBy(myAssets, 'btc')
+    return _.sumBy(_.toArray(myAssets), 'btc')
   }
 }

@@ -17,11 +17,11 @@ function redisKeysExists(key) {
   return redis.existsAsync(key)
 }
 
-function redisGet(key) {
-  return redis.getAsync(key)
+async function redisGet(key) {
+  return JSON.parse(await redis.getAsync(key))
 }
 async function redisSet({ key, data, expire }) {
-  const strData = typeof data === 'string' ? data : JSON.stringify(data);
+  const strData = JSON.stringify(data);
   let res = await redis.setAsync(key, strData);
   expire && await redis.expireAsync(key, expire);
   return res;
@@ -41,11 +41,12 @@ function publish(event, data, { rateLimit } = {}) {
 
 function subscribe(event, handlers) {
   let redis = getRedis();
+  handlers = typeof handlers == 'function' ? { [event]: handlers } : handlers;
   redis.on('pmessage', async (pattern, channel, data) => {
     const json = JSON.parse(data);
     for (regex in handlers) {
       if (new RegExp(regex).test(channel)) {
-        handlers[regex](json);
+        handlers[regex](json, channel);
       }
     }
   });

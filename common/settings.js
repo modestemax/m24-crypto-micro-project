@@ -57,8 +57,9 @@ module.exports = {
             // isActive: true,
             bidMarket: true
         },
-        "binance_24h": {
+        "binance-24h": {
             isActive: true,
+            timeInForce: 'GTC',
         }
     }),
 };

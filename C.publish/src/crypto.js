@@ -1,5 +1,8 @@
 const debug = require("debug")("C:crypto");
 
+const Mutex = new require("await-mutex").default;
+const mutex = new Mutex();
+
 const { subscribe: redisSubscribe, publish } = require('common/redis');
 const { exchange } = require("common");
 const { MAX_TRADE_COUNT, strategies } = require("common/settings");
@@ -25,22 +28,31 @@ redisSubscribe('crypto:*', {
     }
   },
   'crypto:buy_limit': async function ({ symbolId, openPrice, strategyName }) {
-    const assets = await getAssets();
-    const market = exchange.marketsById[symbolId];
-    const strategy = strategies[strategyName];
-    if (!assets[market.baseId] && strategy) {
-      let btc = estimatedValue(assets);
-      let cost = btc / MAX_TRADE_COUNT;
-      let quantity = (cost / openPrice);
-      if (market.limits.cost.min < cost) {
-        exchange.createLimitBuyOrder(market.symbol, quantity, openPrice, {
-          newClientOrderId: `${strategyName}_${symbolId}`,
-          timeInForce: strategy.timeInForce
-        });
-        debug("order posted " + symbolId);
+
+    let unlock = await mutex.lock();
+    try {
+      const assets = await getAssets();
+      if (Object.keys(assets).filter(asset => !/BTC|BNB/.test(asset)).length < MAX_TRADE_COUNT) {
+        const market = exchange.marketsById[symbolId];
+        const strategy = strategies[strategyName];
+        if (!assets[market.baseId] && strategy) {
+          let btc = await estimatedValue(assets);
+          let cost = btc / MAX_TRADE_COUNT;
+          let quantity = exchange.amount_to_precision(market.symbol, cost / openPrice);
+          if (market.limits.cost.min < cost) {
+            exchange.createLimitBuyOrder(market.symbol, quantity, openPrice, {
+              newClientOrderId: `${strategyName}_${symbolId}`,
+              timeInForce: strategy.timeInForce
+            });
+            debug("order posted " + symbolId);
+          }
+        }
       }
+    } finally {
+      unlock();
     }
+
 
   }
 });
- 
+

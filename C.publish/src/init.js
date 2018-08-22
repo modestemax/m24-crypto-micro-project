@@ -1,8 +1,11 @@
 const { getOpenOrders, getTrades } = require('./market');
 const _ = require('lodash');
-const { publish } = require('common/redis');
+const { publish, subscribe } = require('common/redis');
 
-(async () => {
+subscribe('asset:load', loadAssets)
+loadAssets();
+
+async function loadAssets() {
   try {
     //-----PENDING ORDERS
     const orders = await getOpenOrders();
@@ -17,6 +20,6 @@ const { publish } = require('common/redis');
     })
 
   } catch (err) {
-    debugger
+    process.exit(1);
   }
-})()
+}
