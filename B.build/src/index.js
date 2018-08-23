@@ -1,3 +1,5 @@
+console.log('\n\n'+process.env.APP_NAME+ ' Running '+ new Date()+'\n\n');
+
 const debug = require('debug')('B:index');
 const _ = require('lodash');
 const strategies = require('./strategies');
@@ -14,4 +16,3 @@ redisSubscribe('newData:.*', {
     }
 });
 
-console.log(process.env.APP_NAME+ ' Running '+ new Date());
