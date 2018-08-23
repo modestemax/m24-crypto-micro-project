@@ -67,6 +67,9 @@ module.exports = class extends Template {
             m24.volumeRatio = m24.bidVolume / newAsset.info.quoteVolume * 100
 
             const { change, maxInstantDelta, delta, growingUpSmoothly, volumeRatio, bidVolume, duration } = m24;
+           
+            console.log('#'+symbol, change);
+
             const BREAK_CHANGE = 3;
             if (change > BREAK_CHANGE) {//faire aumoins 3% 
                 if (newAsset.percentage > 2) //ne pas toucher a ceux qui sont descendant
