@@ -45,10 +45,10 @@ module.exports = class extends Template {
     }
     assetChanged(asset, newAsset) {
         if (/\/BTC/.test(asset.symbol)) {
-            const { symbol, } = asset;
-
+            const { symbol, m24 } = asset;
+            console.log(asset.symbol, m24.change);
             const now = Date.now();
-            const m24 = asset.m24;
+
             m24.bid = newAsset.bid;
             m24.duration = now - m24.time;
             m24.prevChange = m24.change;
