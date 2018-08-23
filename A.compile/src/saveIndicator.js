@@ -1,6 +1,7 @@
 const debug = require('debug')('A:save-signal');
 const _ = require('lodash');
-const { candleUtils, publish, redisSet } = require('common');
+const { candleUtils } = require('common');
+const {  publish, redisSet } = require('common/redis');
 const { getKeyById } = candleUtils;
 
 

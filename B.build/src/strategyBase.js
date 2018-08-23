@@ -1,7 +1,8 @@
 const debug = require('debug')('B:strategy-base');
 const _ = require('lodash');
 
-const { tradingView, publish, candleUtils, computeChange } = require('common');
+const { publish } = require('common/redis');
+const { tradingView, candleUtils, computeChange } = require('common');
 const { findSignal } = candleUtils;
 
 module.exports = class Strategy {

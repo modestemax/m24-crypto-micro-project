@@ -1,6 +1,7 @@
 const debug = require('debug')('A:load-signals');
 const _ = require('lodash');
-const { tradingView, publish } = require('common');
+const { tradingView } = require('common');
+const {  publish } = require('common/redis');
 
 const EXCHANGE = 'binance';
 

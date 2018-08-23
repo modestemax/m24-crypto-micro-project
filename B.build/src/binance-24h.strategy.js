@@ -1,9 +1,11 @@
 const debug = require('debug')('B:strategy:emah1h4');
 const _ = require('lodash');
 const Template = require('./strategyBase');
-const { candleUtils, exchange, redis, publish } = require("common");
+
+const {  redis, publish,redisGet, redisSet, } = require("common/redis");
+const { candleUtils, exchange} = require("common");
 const { computeChange, valuePercent } = candleUtils;
-const { redisGet, redisSet, } = redis;
+
 
 module.exports = class extends Template {
     constructor(options) {
@@ -45,8 +47,7 @@ module.exports = class extends Template {
     }
     assetChanged(asset, newAsset) {
         if (/\/BTC/.test(asset.symbol)) {
-            const { symbol, m24 } = asset;
-            console.log(asset.symbol, m24.change);
+            const { symbol, m24 } = asset;            
             const now = Date.now();
 
             m24.bid = newAsset.bid;
@@ -68,7 +69,7 @@ module.exports = class extends Template {
 
             const { change, maxInstantDelta, delta, growingUpSmoothly, volumeRatio, bidVolume, duration } = m24;
            
-            console.log('#'+symbol, change);
+            // console.log('#'+symbol, change);
 
             const BREAK_CHANGE = 3;
             if (change > BREAK_CHANGE) {//faire aumoins 3% 

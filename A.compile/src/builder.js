@@ -4,11 +4,12 @@ const isSorted = require('is-sorted');
 const trend = require('trend');
 const Promise = require('bluebird');
 
-const { redisSet, redisGet, candleUtils } = require('common');
+const { redisSet, redisGet } = require('common/redis');
+const { candleUtils } = require('common');
 const { getNewCandleId } = candleUtils;
 
 process.on('tv:signals', async ({ markets, timeframe }) => {
-    
+
     await buildAll(markets);
 });
 
@@ -49,7 +50,7 @@ function backupLastPoints({ limitPointCount = 3, signal, /* timeframes = [5, 15,
                 points.push(signal);
                 points.splice(0, points.length - limitPointCount);
             }
-            redisSet({ key: `points:${symbolId}:${timeframe}`, data: (points), expire: timeframe * 60 + 5*60 });
+            redisSet({ key: `points:${symbolId}:${timeframe}`, data: (points), expire: timeframe * 60 + 5 * 60 });
         }
     }
 
@@ -63,7 +64,7 @@ function backupLastPoints({ limitPointCount = 3, signal, /* timeframes = [5, 15,
         if (!points) {
             redisGet(`points:${symbolId}:${timeframe}`).then(points => {
                 points = points || [];
-                if(!points.push)points=[];
+                if (!points.push) points = [];
                 backupLastPoints.tendances[symbolId][timeframe] = points;
             })
         }
@@ -71,9 +72,9 @@ function backupLastPoints({ limitPointCount = 3, signal, /* timeframes = [5, 15,
     }
 
 
-    
-    
-    
+
+
+
 
     _.defaults(backupLastPoints, { getLastPoints, /*getPivotPoint */ });
 }
@@ -82,26 +83,26 @@ function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQuote =
 
     const { symbolId, timeframe } = signal;
     init();
-    
+
     const data = buildSpecialData(timeframe);
     data && process.emit('analyse:newData', data);
-    
-    
 
-    
+
+
+
 
     function buildSpecialData(timeframe) {
 
         const points = backupLastPoints.getLastPoints({ symbolId, timeframe });
-        
-        
-        
+
+
+
         const [last, prev] = (points || []).concat().reverse();
         if (last) {
 
             const specialData = getSpecialData({ symbolId, timeframe });
 
-            _.extend(specialData, { points, candle: last ,candle_1:prev});
+            _.extend(specialData, { points, candle: last, candle_1: prev });
             close();
             ema();
             rsi();

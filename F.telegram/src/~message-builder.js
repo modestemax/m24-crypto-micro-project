@@ -1,6 +1,7 @@
 
 const _ = require('lodash');
-const { redisSet, redisGet, candleUtils } = require('common');
+const { redisSet, redisGet} = require('common/redis');
+const {  candleUtils } = require('common');
 
 const M24_LOG_CHAT_ID = "475514014";//"@modestemax";
 const M24_CHAT_ID = "-1001169214481";//"M24";

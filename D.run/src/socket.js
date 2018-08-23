@@ -1,7 +1,8 @@
 const debug = require("debug")("D:socket");
 const _ = require("lodash");
 const { tryToBuy, onBuy, onSell, onBalanceChanged, onPriceChanged } = require("./assets");
-const { auth, publish } = require("common");
+const { auth } = require("common");
+const {  publish } = require('common/redis');
 
 const Binance = require("binance-api-node").default;
 const client = Binance({ apiKey: auth.api_key, apiSecret: auth.secret });

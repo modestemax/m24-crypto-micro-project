@@ -2,8 +2,7 @@ const debug = require("debug")("C:market");
 const _ = require("lodash");
 
 // const exchange = require("./exchange");
-const { publish, exchange } = require("common");
-
+const {  exchange } = require("common");
 
 
 const $this = module.exports = {

@@ -3,7 +3,7 @@ const _ = require("lodash");
 const ccxt = require("ccxt");
 const redisLib = require("redis");
 const redisClient = redisLib.createClient({ host: process.env.REDIS_HOST });
-const redisPub = redisClient.duplicate();
+
 const redis = Promise.promisifyAll(redisClient);
 
 
@@ -11,40 +11,10 @@ module.exports = {
   redisKeysExists, redisGet, redisSet,
   loadOrders, saveTrade, loadTrades, loadTrade, delTrade, saveOder, saveSellOder, delOder /*delExpiredOrders,*/,
   loadOrder, loadSellOrders, loadSellOrder, getFreeBalance, loadMarkets, computeChange,
-  valuePercent, publish, getRedis, saveBalances, loadBalances, saveOderStrategy, loadOrderStrategy
+  valuePercent, saveBalances, loadBalances, saveOderStrategy, loadOrderStrategy
 };
-
-
-//---------------------REDIS-------------------------
-
-// redis.on('error',function(){
-//   debugger;
-// })
-// redis.on('connect',function(){
-//   debugger;
-// })
-
-// redis.on('reconnecting',function(){
-//   debugger;
-// })
-
-// redis.on('end',function(){
-//   debugger;
-// })
-
-function redisKeysExists(key) {
-  return redis.existsAsync(key)
-}
-
-function redisGet(key) {
-  return redis.getAsync(key)
-}
-async function redisSet({ key, data, expire }) {
-  const strData = typeof data === 'string' ? data : JSON.stringify(data);
-  let res = await redis.setAsync(key, strData);
-  expire && await redis.expireAsync(key, expire);
-  return res;
-}
+ 
+ 
 async function loadData({ hKey, filter = {} }) {
   let data = _(await redis.HVALSAsync(hKey)).map(JSON.parse);
   for (let key in filter) {
@@ -179,17 +149,7 @@ async function getBalance({ exchange, symbolId, part }) {
   };
 }
 
-//------------------------PUB/SUB---------------------
-function getRedis() {
-  return Promise.promisifyAll(redisClient.duplicate());
-}
 
-function publish(event, data,{rateLimit}={}) {
-  // if(rateLimit)
-
-  let json = typeof data === "string" ? data : JSON.stringify(data);
-  redisPub.publish(event, json);
-}
 
 //--------------------UTILS-----------------------------
 function computeChange(openPrice, closePrice) {
@@ -202,7 +162,7 @@ function valuePercent(price, changePercent) {
 const exchanges = {};
 
 async function loadMarkets({ exchangeId, auth }) {
-  if(!ccxt[exchangeId])exchangeId='binance';//debug purpuse
+  if (!ccxt[exchangeId]) exchangeId = 'binance';//debug purpuse
   exchanges[exchangeId] = exchanges[exchangeId] || new ccxt[exchangeId]({
     apiKey: auth.api_key,
     secret: auth.secret,

@@ -1,4 +1,4 @@
-const { redisKeysExists, redisGet } = require('./utils');
+const { redisKeysExists, redisGet } = require('./redis');
 
 const $this = module.exports = {
     timeframeDuration: (timeframe) => timeframe * 60e3,
