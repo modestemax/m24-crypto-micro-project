@@ -33,9 +33,7 @@ function getRedis() {
 }
 
 function publish(event, data, { rateLimit } = {}) {
-  // if(rateLimit)
-
-  let json = typeof data === "string" ? data : JSON.stringify(data);
+  let json = JSON.stringify(data);
   redisPub.publish(event, json);
 }
 
@@ -43,6 +41,7 @@ function subscribe(event, handlers) {
   let redis = getRedis();
   handlers = typeof handlers == 'function' ? { [event]: handlers } : handlers;
   redis.on('pmessage', async (pattern, channel, data) => {
+    // console.log('redis event data received');
     const json = JSON.parse(data);
     for (regex in handlers) {
       if (new RegExp(regex).test(channel)) {
