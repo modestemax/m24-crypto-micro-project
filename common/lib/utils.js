@@ -8,7 +8,6 @@ const redis = Promise.promisifyAll(redisClient);
 
 
 module.exports = {
-  redisKeysExists, redisGet, redisSet,
   loadOrders, saveTrade, loadTrades, loadTrade, delTrade, saveOder, saveSellOder, delOder /*delExpiredOrders,*/,
   loadOrder, loadSellOrders, loadSellOrder, getFreeBalance, loadMarkets, computeChange,
   valuePercent, saveBalances, loadBalances, saveOderStrategy, loadOrderStrategy
