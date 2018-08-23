@@ -81,7 +81,7 @@ module.exports = class extends Template {
                                         this.initAsset(asset, newAsset);
                                     }
             }
-            if (change < -1 || newAsset.percentage <2 || delta > .5 || maxInstantDelta > 1 || !growingUpSmoothly) {
+            if (change < -1 || newAsset.percentage < 2 || delta > .5 || maxInstantDelta > 1) {
                 this.initAsset(asset, newAsset);
             }
         }

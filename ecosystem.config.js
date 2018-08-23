@@ -84,7 +84,7 @@ module.exports = {
       ref: 'origin/master',
       repo: 'https://github.com/modestemax/m24-crypto-micro-project',
       path: '/home/ubuntu/m24/prod',
-      'post-deploy': 'npm install && pm2 reload ecosystem.config.js --env production --update-env'
+      'post-deploy': 'npm install && pm2 reset all && pm2 flush && pm2 reload ecosystem.config.js --env production --update-env'
     },
     dev: {
       // user: 'node',
