@@ -10,8 +10,9 @@ const { MAX_TRADE_COUNT, strategies } = require("common/settings");
 const { getAssets, estimatedValue } = require('./market');
 
 redisSubscribe('crypto:*', {
-  'crypto:cancel_order': function ({ orderId }) {
-    exchange.cancelOrder(orderId)
+  'crypto:cancel_order': function ({ orderId,symbolId }) {
+    const market = exchange.marketsById[symbolId];
+    exchange.cancelOrder(orderId,market.symbol)
   },
   'crypto:sell_market': function ({ symbolId, clientOrderId: newClientOrderId, quantity }) {
     const market = exchange.marketsById[symbolId];

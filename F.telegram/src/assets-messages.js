@@ -23,13 +23,13 @@ const $this = module.exports = new class {
 
   newOrder(order) {
     const { price: bid, symbolId, clientOrderId } = order;
-    const strategy = clientOrderId.split("_")[0];
+    const strategyName = clientOrderId.split("_")[0];
 
     tme.sendMessage({
       chat_id: M24_CHAT_ID,
       text: [
         "A new /order was posted",
-        `${strategy}, ${symbolId} at ${bid}`
+        `${strategyName}, ${symbolId} at ${bid}`
       ].join("\n")
     });
   }
@@ -69,7 +69,7 @@ const $this = module.exports = new class {
       ].join("\n")
     };
     if (!message_id) {
-      let { message_id } = await tme.sendMessage(msg);
+       ( { message_id } = await tme.sendMessage(msg));
       tradesMessageId[clientOrderId] = message_id;
       //await saveTrade(trade);
     } else {

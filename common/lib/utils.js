@@ -5,15 +5,22 @@ const redisLib = require("redis");
 const redisClient = redisLib.createClient({ host: process.env.REDIS_HOST });
 
 const redis = Promise.promisifyAll(redisClient);
+// const humanizeDuration = require('humanize-duration');
+
+const humanizeDuration =_.partial( require('humanize-duration'),_,{
+  units: ['h','m'],
+  round: true
+});
 
 
 module.exports = {
   loadOrders, saveTrade, loadTrades, loadTrade, delTrade, saveOder, saveSellOder, delOder /*delExpiredOrders,*/,
   loadOrder, loadSellOrders, loadSellOrder, getFreeBalance, loadMarkets, computeChange,
-  valuePercent, saveBalances, loadBalances, saveOderStrategy, loadOrderStrategy
+  valuePercent, saveBalances, loadBalances, saveOderStrategy, loadOrderStrategy,
+  humanizeDuration
 };
- 
- 
+
+
 async function loadData({ hKey, filter = {} }) {
   let data = _(await redis.HVALSAsync(hKey)).map(JSON.parse);
   for (let key in filter) {

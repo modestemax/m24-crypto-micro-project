@@ -3,7 +3,7 @@ const defaultStrategyOptions = {
     timeInForce: 'FOK',
     bidMarket: false,
     takeProfit: 3,
-    stopLoss: -2,
+    stopLoss: -3,
     trailingStop: 1.5,
     cancelBidAfterSecond: 60 * 60,//1hour,
     ownerTelegramChatId: "475514014",//"@modestemax";
@@ -60,6 +60,7 @@ module.exports = {
         "binance-24h": {
             isActive: true,
             timeInForce: 'GTC',
+            stopLoss: null,
         }
     }),
 };

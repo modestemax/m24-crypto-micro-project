@@ -18,7 +18,12 @@ function redisKeysExists(key) {
 }
 
 async function redisGet(key) {
-  return JSON.parse(await redis.getAsync(key))
+  const data = await redis.getAsync(key)
+  try {
+    return JSON.parse(data)
+  } catch (e) {
+    return data
+  }
 }
 async function redisSet({ key, data, expire }) {
   const strData = JSON.stringify(data);
@@ -42,7 +47,9 @@ function subscribe(event, handlers) {
   handlers = typeof handlers == 'function' ? { [event]: handlers } : handlers;
   redis.on('pmessage', async (pattern, channel, data) => {
     // console.log('redis event data received');
-    const json = JSON.parse(data);
+    let json;
+    try { json = JSON.parse(data); } catch (e) { json = data }
+
     for (regex in handlers) {
       if (new RegExp(regex).test(channel)) {
         handlers[regex](json, channel);

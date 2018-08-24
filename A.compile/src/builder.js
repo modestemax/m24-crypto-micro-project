@@ -23,7 +23,7 @@ async function buildAll(markets) {
 
 async function build({ signal }) {
 
-    backupLastPoints({ signal });
+    await backupLastPoints({ signal });
     buildIndicators({ signal, /*timeframes*/ });
 
 }
@@ -38,8 +38,8 @@ function backupLastPoints({ limitPointCount = 3, signal, /* timeframes = [5, 15,
     init();
     savePoints();
 
-    function savePoints(/*timeframe*/) {
-        const points = getLastPoints({ symbolId, timeframe });
+    async function savePoints(/*timeframe*/) {
+        const points = await getLastPoints({ symbolId, timeframe });
 
         if (points) {
             if (_.isEmpty(points)) {
@@ -50,7 +50,7 @@ function backupLastPoints({ limitPointCount = 3, signal, /* timeframes = [5, 15,
                 points.push(signal);
                 points.splice(0, points.length - limitPointCount);
             }
-            redisSet({ key: `points:${symbolId}:${timeframe}`, data: (points), expire: timeframe * 60 + 5 * 60 });
+            await redisSet({ key: `points:${symbolId}:${timeframe}`, data: (points), expire: timeframe * 60 + 5 * 60 });
         }
     }
 
@@ -62,10 +62,10 @@ function backupLastPoints({ limitPointCount = 3, signal, /* timeframes = [5, 15,
     function getLastPoints({ symbolId, timeframe }) {
         let points = backupLastPoints.tendances[symbolId][timeframe];
         if (!points) {
-            redisGet(`points:${symbolId}:${timeframe}`).then(points => {
+            return redisGet(`points:${symbolId}:${timeframe}`).then(points => {
                 points = points || [];
                 if (!points.push) points = [];
-                backupLastPoints.tendances[symbolId][timeframe] = points;
+                return backupLastPoints.tendances[symbolId][timeframe] = points;
             })
         }
         return points
@@ -79,21 +79,21 @@ function backupLastPoints({ limitPointCount = 3, signal, /* timeframes = [5, 15,
     _.defaults(backupLastPoints, { getLastPoints, /*getPivotPoint */ });
 }
 
-function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQuote = 3 / 4 }) {
+async function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQuote = 3 / 4 }) {
 
     const { symbolId, timeframe } = signal;
     init();
 
-    const data = buildSpecialData(timeframe);
+    const data = await buildSpecialData(timeframe);
     data && process.emit('analyse:newData', data);
 
 
 
 
 
-    function buildSpecialData(timeframe) {
+    async function buildSpecialData(timeframe) {
 
-        const points = backupLastPoints.getLastPoints({ symbolId, timeframe });
+        const points = await backupLastPoints.getLastPoints({ symbolId, timeframe });
 
 
 
