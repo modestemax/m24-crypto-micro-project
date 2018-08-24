@@ -4,7 +4,7 @@ const { bot, tme, M24_LOG_CHAT_ID, M24_CHAT_ID } = require('./bot');
 
 const _ = require('lodash')
 const { redisSet } = require('common/redis');
-
+const { humanizeDuration } = require('common');
 
 module.exports = {
   'm24:*': function (data, channel) {
@@ -31,7 +31,7 @@ module.exports = {
         text = ["Timeframes loaded", JSON.stringify(data)].join('\n')
         break;
       case "m24:algo:tracking":
-        text = [`#${data.strategyName}`,].concat(data.top5.map(t => `${t.symbolId} ${t.change}`)).join('\n')
+        text = [`#${data.strategyName}`,].concat(data.top5.map(t => `#${t.symbolId} ${t.change} [ since ${humanizeDuration(t.duration)} ]`)).join('\n')
         break
 
     }
