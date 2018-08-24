@@ -1,6 +1,6 @@
 const debug = require('debug')('F;commands');
 const { bot, tme, M24_LOG_CHAT_ID, M24_CHAT_ID } = require('./bot');
-const { publish, subscribe,redisGet } = require('common/redis');
+const { publish, subscribe, redisGet } = require('common/redis');
 const { candleUtils } = require('common');
 const { change24H } = candleUtils;
 const { resetMessage } = require("./assets-messages");
@@ -9,10 +9,11 @@ serviceStatusHandler();
 
 const commands = {
 	"start"(message) {
-		message.lines(["This bot is for trading",
+		message.lines([
+			"This bot is for trading",
 			"Check Services Status: /check_services",
 			"Get Error Stack: /error_stack",
-			"Get 24h change buy symbol: /24h"
+			"Get 24h change buy symbol: /top5"
 		]);
 	},
 	"reset"(message) {
@@ -31,13 +32,8 @@ const commands = {
 			message.send(stack)
 		});
 	},
-	"24h"(message) {
-		message.send("Enter symbol");
-
-		message.answer(async (message) => {
-			let change = await change24H({ exchange: 'binance', symbolId: message.text })
-			message.send(change + "%")
-		});
+	"top5"(message) {
+		publish('m24:algo:get_top5')
 	}
 }
 

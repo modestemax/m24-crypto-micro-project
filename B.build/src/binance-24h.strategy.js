@@ -2,7 +2,7 @@ const debug = require('debug')('B:strategy:emah1h4');
 const _ = require('lodash');
 const Template = require('./strategyBase');
 
-const { redis, publish, redisGet, redisSet, } = require("common/redis");
+const { subscribe, publish, redisGet, redisSet, } = require("common/redis");
 const { candleUtils, exchange, humanizeDuration } = require("common");
 const { computeChange, valuePercent } = candleUtils;
 
@@ -11,7 +11,7 @@ module.exports = class extends Template {
     constructor(options) {
         super(options);
         this.track24H()
-
+        subscribe('m24:algo:get_top5', () => this.logTop5())
     }
     testV1(m24, BREAK_CHANGE = 3) {
         const { change, bid, symbol, maxInstantDelta, delta, growingUpSmoothly, volumeRatio,
@@ -37,7 +37,7 @@ module.exports = class extends Template {
     }
     async track24H() {
         this.startTime = Date.now();
-        let assets = await redisGet('assets');
+        let assets = this.assets = await redisGet('assets');
         if (!assets) {
             assets = await exchange.fetchTickers();
             _.forEach(assets, (asset, baseId) => {
@@ -57,6 +57,7 @@ module.exports = class extends Template {
         setInterval(async () => this.logTop5(assets), process.env.NODE_ENV === 'production' ? 10 * 60e3 : 30e3)
     }
     logTop5(assets) {
+        assets = assets || this.assets;
         let top5 = _(assets)
             .map('m24')
             .filter(m24 => this.testV1(m24, 0))
@@ -118,7 +119,7 @@ module.exports = class extends Template {
             const { bid, delta, change, duration, highPercentage, percentage } = m24;
             if (this.testV1(m24)) {//quantité de bid relativement petite
                 if (duration > 1e3 * 60 * 60) {//1heure
-                    m24.openPrice = bid - delta*bid/100
+                    m24.openPrice = bid - delta * bid / 100
                     console.log(new Date(now), symbol + ' ' + m24.bid + ' [' + m24.openPrice.toFixed(8) + '] ' + change.toFixed(2) + '%', ' since ' + humanizeDuration(duration));
                     this.buy(asset);
                     //  this.initAsset(asset, newAsset);
