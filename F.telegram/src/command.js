@@ -1,6 +1,6 @@
 const debug = require('debug')('F;commands');
 const { bot, tme, M24_LOG_CHAT_ID, M24_CHAT_ID } = require('./bot');
-const { publish, subscribe } = require('common/redis');
+const { publish, subscribe,redisGet } = require('common/redis');
 const { candleUtils } = require('common');
 const { change24H } = candleUtils;
 const { resetMessage } = require("./assets-messages");

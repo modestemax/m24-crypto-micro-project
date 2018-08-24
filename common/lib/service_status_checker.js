@@ -3,7 +3,7 @@ const redisSub = getRedis();
 const APP_NAME = process.env.APP_NAME || process.argv[1];
 
 subscribe('m24:service_status_check', async (data) => {
-  publish('m24:service_status', Object.assign(JSON.parse(data), { text: APP_NAME + ' OK' }))
+  publish('m24:service_status', Object.assign((data), { text: APP_NAME + ' OK' }))
 });
 
 process.on('unhandledRejection', (reason, p) => {
