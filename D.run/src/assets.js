@@ -83,6 +83,7 @@ function takeADecision(asset) {
   }
   if (stopLoss) {
     strategy.stopLoss = Math.max(stopLoss, change > 1 ? 1 : stopLoss);
+    
     if (change <= stopLoss) {
       publish('crypto:sell_market', asset)
       return;
