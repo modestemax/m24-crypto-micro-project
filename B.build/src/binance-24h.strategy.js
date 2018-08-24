@@ -118,8 +118,8 @@ module.exports = class extends Template {
             const { bid, delta, change, duration, highPercentage, percentage } = m24;
             if (this.testV1(m24)) {//quantité de bid relativement petite
                 if (duration > 1e3 * 60 * 60) {//1heure
-                    console.log(new Date(now), symbol + ' ' + m24.bid + ' ' + change.toFixed(2) + '%', ' since ' + humanizeDuration(duration));
-                    asset.openPrice = bid - delta
+                    m24.openPrice = bid - delta*bid/100
+                    console.log(new Date(now), symbol + ' ' + m24.bid + ' [' + m24.openPrice.toFixed(8) + '] ' + change.toFixed(2) + '%', ' since ' + humanizeDuration(duration));
                     this.buy(asset);
                     //  this.initAsset(asset, newAsset);
                 }
