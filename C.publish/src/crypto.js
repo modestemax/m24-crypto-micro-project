@@ -27,8 +27,9 @@ redisSubscribe('crypto:*', {
         if (!assets[market.baseId] && strategy) {
           let btc = await estimatedValue(assets);
           let cost = btc / MAX_TRADE_COUNT;
-          let quantity = exchange.amount_to_precision(market.symbol, cost / openPrice);
+          if (cost > assets.BTC.free) cost = assets.BTC.free;
           if (market.limits.cost.min < cost) {
+            let quantity = exchange.amount_to_precision(market.symbol, cost / openPrice);
             exchange.createLimitBuyOrder(market.symbol, quantity, openPrice, {
               newClientOrderId: `${strategyName}_${symbolId}`,
               timeInForce: strategy.timeInForce
