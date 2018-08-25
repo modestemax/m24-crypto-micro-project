@@ -41,7 +41,7 @@ module.exports = class extends Template {
         assets = assets || this.assets;
         let top5 = _(assets)
             .map('m24')
-            .filter(m24 => this.test(m24, 0,0))
+            .filter(m24 => this.test(m24, 0, 0))
             .orderBy(m24 => m24.change).reverse().slice(0, 5)
             .map(m24 => ({
                 symbolId: m24.symbolId,
@@ -49,7 +49,10 @@ module.exports = class extends Template {
                 duration: m24.duration
             }))
             .value();
-        publish('m24:algo:tracking', { strategyName: this.name, top5 });
+        publish('m24:algo:tracking', {
+            strategyName: this.name,
+            text: top5.map(t => `#${t.symbolId} ${t.change} [ since ${humanizeDuration(t.duration)} ]`)
+        });
         console.log("top5", this.name)
         top5.length && top5.map(t => `${t.symbolId} ${t.change}  ${humanizeDuration(t.duration)}`).map(str => console.log(str))
     }

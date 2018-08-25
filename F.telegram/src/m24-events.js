@@ -31,7 +31,7 @@ module.exports = {
         text = ["Timeframes loaded", JSON.stringify(data)].join('\n')
         break;
       case "m24:algo:tracking":
-        text = [`#${data.strategyName}`,].concat(data.top5.map(t => `#${t.symbolId} ${t.change} [ since ${humanizeDuration(t.duration)} ]`)).join('\n')
+        text = [`#${data.strategyName}`, data.text].join('\n')
         break
 
     }
