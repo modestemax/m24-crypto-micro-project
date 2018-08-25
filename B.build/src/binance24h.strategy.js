@@ -9,7 +9,7 @@ const { computeChange, valuePercent } = candleUtils;
 
 module.exports = class extends M24Base {
 
-    test(m24, BREAK_CHANGE = 3) {
+    test(m24, BREAK_CHANGE = 3,DURATION= 1e3 * 60 * 60) {
         const { change, bid, symbol, maxInstantDelta, delta, growingUpSmoothly, volumeRatio,
             askVolumeBTC, bidVolumeBTC, spreadPercent, duration,
             percentage, prevPercentage, highPercentage, lastQuoteVolume } = m24;
@@ -26,7 +26,7 @@ module.exports = class extends M24Base {
                                     if (lastQuoteVolume > 8)//top 100
                                         // if (askVolumeBTC < 1 && bidVolumeBTC < 1)//assez bon volume 24H
                                         if (bidVolumeBTC < 1)//assez bon volume 24H
-                                            if (duration > 1e3 * 60 * 60)
+                                            if (duration >DURATION)
                                                 if (volumeRatio < 10) {//quantité de bid relativement petite
                                                     return true;
                                                 }
