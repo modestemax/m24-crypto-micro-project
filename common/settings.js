@@ -66,7 +66,7 @@ module.exports = {
             selfStop: true
         },
           "m24Scalping": {
-            isActive: true,
+            isActive: false,
             timeInForce: 'GTC',
             stopLoss: null,
             trailingStop: null,
