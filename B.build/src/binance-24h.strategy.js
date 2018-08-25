@@ -139,8 +139,8 @@ module.exports = class extends Template {
 
     getSellPriceIfSellable(asset) {
         const { change, maxChange } = asset;
-        let lossPercentage = maxChange-change;
-        if (lossPercentage > 2) {
+        let lossPercentage = maxChange - change;
+        if (lossPercentage >= 3) {
             return true
         }
     }

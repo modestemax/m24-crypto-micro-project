@@ -1,12 +1,13 @@
 const _ = require('lodash');
 const { strategies } = require('common/settings');
-const { candleUtils, redis } = require("common");
+const { candleUtils, loadAsset, delAsset,saveAsset, redis } = require("common");
 const { valuePercent, computeChange } = candleUtils;
 const { publish } = redis;
 const assets = {};
+const saveAssetThrottled=_.throttle(saveAsset,30e3);
 
 const $this = module.exports = {
-  tryToBuy({ orderId, symbolId,clientOrderId, orderTime }) {
+  tryToBuy({ orderId, symbolId, clientOrderId, orderTime }) {
     if (clientOrderId) {
       let strategyName = clientOrderId.split('_')[0];
       if (strategyName in strategies) {
@@ -14,7 +15,7 @@ const $this = module.exports = {
         let { cancelBidAfterSecond } = strategy;
         let now = Date.now();
         if (now - orderTime > cancelBidAfterSecond * 1e3) {
-          publish("crypto:cancel_order", { orderId,symbolId });
+          publish("crypto:cancel_order", { orderId, symbolId });
         } else {
           setTimeout(() => $this.tryToBuy.apply(this, arguments),
             orderTime + cancelBidAfterSecond * 1e3 - now
@@ -23,14 +24,19 @@ const $this = module.exports = {
       }
     }
   },
-  onBuy({ symbolId, clientOrderId, openPrice, quantity, stopTick }) {
+  async onBuy({ symbolId, clientOrderId, openPrice, quantity, stopTick }) {
     let strategyName = clientOrderId.split('_')[0];
     if (strategyName in strategies) {
-      assets[clientOrderId] = {
+      let asset = await loadAsset({clientOrderId});
+      if (asset && !(asset.openPrice == openPrice && asset.quantity == quantity)) {
+        delAsset(asset)
+      }
+      assets[clientOrderId] = Object.assign({}, asset, {
         symbolId, clientOrderId, strategyName,
         strategy: Object.assign({}, strategies[strategyName]),
         openPrice, quantity, stopTick
-      }
+      })
+
     } else {
       stopTick()
     }
@@ -50,9 +56,11 @@ const $this = module.exports = {
   },
   onBalanceChanged(balances) { },
   onPriceChanged({ symbolId, lastPrice }) {
+    
     const assetsChanged = _.filter(assets, { symbolId })
     _.forEach(assetsChanged, asset => {
       if (asset) {
+        saveAssetThrottled(asset);
         asset.closePrice = lastPrice
         asset.prevChange = asset.change;
         asset.change = computeChange(asset.openPrice, asset.closePrice);
@@ -72,6 +80,7 @@ const $this = module.exports = {
 }
 
 function takeADecision(asset) {
+
   const { change, maxChange, strategy, symbolId, quantity, closePrice } = asset;
 
   const { takeProfit, stopLoss, trailingStop, selfStop } = strategy;

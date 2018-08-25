@@ -7,13 +7,14 @@ const redisClient = redisLib.createClient({ host: process.env.REDIS_HOST });
 const redis = Promise.promisifyAll(redisClient);
 // const humanizeDuration = require('humanize-duration');
 
-const humanizeDuration =_.partial( require('humanize-duration'),_,{
-  units: ['h','m'],
+const humanizeDuration = _.partial(require('humanize-duration'), _, {
+  units: ['h', 'm'],
   round: true
 });
 
 
 module.exports = {
+  loadAsset, delAsset, saveAsset,
   loadOrders, saveTrade, loadTrades, loadTrade, delTrade, saveOder, saveSellOder, delOder /*delExpiredOrders,*/,
   loadOrder, loadSellOrders, loadSellOrder, getFreeBalance, loadMarkets, computeChange,
   valuePercent, saveBalances, loadBalances, saveOderStrategy, loadOrderStrategy,
@@ -77,7 +78,21 @@ function saveSellOder(order) {
     datum: order
   });
 }
+//--------------------------ASSETS-------------------------
 
+async function loadAsset({ clientOrderId }) {
+  return loadDatum({ hKey: "t_assets", id: clientOrderId });
+}
+function saveAsset(asset) {
+  return saveDatum({
+    hKey: "t_assets",
+    id: asset.clientOrderId,
+    datum: asset
+  });
+}
+function delAsset({ clientOrderId }) {
+  return delDatum({ hKey: "t_assets", id: clientOrderId });
+}
 //-------------------------TRADES-----------------------------
 
 async function loadTrades({ strategy, exchangeId, symbolId } = {}) {
