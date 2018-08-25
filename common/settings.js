@@ -6,7 +6,7 @@ const defaultStrategyOptions = {
     takeProfit: 3,
     stopLoss: -3,
     trailingStop: 1.5,
-    cancelBidAfterSecond: 60 * 60,//1hour,
+    cancelBidAfterSecond: 60 * 20,//1hour,
     ownerTelegramChatId: "475514014",//"@modestemax";
 };
 
@@ -70,7 +70,8 @@ module.exports = {
             timeInForce: 'GTC',
             stopLoss: null,
             trailingStop: null,
-            selfStop: true
+            selfStop: true,
+            cancelBidAfterSecond: 60 * 5,
         }
     }),
 };
