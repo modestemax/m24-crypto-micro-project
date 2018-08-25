@@ -49,7 +49,7 @@ redisSubscribe('crypto:*', {
 async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity, closePrice, strategyName }) {
   const market = exchange.marketsById[symbolId];
   const assets = await getAssets();
-  const quantity = assets[market.baseId].free;
+  quantity = assets[market.baseId].free;
   if (quantity) {
     let args = [market.symbol, quantity,]
     let sellFunction = closePrice ? (args.push(closePrice), 'createLimitSellOrder') : 'createMarketSellOrder';
