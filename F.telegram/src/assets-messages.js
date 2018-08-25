@@ -38,12 +38,11 @@ const $this = module.exports = new class {
     const { price: bid, symbolId, target, trailling, stopLoss, clientOrderId } = trade;
     const strategyName = clientOrderId.split("_")[0];
 
-    tradesMessageId = {};
     tme.sendMessage({
       chat_id: M24_CHAT_ID,
       text: [
         "A new /trade is running",
-        `#${strategyName}, #${symbolId}`
+        `#${strategyName}, #${symbolId} at ${bid}`
       ].join("\n")
     });
   }
@@ -69,7 +68,7 @@ const $this = module.exports = new class {
       ].join("\n")
     };
     if (!message_id) {
-       ( { message_id } = await tme.sendMessage(msg));
+      ({ message_id } = await tme.sendMessage(msg));
       tradesMessageId[clientOrderId] = message_id;
       //await saveTrade(trade);
     } else {
@@ -87,7 +86,7 @@ const $this = module.exports = new class {
   }
 
   endTrade(trade) {
-    const { price: bid, ask, symbolId, change, target, clientOrderId } = trade;
+    const { openPrice, closePrice, symbolId, change, target, clientOrderId } = trade;
     const strategyName = clientOrderId.split("_")[0];
     const targetStatus =
       change >= target ? "Success" : change > 0 ? "Ok" : "Fail";
@@ -97,11 +96,11 @@ const $this = module.exports = new class {
       chat_id: M24_CHAT_ID,
       text: [
         "trade ended",
-        `${strategyName}, ${symbolId}`,
-        // `bid : ${bid}`,
-        // `sell : ${ask}`,
-        // `change : ${change} [${targetStatus}]`,
-        // `trade result : *${result}*`
+        `#${strategyName}, #${symbolId}`,
+        `bid : ${openPrice}`,
+        `sell : ${closePrice}`,
+        `change : ${change.toFixed(2)} [${targetStatus}]`,
+        `#${result}`
       ].join("\n")
     });
   }

@@ -15,4 +15,12 @@ redisSubscribe('newData:*', {
         }
     }
 });
+redisSubscribe('crypto:self_stop', (asset) => {
+    for (let strategy in strategies) {
+        debug('checkin if asset is sellable', asset.symbolId);
+        if (asset.strategyName === strategy) {
+            strategies[strategy].selfSell(asset);
+        }
+    }
+});
 

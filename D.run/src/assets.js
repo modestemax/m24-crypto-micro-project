@@ -6,7 +6,7 @@ const { publish } = redis;
 const assets = {};
 
 const $this = module.exports = {
-  tryToBuy({ orderId, clientOrderId, orderTime }) {
+  tryToBuy({ orderId, symbolId,clientOrderId, orderTime }) {
     if (clientOrderId) {
       let strategyName = clientOrderId.split('_')[0];
       if (strategyName in strategies) {
@@ -14,7 +14,7 @@ const $this = module.exports = {
         let { cancelBidAfterSecond } = strategy;
         let now = Date.now();
         if (now - orderTime > cancelBidAfterSecond * 1e3) {
-          publish("crypto:cancel_order", { orderId });
+          publish("crypto:cancel_order", { orderId,symbolId });
         } else {
           setTimeout(() => $this.tryToBuy.apply(this, arguments),
             orderTime + cancelBidAfterSecond * 1e3 - now
@@ -74,24 +74,28 @@ const $this = module.exports = {
 function takeADecision(asset) {
   const { change, maxChange, strategy, symbolId, quantity, closePrice } = asset;
 
-  const { takeProfit, stopLoss, trailingStop } = strategy;
-  if (takeProfit) {
-    if (change >= takeProfit) {
-      publish('crypto:sell_market', asset)
-      return;
+  const { takeProfit, stopLoss, trailingStop, selfStop } = strategy;
+  if (!selfStop) {
+    if (takeProfit) {
+      if (change >= takeProfit) {
+        publish('crypto:sell_market', asset)
+        return;
+      }
     }
-  }
-  if (stopLoss) {
-    strategy.stopLoss = Math.max(stopLoss, change > 1 ? 1 : stopLoss);
-    
-    if (change <= stopLoss) {
-      publish('crypto:sell_market', asset)
-      return;
+    if (stopLoss) {
+      strategy.stopLoss = Math.max(stopLoss, change > 1 ? 1 : stopLoss);
+
+      if (change <= stopLoss) {
+        publish('crypto:sell_market', asset)
+        return;
+      }
     }
-  }
-  if (trailingStop) {
-    let trail = Math.trunc(change / trailingStop) * trailingStop;
-    strategy.stopLoss = Math.max(stopLoss, stopLoss + trail);
+    if (trailingStop) {
+      let trail = Math.trunc(change / trailingStop) * trailingStop;
+      strategy.stopLoss = Math.max(stopLoss, stopLoss + trail);
+    }
+  } else {
+    publish('crypto:self_stop', asset)
   }
   // if (valuePercent(change, maxChange) > 60 && maxChange < 1 && change > 0) {
   //   ....

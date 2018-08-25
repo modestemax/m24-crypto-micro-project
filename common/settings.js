@@ -1,5 +1,6 @@
 const defaultStrategyOptions = {
     isActive: false,
+    selfStop: false,
     timeInForce: 'FOK',
     bidMarket: false,
     takeProfit: 3,
@@ -15,7 +16,7 @@ module.exports = {
     defaultStrategyOptions,
     strategies: filterActive({
         "testEma01": {
-            timeInForce: 'GTC',            
+            timeInForce: 'GTC',
             cancelBidAfterSecond: 30,
             isActive: process.env.NODE_ENV != 'production',
             // isActive: false
@@ -29,31 +30,31 @@ module.exports = {
         },
         "bbemaH1": {
             timeframe: 60,
-            timeInForce: 'FOK',          
+            timeInForce: 'FOK',
             // isActive: false,
             bidMarket: true
         },
         "BBEMA150-15M": {
             timeframe: 15,
-            timeInForce: 'FOK',           
+            timeInForce: 'FOK',
             // isActive: false,
             bidMarket: true
         },
         "BBEMA150-1H": {
             timeframe: 60,
-            timeInForce: 'FOK',          
+            timeInForce: 'FOK',
             // isActive: false,
             bidMarket: true
         },
         "BBEMA180-15M": {
-            timeframe:15,
-            timeInForce: 'FOK',         
+            timeframe: 15,
+            timeInForce: 'FOK',
             isActive: true,
             bidMarket: true
         },
         "BBEMA180-1H": {
-            timeframe:60,
-            timeInForce: 'FOK',          
+            timeframe: 60,
+            timeInForce: 'FOK',
             isActive: true,
             bidMarket: true
         },
@@ -61,7 +62,8 @@ module.exports = {
             isActive: true,
             timeInForce: 'GTC',
             stopLoss: null,
-            trailingStop: 3,
+            trailingStop: null,
+            selfStop: true
         }
     }),
 };

@@ -25,8 +25,22 @@ module.exports = class Strategy {
             this.notifySell();
         }
     }
+    selfSell(asset) {
+        let ask = this.getSellPriceIfSellable(asset)
+        if (ask) {
+            if (typeof ask === 'boolean') {
+                delete asset.closePrice;
+                publish('crypto:sell_market', asset)
+            } else {
+                asset.closePrice = ask
+                publish('crypto:sell_limit', asset)
+            }
+        }
+    }
 
+    getSellPriceIfSellable(asset) {
 
+    }
     canBuy(signal) {
     }
     canSell(signal) {

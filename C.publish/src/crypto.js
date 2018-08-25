@@ -10,24 +10,12 @@ const { MAX_TRADE_COUNT, strategies } = require("common/settings");
 const { getAssets, estimatedValue } = require('./market');
 
 redisSubscribe('crypto:*', {
-  'crypto:cancel_order': function ({ orderId,symbolId }) {
+  'crypto:cancel_order': function ({ orderId, symbolId }) {
     const market = exchange.marketsById[symbolId];
-    exchange.cancelOrder(orderId,market.symbol)
+    exchange.cancelOrder(orderId, market.symbol)
   },
-  'crypto:sell_market': function ({ symbolId, clientOrderId: newClientOrderId, quantity }) {
-    const market = exchange.marketsById[symbolId];
-    exchange.createMarketSellOrder(market.symbol, quantity, { newClientOrderId });
-  },
-  'crypto:sell_limit': async function ({ symbolId, closePrice, strategyName }) {
-    const market = exchange.marketsById[symbolId];
-    const assets = await getAssets();
-    const quantity = assets[market.baseId].free;
-    if (quantity) {
-      exchange.createLimitSellOrder(market.symbol, quantity, closePrice, {
-        newClientOrderId: `${strategyName}_${symbolId}`,
-      });
-    }
-  },
+  'crypto:sell_market': cryptoSell,
+  'crypto:sell_limit': cryptoSell,
   'crypto:buy_limit': async function ({ symbolId, openPrice, strategyName }) {
 
     let unlock = await mutex.lock();
@@ -57,3 +45,16 @@ redisSubscribe('crypto:*', {
   }
 });
 
+async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity, closePrice, strategyName }) {
+  const market = exchange.marketsById[symbolId];
+  const assets = await getAssets();
+  const quantity = assets[market.baseId].free;
+  if (quantity) {
+    let args = [market.symbol, quantity,]
+    let sellFunction = closePrice ? (args.push(closePrice), 'createLimitSellOrder') : 'createMarketSellOrder';
+    args.push({
+      newClientOrderId: newClientOrderId || `${strategyName}_${symbolId}`,
+    })
+    exchange[sellFunction].apply(exchange, args);
+  }
+}

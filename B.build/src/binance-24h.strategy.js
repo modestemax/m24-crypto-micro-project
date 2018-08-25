@@ -136,8 +136,13 @@ module.exports = class extends Template {
         Object.assign(this, { symbolId, bid: openPrice });
         this.notifyBuy();
     }
-    async canBuy() {
 
+    getSellPriceIfSellable(asset) {
+        const { change, maxChange } = asset;
+        let lossPercentage = maxChange-change;
+        if (lossPercentage > 2) {
+            return true
+        }
     }
 };
 
