@@ -51,7 +51,7 @@ module.exports = class extends Template {
             .value();
         publish('m24:algo:tracking', {
             strategyName: this.name,
-            text: top5.map(t => `#${t.symbolId} ${t.change} [ since ${humanizeDuration(t.duration)} ]`)
+            text: top5.map(t => `#${t.symbolId} ${t.change} [ since ${humanizeDuration(t.duration)} ]`).join('\n')
         });
         console.log("top5", this.name)
         top5.length && top5.map(t => `${t.symbolId} ${t.change}  ${humanizeDuration(t.duration)}`).map(str => console.log(str))
