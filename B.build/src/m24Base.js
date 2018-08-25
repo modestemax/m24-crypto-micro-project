@@ -49,12 +49,15 @@ module.exports = class extends Template {
                 duration: m24.duration
             }))
             .value();
-        publish('m24:algo:tracking', {
-            strategyName: this.name,
-            text: top5.map(t => `#${t.symbolId} ${t.change} [ since ${humanizeDuration(t.duration)} ]`).join('\n')
-        });
-        console.log("top5", this.name)
-        top5.length && top5.map(t => `${t.symbolId} ${t.change}  ${humanizeDuration(t.duration)}`).map(str => console.log(str))
+   
+        if (top5.length) {
+            publish('m24:algo:tracking', {
+                strategyName: this.name,
+                text: top5.map(t => `#${t.symbolId} ${t.change} [ since ${humanizeDuration(t.duration)} ]`).join('\n')
+            });
+            console.log("top5", this.name)
+            top5.map(t => `${t.symbolId} ${t.change}  since ${humanizeDuration(t.duration)}`).map(str => console.log(str))
+        }
     }
     initAsset(asset, newAsset) {
         const now = Date.now();
