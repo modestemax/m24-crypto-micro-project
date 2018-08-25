@@ -61,6 +61,7 @@ module.exports = {
             isActive: true,
             timeInForce: 'GTC',
             stopLoss: null,
+            trailingStop: 3,
         }
     }),
 };
