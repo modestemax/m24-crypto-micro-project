@@ -58,7 +58,14 @@ module.exports = {
             isActive: true,
             bidMarket: true
         },
-        "binance-24h": {
+        "binance24h": {
+            isActive: true,
+            timeInForce: 'GTC',
+            stopLoss: null,
+            trailingStop: null,
+            selfStop: true
+        },
+          "m24Scalping": {
             isActive: true,
             timeInForce: 'GTC',
             stopLoss: null,

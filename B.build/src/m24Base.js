@@ -13,27 +13,8 @@ module.exports = class extends Template {
         this.track24H()
         subscribe('m24:algo:get_top5', () => this.logTop5())
     }
-    testV1(m24, BREAK_CHANGE = 3) {
-        const { change, bid, symbol, maxInstantDelta, delta, growingUpSmoothly, volumeRatio,
-            askVolumeBTC, bidVolumeBTC, spreadPercent, duration,
-            percentage, prevPercentage, highPercentage, lastQuoteVolume } = m24;
+    test(m24, BREAK_CHANGE = 3) {
 
-        if (/\/BTC/.test(symbol))
-            if (change > BREAK_CHANGE && isFinite(change)) {//faire aumoins 3% 
-                // if (prevPercentage <= percentage) //growing...
-                if (highPercentage - percentage < 2)
-                    // if (asset.percentage < 15) //ne pas toucher a ceux qui sont dejà assez monté
-                    if (spreadPercent < 1)//bid-ask percentage
-                        if (delta < .5) //if (delta < .5) //se rassurer des petits pas entre les variations
-                            if (maxInstantDelta < 1)//pas de hause/chute (pique) brusque
-                                if (growingUpSmoothly)//monté progressive
-                                    if (lastQuoteVolume > 8)//top 100
-                                        // if (askVolumeBTC < 1 && bidVolumeBTC < 1)//assez bon volume 24H
-                                        if (bidVolumeBTC < 1)//assez bon volume 24H
-                                            if (volumeRatio < 10) {//quantité de bid relativement petite
-                                                return true;
-                                            }
-            }
     }
     async track24H() {
         this.startTime = Date.now();
@@ -60,7 +41,7 @@ module.exports = class extends Template {
         assets = assets || this.assets;
         let top5 = _(assets)
             .map('m24')
-            .filter(m24 => this.testV1(m24, 0))
+            .filter(m24 => this.test(m24, 0))
             .orderBy(m24 => m24.change).reverse().slice(0, 5)
             .map(m24 => ({
                 symbolId: m24.symbolId,
@@ -69,7 +50,7 @@ module.exports = class extends Template {
             }))
             .value();
         publish('m24:algo:tracking', { strategyName: this.name, top5 });
-        console.log("top5")
+        console.log("top5", this.name)
         top5.length && top5.map(t => `${t.symbolId} ${t.change}  ${humanizeDuration(t.duration)}`).map(str => console.log(str))
     }
     initAsset(asset, newAsset) {
@@ -111,14 +92,14 @@ module.exports = class extends Template {
 
             m24.upCount += m24.delta > 0;
             m24.downCount += m24.delta < 0;
-            m24.growingUpSmoothly = m24.upCount > 2 && m24.upCount > m24.downCount;
+            m24.growingUpSmoothly = m24.upCount >= 2 && m24.upCount > m24.downCount;
             m24.askVolumeBTC = newAsset.askVolume * newAsset.ask;
             m24.bidVolumeBTC = newAsset.bidVolume * newAsset.bid;
             m24.volumeRatio = m24.bidVolumeBTC / newAsset.quoteVolume * 100
             m24.spreadPercent = computeChange(asset.bid, asset.ask);
             const { bid, delta, change, duration, highPercentage, percentage } = m24;
-            if (this.testV1(m24)) {//quantité de bid relativement petite
-                if (duration > 1e3 * 60 * 60) {//1heure
+            if (this.test(m24)) {//quantité de bid relativement petite
+                {//1heure
                     m24.openPrice = bid - delta * bid / 100
                     console.log(new Date(now), symbol + ' ' + m24.bid + ' [' + m24.openPrice.toFixed(8) + '] ' + change.toFixed(2) + '%', ' since ' + humanizeDuration(duration));
                     this.buy(asset);
@@ -126,10 +107,11 @@ module.exports = class extends Template {
                 }
             }
 
-            if (change < -1 || highPercentage - percentage > 2) {
-                this.initAsset(asset, newAsset);
-            }
+            this.tryReset(asset, newAsset)
         }
+    }
+    tryReset(asset, newAsset) {
+
     }
     buy(asset) {
         let { symbolId, openPrice } = asset.m24;
@@ -138,11 +120,7 @@ module.exports = class extends Template {
     }
 
     getSellPriceIfSellable(asset) {
-        const { change, maxChange } = asset;
-        let lossPercentage = maxChange - change;
-        if (lossPercentage >= 3) {
-            return true
-        }
+
     }
 };
 

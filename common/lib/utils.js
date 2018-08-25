@@ -177,7 +177,7 @@ function computeChange(openPrice, closePrice) {
   return ((closePrice - openPrice) / openPrice) * 100;
 }
 function valuePercent(price, changePercent) {
-  return price * (1 + changePercent);
+  return price * (1 + changePercent/100);
 }
 
 const exchanges = {};

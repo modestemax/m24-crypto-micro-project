@@ -67,6 +67,6 @@ const $this = module.exports = {
         return ((closePrice - openPrice) / openPrice) * 100;
     },
     valuePercent(price, changePercent) {
-        return price * (1 + changePercent);
+        return price * (1 + changePercent/100);
     }
 }
