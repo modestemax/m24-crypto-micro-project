@@ -49,7 +49,7 @@ module.exports = class extends Template {
                 duration: m24.duration
             }))
             .value();
-   
+
         if (top5.length) {
             publish('m24:algo:tracking', {
                 strategyName: this.name,
@@ -106,7 +106,7 @@ module.exports = class extends Template {
             const { bid, delta, change, duration, highPercentage, percentage } = m24;
             if (this.test(m24)) {//quantité de bid relativement petite
                 {//1heure
-                    m24.openPrice = bid - delta * bid / 100
+                    m24.openPrice = this.getOpenPrice(m24)
                     console.log(new Date(now), symbol + ' ' + m24.bid + ' [' + m24.openPrice.toFixed(8) + '] ' + change.toFixed(2) + '%', ' since ' + humanizeDuration(duration));
                     this.buy(asset);
                     //  this.initAsset(asset, newAsset);
@@ -118,6 +118,10 @@ module.exports = class extends Template {
     }
     tryReset(asset, newAsset) {
 
+    }
+    getOpenPrice(m24) {
+        const { bid, delta } = m24;
+        return bid - (delta * bid / 100) / 2
     }
     buy(asset) {
         let { symbolId, openPrice } = asset.m24;
