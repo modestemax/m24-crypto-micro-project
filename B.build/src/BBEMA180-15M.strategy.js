@@ -13,11 +13,11 @@ module.exports = class extends Template {
             const prev = signal.candle_1;
             if (last && prev) {
                 if (prev.ema100 >= prev.ema10) {
-                    publish('m24:algo:tracking', { strategyName: this.name, text: `${tfSymbol} (prev.ema100 >= prev.ema10)` });
+                  //  publish('m24:algo:tracking', { strategyName: this.name, text: `${tfSymbol} (prev.ema100 >= prev.ema10)` });
                     if (last.ema100 < last.ema10) {
-                        publish('m24:algo:tracking', { strategyName: this.name, text: `${tfSymbol} (last.ema100 < last.ema10)` });
+                   //     publish('m24:algo:tracking', { strategyName: this.name, text: `${tfSymbol} (last.ema100 < last.ema10)` });
                         if (last.ema30 >= last.ema50) {
-                            publish('m24:algo:tracking', { strategyName: this.name, text: `${tfSymbol} (last.ema30 >= last.ema50)` });
+                     //       publish('m24:algo:tracking', { strategyName: this.name, text: `${tfSymbol} (last.ema30 >= last.ema50)` });
                             if (last.macd > last.macdSignal) {
                                 publish('m24:algo:tracking', { strategyName: this.name, text: `${tfSymbol} (last.macd > last.macdSignal)` });
                                 if ((last.ema100 > last.bbb && last.close <= last.ema100) ||
