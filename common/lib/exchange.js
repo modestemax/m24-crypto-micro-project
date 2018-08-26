@@ -1,5 +1,7 @@
 const _ = require("lodash");
 const ccxt = require("ccxt");
+const { loadBalances } = require('./utils')
+const { subscribe, publish } = require('./redis');
 
 module.exports = function (auth) {
   const exchange = new ccxt['binance']({
@@ -47,4 +49,28 @@ function rateLimit(exchange) {
     })
   })
 
+
+  exchange.fetchBalance = _.wrap(exchange.fetchBalance, async (fetchBalance, ...args) => {
+    let balance = await loadBalances();
+    if (!balance) {
+      balance = await fetchBalance.apply(exchange, args)
+    }
+    return balance;
+  });
+
+
+  exchange.fetchTickers = _.wrap(exchange.fetchTickers, async (fetchTickers, ...args) => {
+    return new Promise(async (resolve) => {
+      let unsubscribe = subscribe('m24:exchange:tickers', (tickers) => {
+        resolve(tickers);
+        unsubscribe();
+      });
+      publish('m24:exchange:fetchTickers')
+    })
+  });
 }
+
+
+
+// exchange.fetchTickers();
+// let assets = await exchange.fetchBalance();

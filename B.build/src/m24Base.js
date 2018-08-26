@@ -6,6 +6,7 @@ const { subscribe, publish, redisGet, redisSet, } = require("common/redis");
 const { candleUtils, exchange, humanizeDuration } = require("common");
 const { computeChange, valuePercent } = candleUtils;
 
+const redisSetThrottled = _.throttle(redisSet, 60 * 1e3);
 
 module.exports = class extends Template {
     constructor(options) {
@@ -25,13 +26,13 @@ module.exports = class extends Template {
                 this.initAsset(asset);
             });
         }
-        let count = 0;
+
         setInterval(async () => {
             let prices = await exchange.fetchTickers();
             _.forEach(assets, (asset, baseId) => {
-                this.assetChanged(asset, prices[baseId])
+                prices[baseId] && this.assetChanged(asset, prices[baseId])
             })
-            ++count > 6 && (redisSet({ key: 'assets', data: assets, expire: 60 * 20 }), count = 0)//20 min
+            redisSetThrottled({ key: 'assets', data: assets, expire: 60 * 20 })//20 min
         }, 10e3)
 
         // setInterval(async () => this.logTop5(assets), 5e3)

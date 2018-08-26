@@ -1,5 +1,10 @@
-console.log('\n\n'+process.env.APP_NAME+ ' Running '+ new Date()+'\n\n');
+console.log('\n\n' + process.env.APP_NAME + ' Running ' + new Date() + '\n\n');
 
-require("./init");
 
-require("./crypto");
+const { exchange } = require("common");
+exchange.loadMarkets().then(() => {
+
+    require("./init");
+
+    require("./crypto");
+})

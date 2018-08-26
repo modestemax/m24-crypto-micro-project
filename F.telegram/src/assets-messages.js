@@ -28,7 +28,7 @@ const $this = module.exports = new class {
     tme.sendMessage({
       chat_id: M24_CHAT_ID,
       text: [
-        "A new /order was posted",
+        "#new_order was posted",
         `${strategyName}, ${symbolId} at ${bid}`
       ].join("\n")
     });
@@ -41,7 +41,7 @@ const $this = module.exports = new class {
     tme.sendMessage({
       chat_id: M24_CHAT_ID,
       text: [
-        "A new /trade is running",
+        "#new_trade is running",
         `#${strategyName}, #${symbolId} at ${bid}`
       ].join("\n")
     });
@@ -60,7 +60,7 @@ const $this = module.exports = new class {
       chat_id: M24_CHAT_ID,
       message_id,
       text: [
-        "trade changed",
+        "#trade_changed",
         `#${strategyName}, #${symbolId}`,
         `max ${maxChange.toFixed(2)}% : min ${minChange.toFixed(2)}%`,
         `stop ${strategy.stopLoss} : profit ${strategy.takeProfit}`,
@@ -81,7 +81,7 @@ const $this = module.exports = new class {
     const strategyName = clientOrderId.split("_")[0];
     tme.sendMessage({
       chat_id: M24_CHAT_ID,
-      text: ["order expired/canceled", `#${strategyName}, #${symbolId}`].join("\n")
+      text: ["#order_expired_canceled", `#${strategyName}, #${symbolId}`].join("\n")
     });
   }
 
@@ -95,7 +95,7 @@ const $this = module.exports = new class {
     tme.sendMessage({
       chat_id: M24_CHAT_ID,
       text: [
-        "trade ended",
+        "#trade_ended",
         `#${strategyName}, #${symbolId}`,
         `bid : ${openPrice}`,
         `sell : ${closePrice}`,

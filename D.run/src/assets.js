@@ -1,10 +1,10 @@
 const _ = require('lodash');
 const { strategies } = require('common/settings');
-const { candleUtils, loadAsset, delAsset,saveAsset, redis } = require("common");
+const { candleUtils, loadAsset, delAsset, saveAsset, saveBalances, exchange, redis } = require("common");
 const { valuePercent, computeChange } = candleUtils;
 const { publish } = redis;
 const assets = {};
-const saveAssetThrottled=_.throttle(saveAsset,30e3);
+const saveAssetThrottled = _.throttle(saveAsset, 30e3);
 
 const $this = module.exports = {
   tryToBuy({ orderId, symbolId, clientOrderId, orderTime }) {
@@ -27,7 +27,7 @@ const $this = module.exports = {
   async onBuy({ symbolId, clientOrderId, openPrice, quantity, stopTick }) {
     let strategyName = clientOrderId.split('_')[0];
     if (strategyName in strategies) {
-      let asset = await loadAsset({clientOrderId});
+      let asset = await loadAsset({ clientOrderId });
       if (asset && !(asset.openPrice == openPrice && asset.quantity == quantity)) {
         delAsset(asset)
       }
@@ -42,7 +42,7 @@ const $this = module.exports = {
     }
   },
   onSell({ symbolId, clientOrderId, price, quantity, }) {
-    debugger
+    // debugger
     const asset = assets[clientOrderId];
     if (asset) {
       asset.stopTick();
@@ -54,9 +54,15 @@ const $this = module.exports = {
     }
 
   },
-  onBalanceChanged(balances) { },
+  async onBalanceChanged(balances) {
+    debugger
+    let bal = _.mapValues(balances, b =>
+      ({ free: +b.available, used: +b.locked, total: +b.available + +b.locked }))
+    let bal2 = await exchange.fetchBalance();
+    saveBalances(bal)
+  },
   onPriceChanged({ symbolId, lastPrice }) {
-    
+
     const assetsChanged = _.filter(assets, { symbolId })
     _.forEach(assetsChanged, asset => {
       if (asset) {

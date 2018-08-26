@@ -1,4 +1,9 @@
-console.log('\n\n'+process.env.APP_NAME+ ' Running '+ new Date()+'\n\n');
+console.log('\n\n' + process.env.APP_NAME + ' Running ' + new Date() + '\n\n');
 
-require('./init'); 
 
+const { exchange } = require("common");
+exchange.loadMarkets().then(async () => {
+    await require('./prices')();
+    require('./init');
+
+})

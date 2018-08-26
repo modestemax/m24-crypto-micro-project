@@ -16,7 +16,7 @@ const humanizeDuration = _.partial(require('humanize-duration'), _, {
 module.exports = {
   loadAsset, delAsset, saveAsset,
   loadOrders, saveTrade, loadTrades, loadTrade, delTrade, saveOder, saveSellOder, delOder /*delExpiredOrders,*/,
-  loadOrder, loadSellOrders, loadSellOrder, getFreeBalance, loadMarkets, computeChange,
+  loadOrder, loadSellOrders, loadSellOrder, /*getFreeBalance,*/ loadMarkets, computeChange,
   valuePercent, saveBalances, loadBalances, saveOderStrategy, loadOrderStrategy,
   humanizeDuration
 };
@@ -129,46 +129,57 @@ function saveOderStrategy(strategy) {
 }
 
 //------------------BALANCES-------------------
-function saveBalances(exchangeId, balances) {
-  let balancesData = _.cloneDeep(balances);
-  delete balancesData.info;
-  balancesData = _(balancesData)
-    .mapValues((balance, key) => {
-      Object.assign(balance, {
-        free: +(balance.free || balance.available),
-        used: +(balance.used || balance.locked),
-        asset: balance.asset || key
-      });
 
-      balance.total = balance.free + balance.used;
-      return balance;
-    })
-    .filter(b => b.total)
-    .mapKeys((b, key) => (isNaN(+key) ? key : b.asset))
-    .value();
-  return saveDatum({ hKey: "balances", id: exchangeId, datum: balancesData });
+async function loadBalances() {
+  return loadDatum({ hKey: "balances", id: 'binance' });
 }
-async function loadBalances(exchangeId) {
-  return loadDatum({ hKey: "balances", id: exchangeId });
+function saveBalances(balances) {
+  return saveDatum({
+    hKey: "balances", id: 'binance',
+    datum: balances
+  });
 }
 
-async function getFreeBalance({ exchange, symbolId }) {
-  return getBalance({ exchange, symbolId, part: "free" });
-}
+// function saveBalances(exchangeId, balances) {
+//   let balancesData = _.cloneDeep(balances);
+//   delete balancesData.info;
+//   balancesData = _(balancesData)
+//     .mapValues((balance, key) => {
+//       Object.assign(balance, {
+//         free: +(balance.free || balance.available),
+//         used: +(balance.used || balance.locked),
+//         asset: balance.asset || key
+//       });
 
-async function getBalance({ exchange, symbolId, part }) {
-  let balance = await loadBalances(exchange.id);
-  if (!balance) {
-    balance = await exchange.fetchBalance();
-    await saveBalances(exchange.id, balance);
-  }
-  const market = exchange.marketsById[symbolId];
+//       balance.total = balance.free + balance.used;
+//       return balance;
+//     })
+//     .filter(b => b.total)
+//     .mapKeys((b, key) => (isNaN(+key) ? key : b.asset))
+//     .value();
+//   return saveDatum({ hKey: "balances", id: exchangeId, datum: balancesData });
+// }
+// async function loadBalances(exchangeId) {
+//   return loadDatum({ hKey: "balances", id: exchangeId });
+// }
 
-  return {
-    quote: _.get(balance[market.quoteId], part, 0),
-    base: _.get(balance[market.baseId], part, 0)
-  };
-}
+// async function getFreeBalance({ exchange, symbolId }) {
+//   return getBalance({ exchange, symbolId, part: "free" });
+// }
+
+// async function getBalance({ exchange, symbolId, part }) {
+//   let balance = await loadBalances(exchange.id);
+//   if (!balance) {
+//     balance = await exchange.fetchBalance();
+//     await saveBalances(exchange.id, balance);
+//   }
+//   const market = exchange.marketsById[symbolId];
+
+//   return {
+//     quote: _.get(balance[market.quoteId], part, 0),
+//     base: _.get(balance[market.baseId], part, 0)
+//   };
+// }
 
 
 
@@ -177,7 +188,7 @@ function computeChange(openPrice, closePrice) {
   return ((closePrice - openPrice) / openPrice) * 100;
 }
 function valuePercent(price, changePercent) {
-  return price * (1 + changePercent/100);
+  return price * (1 + changePercent / 100);
 }
 
 const exchanges = {};
