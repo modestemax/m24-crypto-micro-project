@@ -4,14 +4,14 @@ const { tryToBuy, onBuy, onSell, onBalanceChanged, onPriceChanged } = require(".
 
 const { publish } = require('common/redis');
 
-const client = require('./binance');
+const {binance} = require('common');
 
 module.exports = { listenToPriceChange, assetChangeManangement }
 
 
 //--------------USER DATA------------
 function assetChangeManangement() {
-  client.ws.user(async msg => {
+  binance.ws.user(async msg => {
     switch (msg.eventType) {
       case "executionReport":
         const order = Object.assign({ symbolId: msg.symbol }, msg);
@@ -76,7 +76,7 @@ function assetChangeManangement() {
 }
 
 function listenToPriceChange(symbolId) {
-  return client.ws.ticker([symbolId], (price) => {
+  return binance.ws.ticker([symbolId], (price) => {
     let lastPrice = +price.curDayClose;
     onPriceChanged({ symbolId, lastPrice })
   });

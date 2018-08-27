@@ -1,7 +1,7 @@
 
-const { exchange, redis } = require("common");
+const { exchange, binance, redis } = require("common");
 const { subscribe, publish } = redis;
-const client = require('./binance');
+
 const assets = {};
 
 module.exports = async function fetchTickers() {
@@ -13,7 +13,7 @@ module.exports = async function fetchTickers() {
   Object.assign(assets, await exchange.fetchTickers())
 
   const symbols = Object.keys(exchange.marketsById).filter(s => /BTC$/.test(s));
-  client.ws.ticker(symbols, async (price) => {
+  binance.ws.ticker(symbols, async (price) => {
     let info = Object.assign({}, price, {
       askPrice: +price.bestAsk,
       askQty: +price.bestAskQnt,

@@ -1,6 +1,28 @@
 const { getRedis, subscribe, publish } = require('./redis');
 const redisSub = getRedis();
-const APP_NAME = process.env.APP_NAME || process.argv[1];
+const APP_NAME = process.env.APP_NAME //|| process.argv[1];
+const { exchange } = require("./exchange");
+
+
+module.exports = {
+  wait, start
+};
+
+
+function wait(APPA, APPB, callback) {
+  console.log('Waiting',APPA)
+  subscribe(APPA, async () => start(APPB, callback) );
+  publish('waiting:' + APPA);
+}
+
+async function start(APP, callback) {
+  console.log('\n\nStarting ' + (APP_NAME || APP) + ' at ' + new Date() + '\n\n');
+  await exchange.loadMarkets()
+  await callback();
+  publish(APP);
+  subscribe('waiting:' + APP, () => publish(APP))
+}
+
 
 subscribe('m24:service_status_check', async (data) => {
   publish('m24:service_status', Object.assign((data), { text: APP_NAME + ' OK' }))

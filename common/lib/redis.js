@@ -3,15 +3,12 @@ const _ = require("lodash");
 const ccxt = require("ccxt");
 const redisLib = require("redis");
 const redisClient = redisLib.createClient({ host: process.env.REDIS_HOST });
-const redisPub = redisClient.duplicate();
 const redis = Promise.promisifyAll(redisClient);
 
 
 module.exports = {
-  redisKeysExists, redisGet, redisSet, subscribe, publish, getRedis
+  redisKeysExists, redisGet, redisSet, subscribe, publish, getRedis,
 };
-
-
 
 function redisKeysExists(key) {
   return redis.existsAsync(key)

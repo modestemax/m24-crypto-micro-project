@@ -2,8 +2,16 @@ const _ = require("lodash");
 const ccxt = require("ccxt");
 const { loadBalances } = require('./utils')
 const { subscribe, publish } = require('./redis');
+const auth = require(process.env.HOME + '/.api.json').KEYS;
 
-module.exports = function (auth) {
+const Binance = require("binance-api-node").default;
+const binance = Binance({ apiKey: auth.api_key, apiSecret: auth.secret });
+
+
+
+module.exports = { exchange: getExchange(auth), binance }
+
+function getExchange(auth) {
   const exchange = new ccxt['binance']({
     apiKey: auth.api_key,
     secret: auth.secret,
@@ -29,8 +37,8 @@ const limiter = new RateLimiter(10, "second");
 
 function rateLimit(exchange) {
 
-  ['fetchBalance','fetchTickers', 'fetchOrder', 'fetchOrders', 'createOrder', 'cancelOrder'].forEach(apiName => {
-    
+  ['fetchBalance', 'fetchTickers', 'fetchOrder', 'fetchOrders', 'createOrder', 'cancelOrder'].forEach(apiName => {
+
     exchange[apiName] = _.wrap(exchange[apiName], (apiCall, ...args) => {
       return new Promise((resolve, reject) => {
         limiter.removeTokens(1, async () => {
