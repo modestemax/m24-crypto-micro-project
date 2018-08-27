@@ -5,6 +5,11 @@ const client = require('./binance');
 const assets = {};
 
 module.exports = async function fetchTickers() {
+
+  subscribe('m24:exchange:fetchTickers', function () {
+    publish('m24:exchange:tickers', assets)
+  });
+
   Object.assign(assets, await exchange.fetchTickers())
 
   const symbols = Object.keys(exchange.marketsById).filter(s => /BTC$/.test(s));
@@ -40,7 +45,4 @@ module.exports = async function fetchTickers() {
     // exchange.parseTickers(rawTickers, symbols);
   });
 
-  subscribe('m24:exchange:fetchTickers', function () {
-    publish('m24:exchange:tickers', assets)
-  })
 }

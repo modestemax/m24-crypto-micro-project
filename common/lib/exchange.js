@@ -29,14 +29,14 @@ const limiter = new RateLimiter(10, "second");
 
 function rateLimit(exchange) {
 
-  ['fetchBalance', 'fetchOrder', 'fetchOrders', 'createOrder', 'cancelOrder'].forEach(apiName => {
-    exchange[apiName] = exchange[apiName].bind(exchange);
+  ['fetchBalance','fetchTickers', 'fetchOrder', 'fetchOrders', 'createOrder', 'cancelOrder'].forEach(apiName => {
+    
     exchange[apiName] = _.wrap(exchange[apiName], (apiCall, ...args) => {
       return new Promise((resolve, reject) => {
         limiter.removeTokens(1, async () => {
           let unlock = await mutex.lock();
           try {
-            resolve(apiCall.apply(null, args));
+            resolve(await apiCall.apply(exchange, args));
           } catch (error) {
             reject(error);
             debug(error);
@@ -59,13 +59,13 @@ function rateLimit(exchange) {
   });
 
 
-  exchange.fetchTickers = _.wrap(exchange.fetchTickers, async (fetchTickers, ...args) => {
-    return new Promise(async (resolve) => {
-      let unsubscribe = subscribe('m24:exchange:tickers', (tickers) => {
-        resolve(tickers);
+  exchange.fetchTickers = _.wrap(exchange.fetchTickers, (fetchTickers, ...args) => {
+    return new Promise((resolve) => {
+      let unsubscribe = subscribe('m24:exchange:tickers', async (tickers) => {
+        resolve(tickers && Object.keys(tickers).length > 0 ? tickers : (await fetchTickers.apply(exchange)));
         unsubscribe();
       });
-      publish('m24:exchange:fetchTickers')
+      publish('m24:exchange:fetchTickers');
     })
   });
 }

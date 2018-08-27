@@ -58,6 +58,11 @@ module.exports = class extends Template {
             });
             console.log("top5", this.name)
             top5.map(t => `${t.symbolId} ${t.change}  since ${humanizeDuration(t.duration)}`).map(str => console.log(str))
+        }else{
+            publish('m24:algo:tracking', {
+                strategyName: this.name,
+                text: assets?'Empty':'assets is undefined'
+            });
         }
     }
     initAsset(asset, newAsset) {

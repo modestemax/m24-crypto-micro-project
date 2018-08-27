@@ -39,9 +39,10 @@ function getRedis() {
 
 function publish(event, data, { rateLimit } = {}) {
   // console.log('redis publish',event,data)
+  let redis = getRedis();
   data = data === void 0 ? {} : data;
   let json = JSON.stringify(data);
-  redisPub.publish(event, json);
+  redis.publish(event, json);
 }
 
 function subscribe(event, handlers) {
