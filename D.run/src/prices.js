@@ -11,7 +11,7 @@ module.exports = async function fetchTickers() {
   });
 
   Object.assign(assets, await exchange.fetchTickers());
-  setInterval(() => _.mapValues(assets, a => null), 30e3)
+  setInterval(() => _.mapValues(assets, a => null), 30e3);
 
   const symbols = Object.keys(exchange.marketsById).filter(s => /BTC$/.test(s));
   binance.ws.ticker(symbols, async (price) => {
