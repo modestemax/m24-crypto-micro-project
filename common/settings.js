@@ -34,25 +34,25 @@ module.exports = {
             // isActive: false,
             bidMarket: true
         },
-        "BBEMA150-15M": {
+        "BBEMA150M15": {
             timeframe: 15,
             timeInForce: 'FOK',
             // isActive: false,
             bidMarket: true
         },
-        "BBEMA150-1H": {
+        "BBEMA150H1": {
             timeframe: 60,
             timeInForce: 'FOK',
             // isActive: false,
             bidMarket: true
         },
-        "BBEMA180-15M": {
+        "BBEMA180M15": {
             timeframe: 15,
             timeInForce: 'FOK',
             isActive: true,
             bidMarket: true
         },
-        "BBEMA180-1H": {
+        "BBEMA180H1": {
             timeframe: 60,
             timeInForce: 'FOK',
             isActive: true,

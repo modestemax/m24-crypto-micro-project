@@ -1,9 +1,11 @@
 const Promise = require("bluebird");
 const _ = require("lodash");
-const ccxt = require("ccxt");
+// const ccxt = require("ccxt");
 const redisLib = require("redis");
-const redisClient = redisLib.createClient({ host: process.env.REDIS_HOST });
-const redis = Promise.promisifyAll(redisClient);
+// const redisClient = redisLib.createClient({ host: process.env.REDIS_HOST });
+const redis = Promise.promisifyAll(redisLib.createClient({ host: process.env.REDIS_HOST }));
+const redisSub = Promise.promisifyAll(redisLib.createClient({ host: process.env.REDIS_HOST }));
+const redisPub=Promise.promisifyAll(redisLib.createClient({ host: process.env.REDIS_HOST }));
 
 
 module.exports = {
@@ -31,19 +33,19 @@ async function redisSet({ key, data, expire }) {
 
 //------------------------PUB/SUB---------------------
 function getRedis() {
-  return Promise.promisifyAll(redisClient.duplicate());
+  return redis;
 }
 
 function publish(event, data, { rateLimit } = {}) {
   // console.log('redis publish',event,data)
-  let redis = getRedis();
+  let redis =redisPub// getRedis();
   data = data === void 0 ? {} : data;
   let json = JSON.stringify(data);
   redis.publish(event, json);
 }
 
 function subscribe(event, handlers) {
-  let redis = getRedis();
+  let redis =redisSub //getRedis();
   handlers = typeof handlers == 'function' ? { [event]: handlers } : handlers;
   redis.on('pmessage', async (pattern, channel, data) => {
     // console.log('redis event data received');

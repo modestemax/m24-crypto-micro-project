@@ -58,10 +58,10 @@ module.exports = class extends Template {
             });
             console.log("top5", this.name)
             top5.map(t => `${t.symbolId} ${t.change}  since ${humanizeDuration(t.duration)}`).map(str => console.log(str))
-        }else{
+        } else {
             publish('m24:algo:tracking', {
                 strategyName: this.name,
-                text: assets?'Empty':'assets is undefined'
+                text: assets ? 'Empty' : 'assets is undefined'
             });
         }
     }
@@ -84,10 +84,11 @@ module.exports = class extends Template {
             const { symbol, m24 } = asset;
             const now = Date.now();
 
-            m24.bid = newAsset.bid;
-            m24.ask = newAsset.ask;
             m24.prevPercentage = m24.percentage;
-            m24.percentage = newAsset.percentage;
+            Object.assign(m24, _.pick(newAsset, [
+                'bid', 'ask', 'high', 'low', 'open',
+                'close', 'previousClose', 'percentage'
+            ]));
             m24.lastQuoteVolume = newAsset.quoteVolume;
             m24.highPercentage = _.max([m24.percentage, m24.highPercentage]);
 
@@ -96,6 +97,7 @@ module.exports = class extends Template {
             m24.prevChange = m24.change;
             m24.change = computeChange(asset.close, newAsset.close);
             m24.maxChange = _.max([m24.change, m24.maxChange]);
+            // m24.maxDrop = _.max([m24.maxChange - m24.change, m24.maxDrop]);
 
             m24.instantDelta = Math.abs(m24.change - m24.prevChange);
             m24.maxInstantDelta = _.max([m24.instantDelta, m24.maxInstantDelta]);

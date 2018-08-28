@@ -10,26 +10,32 @@ const { computeChange, valuePercent } = candleUtils;
 module.exports = class extends M24Base {
 
     test(m24, BREAK_CHANGE = 3, DURATION = 1e3 * 60 * 60 * 1) {//1hour
-        const { change, bid, symbol, maxInstantDelta, delta, growingUpSmoothly, volumeRatio,
+        const { change, maxChange, bid, symbol, maxInstantDelta, delta, growingUpSmoothly, volumeRatio,
             askVolumeBTC, bidVolumeBTC, spreadPercent, duration,
+            previousClose, open, close, high, maxDrop,
             percentage, prevPercentage, highPercentage, lastQuoteVolume } = m24;
 
         if (/\/BTC/.test(symbol))
             if (change > BREAK_CHANGE && isFinite(change)) {//faire aumoins 3% 
-                // if (prevPercentage <= percentage) //growing...
-                if (highPercentage - percentage < 2)
-                    // if (asset.percentage < 15) //ne pas toucher a ceux qui sont dejà assez monté
-                    if (spreadPercent < 1)//bid-ask percentage
-                        if (delta < .5) //if (delta < .5) //se rassurer des petits pas entre les variations
-                            if (maxInstantDelta < 1)//pas de hause/chute (pique) brusque
-                                if (growingUpSmoothly)//monté progressive
-                                    if (lastQuoteVolume > 8)//top 100
-                                        // if (askVolumeBTC < 1 && bidVolumeBTC < 1)//assez bon volume 24H
-                                        if (bidVolumeBTC < 1)//assez bon volume 24H
-                                            if (duration > DURATION)
-                                                if (volumeRatio < 10) {//quantité de bid relativement petite
-                                                    return true;
-                                                }
+                if (prevPercentage < percentage) //growing...
+                    if (previousClose < close)
+                        // if (maxDrop < 1)
+                        if (open < close && close < high)
+                            // if (valuePercent(close, high) > 1)
+                            if (maxChange - change < 2)
+
+                                if (percentage > 2) //ne pas toucher a ceux qui sont dejà assez monté
+                                    if (spreadPercent < 1)//bid-ask percentage
+                                        if (delta < .5) //if (delta < .5) //se rassurer des petits pas entre les variations
+                                            if (maxInstantDelta < 1)//pas de hause/chute (pique) brusque
+                                                if (growingUpSmoothly)//monté progressive
+                                                    if (lastQuoteVolume > 8)//top 100
+                                                        // if (askVolumeBTC < 1 && bidVolumeBTC < 1)//assez bon volume 24H
+                                                        if (bidVolumeBTC < 1)//assez bon volume 24H
+                                                            if (duration > DURATION)
+                                                                if (volumeRatio < 10) {//quantité de bid relativement petite
+                                                                    return true;
+                                                                }
             }
     }
 
@@ -76,9 +82,10 @@ module.exports = class extends M24Base {
         // }
     }
     tryReset(asset, newAsset) {
-        const { bid, delta, change, duration, highPercentage, percentage } = asset.m24;
+        const { bid, delta, change, maxChange, maxInstantDelta, duration, highPercentage, percentage } = asset.m24;
 
-        if (change < -1 || highPercentage - percentage > 2 || duration > 1e3 * 60 * 60 * 6) {
+        if (change < -1 || maxChange - change > 2 ||
+            maxInstantDelta > 1 || duration > 1e3 * 60 * 60 * 6) {
             this.initAsset(asset, newAsset);
         }
     }

@@ -38,4 +38,7 @@ module.exports = {
     tme.sendMessage({ chat_id: data.chat_id || M24_LOG_CHAT_ID, text });
 
   },
+  'm24sync:*': function (text) {
+    tme.sendMessage({ chat_id: M24_LOG_CHAT_ID, text });
+  }
 }

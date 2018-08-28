@@ -1,0 +1,7 @@
+1. tme command to view recent trades
+    symbol, date, bid, ask, gain/lost
+
+2. tme command to view btc balance
+
+3. display via tme btc balance every 1 day at 12PM
+    old, new, change%
