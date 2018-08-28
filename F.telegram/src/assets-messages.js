@@ -99,7 +99,7 @@ const $this = module.exports = new class {
         `#${strategyName}, #${symbolId}`,
         `bid : ${openPrice}`,
         `sell : ${closePrice}`,
-        `change : ${change.toFixed(2)} [${targetStatus}]`,
+      `change : ${change/*.toFixed(2)*/} [${targetStatus}]`,
         `#${result}`
       ].join("\n")
     });
