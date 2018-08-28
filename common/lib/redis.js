@@ -7,6 +7,7 @@ const redis = Promise.promisifyAll(redisLib.createClient({ host: process.env.RED
 const redisSub = Promise.promisifyAll(redisLib.createClient({ host: process.env.REDIS_HOST }));
 const redisPub=Promise.promisifyAll(redisLib.createClient({ host: process.env.REDIS_HOST }));
 
+redisSub.setMaxListeners(0);
 
 module.exports = {
   redisKeysExists, redisGet, redisSet, subscribe, publish, getRedis,
