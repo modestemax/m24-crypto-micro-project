@@ -1,3 +1,4 @@
+const debug=require('debug')('common:exchange');
 const _ = require("lodash");
 const ccxt = require("ccxt");
 const { loadBalances } = require('./utils')

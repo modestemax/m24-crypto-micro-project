@@ -39,47 +39,56 @@ module.exports = class extends M24Base {
             }
     }
 
+    getOpenPrice(m24) {
+        const { bid, delta, open } = m24;
+        // let myBid = bid - (delta * bid / 100) / 2
+        // if (myBid < open) {
+        //     return bid
+        // } else {
+        //     return myBid;
+        // }
+        return bid;
+    }
+
     getSellPriceIfSellable(asset) {
         const { change, maxChange, openPrice } = asset;
-        let lossPercentage = maxChange - change;
-        if (maxChange < 1) {
-            if (change < -3) {
-                return true;
-            }
-        } else if (1 <= maxChange && maxChange < 2) {
-            if (lossPercentage > .5) {
-                return valuePercent(openPrice, Math.max(change, 1));
-            }
-        } else if (2 <= maxChange && maxChange < 3) {
-            if (lossPercentage > 1) {
-                return valuePercent(openPrice, Math.max(change, 1));
-            }
-        } else if (3 <= maxChange && maxChange < 4) {
-            if (lossPercentage > 1.5) {
-                return valuePercent(openPrice, Math.max(change, 1.3));
-                // return true;
-            }
-        } else if (4 <= maxChange && maxChange < 5) {
-            if (lossPercentage > 2) {
-                return valuePercent(openPrice, Math.max(change, 2));
-                // return true;
-            }
-        } else if (5 <= maxChange && maxChange < 8) {
-            if (lossPercentage > 3) {
-                return valuePercent(openPrice, Math.max(change, 2.5));
-                // return true;
-            }
-        } else if (8 <= maxChange) {
-            if (lossPercentage > 3.5) {
-                return valuePercent(openPrice, Math.max(change, 5));
-                // return true;
-            }
-        }
+        // let lossPercentage = maxChange - change;
+        return valuePercent(openPrice, 1.2);
 
-        // return valuePercent(openPrice, .3);
-        // if (lossPercentage >= 3) {
-        //     return true
+        // if (maxChange < 1) {
+        //     if (change < -3) {
+        //         return true;
+        //     }
+        // } else if (1 <= maxChange && maxChange < 2) {
+        //     if (lossPercentage > .5) {
+        //         return valuePercent(openPrice, Math.max(change, 1));
+        //     }
+        // } else if (2 <= maxChange && maxChange < 3) {
+        //     if (lossPercentage > 1) {
+        //         return valuePercent(openPrice, Math.max(change, 1));
+        //     }
+        // } else if (3 <= maxChange && maxChange < 4) {
+        //     if (lossPercentage > 1.5) {
+        //         return valuePercent(openPrice, Math.max(change, 1.3));
+        //         // return true;
+        //     }
+        // } else if (4 <= maxChange && maxChange < 5) {
+        //     if (lossPercentage > 2) {
+        //         return valuePercent(openPrice, Math.max(change, 2));
+        //         // return true;
+        //     }
+        // } else if (5 <= maxChange && maxChange < 8) {
+        //     if (lossPercentage > 3) {
+        //         return valuePercent(openPrice, Math.max(change, 2.5));
+        //         // return true;
+        //     }
+        // } else if (8 <= maxChange) {
+        //     if (lossPercentage > 3.5) {
+        //         return valuePercent(openPrice, Math.max(change, 5));
+        //         // return true;
+        //     }
         // }
+
     }
     tryReset(asset, newAsset) {
         const { bid, delta, change, maxChange, maxInstantDelta, duration, highPercentage, percentage } = asset.m24;
