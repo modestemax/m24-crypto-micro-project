@@ -54,7 +54,7 @@ module.exports = class extends M24Base {
         const { change, maxChange, openPrice, symbolId } = rawAsset;
         // let lossPercentage = maxChange - change;
         let asset = _.find(this.assets, a => a.m24.symbolId === symbolId);
-        asset && this.initAsset(Asset);
+        asset && this.initAsset(asset);
 
         return valuePercent(openPrice, 1.2);
 
