@@ -1,4 +1,4 @@
-
+const _ = require('lodash')
 const { exchange, binance, redis } = require("common");
 const { subscribe, publish } = redis;
 
@@ -10,7 +10,8 @@ module.exports = async function fetchTickers() {
     publish('m24:exchange:tickers', assets)
   });
 
-  Object.assign(assets, await exchange.fetchTickers())
+  Object.assign(assets, await exchange.fetchTickers());
+  setInterval(() => _.mapValues(assets, a => null), 30e3)
 
   const symbols = Object.keys(exchange.marketsById).filter(s => /BTC$/.test(s));
   binance.ws.ticker(symbols, async (price) => {
@@ -44,5 +45,5 @@ module.exports = async function fetchTickers() {
     // debugger
     // exchange.parseTickers(rawTickers, symbols);
   });
-
+console.log('listening tick for ',symbols.length,' symbols')
 }

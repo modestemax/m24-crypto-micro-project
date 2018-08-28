@@ -50,9 +50,12 @@ module.exports = class extends M24Base {
         return bid;
     }
 
-    getSellPriceIfSellable(asset) {
-        const { change, maxChange, openPrice } = asset;
+    getSellPriceIfSellable(rawAsset) {
+        const { change, maxChange, openPrice, symbolId } = rawAsset;
         // let lossPercentage = maxChange - change;
+        let asset = _.find(this.assets, a => a.m24.symbolId === symbolId);
+        asset && this.initAsset(rawAsset);
+
         return valuePercent(openPrice, 1.2);
 
         // if (maxChange < 1) {
