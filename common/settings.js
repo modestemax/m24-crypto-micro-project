@@ -60,16 +60,12 @@ module.exports = {
         },
         "binance24h": {
             isActive: true,
-            timeInForce: 'GTC',
-            stopLoss: null,
-            trailingStop: null,
+            timeInForce: 'GTC',            
             selfStop: true
         },
           "m24Scalping": {
             isActive: false,
-            timeInForce: 'GTC',
-            stopLoss: null,
-            trailingStop: null,
+            timeInForce: 'GTC',            
             selfStop: true,
             cancelBidAfterSecond: 60 * 5,
         }
