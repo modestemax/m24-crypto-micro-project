@@ -3,7 +3,7 @@ const defaultStrategyOptions = {
     selfStop: false,
     timeInForce: 'FOK',
     bidMarket: false,
-    takeProfit: 3,
+    takeProfit: 1.2,
     stopLoss: -3,
     trailingStop: 1.5,
     cancelBidAfterSecond: 60 * 20,//1hour,
