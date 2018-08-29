@@ -17,10 +17,10 @@ function getExchange(auth) {
     apiKey: auth.api_key,
     secret: auth.secret,
     // verbose: true,
+    enableRateLimit:true,
     options: {
       "warnOnFetchOpenOrdersWithoutSymbol": false,
       adjustForTimeDifference: true,
-      enableRateLimit:true,
       verbose: true, // if needed, not mandatory
       recvWindow: 10000000 // not really needed
     }
