@@ -4,7 +4,7 @@ const Mutex = new require("await-mutex").default;
 const mutex = new Mutex();
 
 const { subscribe: redisSubscribe, publish } = require('common/redis');
-const { exchange } = require("common");
+const { exchange, getLastAsk } = require("common");
 const { MAX_TRADE_COUNT, strategies } = require("common/settings");
 
 const { getAssets, estimatedValue } = require('./market');
@@ -41,21 +41,36 @@ redisSubscribe('crypto:*', {
     } finally {
       unlock();
     }
-
-
   }
 });
 
 async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity, closePrice, strategyName }) {
-  const market = exchange.marketsById[symbolId];
-  const assets = await getAssets();
-  quantity = assets[market.baseId] && assets[market.baseId].free;
-  if (quantity) {
-    let args = [market.symbol, quantity,]
-    let sellFunction = closePrice ? (args.push(closePrice), 'createLimitSellOrder') : 'createMarketSellOrder';
-    args.push({
-      newClientOrderId: newClientOrderId || `${strategyName}_${symbolId}`,
-    })
-    exchange[sellFunction].apply(exchange, args);
+  let unlock = await mutex.lock();
+  try {
+    const market = exchange.marketsById[symbolId];
+    const assets = await getAssets();
+    const asset = assets[market.baseId];
+    const freeQuantity = asset && asset.free;
+    const totalQuantity = asset && asset.total;
+    if (freeQuantity) {
+      let args = [market.symbol, freeQuantity,]
+      let sellFunction = closePrice ? (args.push(closePrice), 'createLimitSellOrder') : 'createMarketSellOrder';
+      args.push({
+        newClientOrderId: newClientOrderId || `${strategyName}_${symbolId}`,
+      })
+      exchange[sellFunction].apply(exchange, args);
+    } else if (totalQuantity) {
+      let lastAsk = await getLastAsk({ clientOrderId: newClientOrderId });
+      if (lastAsk) {
+        if (lastAsk.price !== closePrice) {
+          await exchange.editLimitSellOrder(lastAsk.orderId, market.symbol, totalQuantity, closePrice, {
+            newClientOrderId: newClientOrderId || `${strategyName}_${symbolId}`,
+          });
+          exchange
+        }
+      }
+    }
+  } finally {
+    unlock();
   }
 }

@@ -14,11 +14,13 @@ const humanizeDuration = _.partial(require('humanize-duration'), _, {
 
 
 module.exports = {
+  getLastAsk, saveAsk,
   loadAsset, delAsset, saveAsset,
   loadOrders, saveTrade, loadTrades, loadTrade, delTrade, saveOder, saveSellOder, delOder /*delExpiredOrders,*/,
   loadOrder, loadSellOrders, loadSellOrder, /*getFreeBalance,*/ loadMarkets, computeChange,
   valuePercent, clearBalances, saveBalances, loadBalances, saveOderStrategy, loadOrderStrategy,
-  humanizeDuration
+  humanizeDuration,
+  saveDatum
 };
 
 
@@ -108,6 +110,24 @@ function saveTrade(trade) {
     hKey: "trades",
     id: trade.newClientOrderId,
     datum: trade
+  });
+}
+
+function delTrade({ newClientOrderId }) {
+  return delDatum({ hKey: "trades", id: newClientOrderId });
+}
+//-------------------------ASK-----------------------------
+
+
+async function getLastAsk({ clientOrderId }) {
+  return loadDatum({ hKey: "ask", id: clientOrderId });
+}
+
+function saveAsk(ask) {
+  return saveDatum({
+    hKey: "ask",
+    id: ask.clientOrderId,
+    datum: ask
   });
 }
 

@@ -18,7 +18,7 @@ const $this = module.exports = new class {
   }
 
   resetMessage() {
-    tradesMessageId = {}
+    Object.keys(tradesMessageId).forEach(k => delete tradesMessageId[k])
   }
 
   newOrder(order) {
@@ -61,7 +61,7 @@ const $this = module.exports = new class {
       chat_id: M24_CHAT_ID,
       message_id,
       text: [
-        "#trade_changed",
+        "#trade_changed /sell",
         `#${strategyName}, #${symbolId}`,
         `max ${maxChange.toFixed(2)}% : min ${minChange.toFixed(2)}%`,
         `stop ${strategy.stopLoss} : profit ${strategy.takeProfit}`,
@@ -107,7 +107,7 @@ const $this = module.exports = new class {
         `sell : ${closePrice || '?'}`,
         `change : ${change ? change.toFixed(2) : '?'} [${targetStatus}]`,
         `duration ${humanizeDuration(duration)}`
-        `#${result}`
+          `#${result}`
       ].join("\n")
     });
   }

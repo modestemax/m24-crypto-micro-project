@@ -9,10 +9,14 @@ module.exports = {
 };
 
 
-function wait(APPA, APPB, callback) {
-  console.log('Waiting', APPA)
-  let unsubscribe = subscribe('m24sync:' + APPA, async () => (start(APPB, callback), unsubscribe()));
-  publish('m24sync:waiting:' + APPA, APPB + ' is Waiting for ' + APPA + ' to start ');
+function wait(APPA, APPB, callback, { immediate = false } = {}) {  
+  if (immediate) {
+    start(APPB, callback)
+  } else {
+    console.log('Waiting', APPA)
+    let unsubscribe = subscribe('m24sync:' + APPA, async () => (start(APPB, callback), unsubscribe()));
+    publish('m24sync:waiting:' + APPA, APPB + ' is Waiting for ' + APPA + ' to start ');
+  }
 }
 
 async function start(APP, callback) {

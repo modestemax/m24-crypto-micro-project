@@ -2,9 +2,9 @@
 
 const { wait } = require('common')
 
-// wait('D', 'C', () => {
+wait('D', 'C', () => {
     require("./init");
 
     require("./crypto");
 
-// })
+},{immediate:true})

@@ -17,6 +17,9 @@ module.exports = class extends Template {
     test(m24, BREAK_CHANGE = 3) {
 
     }
+    tick(price){
+        
+    }
     async track24H() {
         this.startTime = Date.now();
         let assets = this.assets = (await redisGet('assets')) ||
@@ -25,23 +28,29 @@ module.exports = class extends Template {
             ));
         fetchTickers((price) => {
             this.assetChanged(assets[price.symbol], price);
+            this.tick(price)
             redisSetThrottled({ key: 'assets', data: assets, expire: 60 * 20 })//20 min
         })
         // setInterval(async () => this.logTop5(assets), 5e3)
         setInterval(async () => this.logTop5(assets), process.env.NODE_ENV === 'production' ? 10 * 60e3 : 30e3)
     }
-    logTop5(assets) {
+    getTop(count = 5, assets) {
         assets = assets || this.assets;
-        let top5 = _(assets)
+        const top = _(assets)
             .map('m24')
             .filter(m24 => this.test(m24, 0, 0))
-            .orderBy(m24 => m24.change).reverse().slice(0, 5)
+            .orderBy(m24 => m24.change).reverse().slice(0, count)
             .map(m24 => ({
                 symbolId: m24.symbolId,
                 change: m24.change.toFixed(2),
                 duration: m24.duration
             }))
             .value();
+        return top;
+    }
+    logTop5(assets) {
+        assets = assets || this.assets;
+        let top5 = this.getTop(5, assets);
 
         if (top5.length) {
             publish('m24:algo:tracking', {
@@ -56,6 +65,7 @@ module.exports = class extends Template {
                 text: assets ? 'Empty' : 'assets is undefined'
             });
         }
+
     }
     initAsset(asset, newAsset) {
         const now = Date.now();

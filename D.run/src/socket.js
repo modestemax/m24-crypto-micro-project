@@ -4,7 +4,7 @@ const { tryToBuy, onBuy, onSell, onPriceChanged } = require("./assets");
 
 const { publish } = require('common/redis');
 
-const { binance } = require('common');
+const { binance, saveAsk } = require('common');
 
 module.exports = { listenToPriceChange, assetChangeManangement }
 
@@ -49,6 +49,7 @@ function assetChangeManangement() {
                 //new order
                 // debug("new sell order detected " + order.symbolId);
                 // createSellOrder(order);
+                saveAsk(order);
                 publish("asset:sell:order_new", order);
                 break;
               case "FILLED":

@@ -1,7 +1,7 @@
 const debug = require('debug')('common:exchange');
 const _ = require("lodash");
 const ccxt = require("ccxt");
-const { loadBalances } = require('./utils')
+const { saveBalances,loadBalances } = require('./utils')
 const { subscribe, publish } = require('./redis');
 const auth = require(process.env.HOME + '/.api.json').KEYS;
 
@@ -63,6 +63,7 @@ function rateLimit(exchange) {
     let balance = await loadBalances();
     if (!balance) {
       balance = await fetchBalance.apply(exchange, args)
+      saveBalances(balance);
     }
     return balance;
   });

@@ -32,6 +32,17 @@ const commands = {
 			message.send(stack)
 		});
 	},
+	"sell"(message) {
+		message.send("Not Implemented)!");
+		// message.send("Enter sell price or sell percentage (prefixed with 'p')!");
+
+		// message.answer(async (message) => {
+		// 	if(message.text[0]==='p'){
+		// 		publish('user:sell:percent')
+		// 	}
+		// 	message.send(stack)
+		// });
+	},
 	"top5"(message) {
 		publish('m24:algo:get_top5')
 	}
