@@ -1,6 +1,6 @@
 const { wait } = require('common')
 
-wait('C', 'B', () => {
+// wait('C', 'B', () => {
     require('./init')
-})
+// })
 

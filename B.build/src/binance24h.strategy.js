@@ -30,8 +30,8 @@ module.exports = class extends M24Base {
                                             if (maxInstantDelta < 1)//pas de hause/chute (pique) brusque
                                                 if (growingUpSmoothly)//monté progressive
                                                     if (lastQuoteVolume > 8)//top 100
-                                                        // if (askVolumeBTC < 1 && bidVolumeBTC < 1)//assez bon volume 24H
-                                                        if (bidVolumeBTC < 1)//assez bon volume 24H
+                                                        if (askVolumeBTC < 1 && bidVolumeBTC < 1)//assez bon volume 24H
+                                                        // if (bidVolumeBTC < 1)//assez bon volume 24H
                                                             if (duration > DURATION)
                                                                 if (volumeRatio < 10) {//quantité de bid relativement petite
                                                                     return true;

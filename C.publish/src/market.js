@@ -2,8 +2,10 @@ const debug = require("debug")("C:market");
 const _ = require("lodash");
 
 // const exchange = require("./exchange");
-const {  exchange } = require("common");
+const { exchange, fetchBalance } = require("common");
+const assets = {};
 
+fetchBalance((balance) => Object.assign(assets, balance))
 
 const $this = module.exports = {
   async   getOpenOrders() {
@@ -23,16 +25,20 @@ const $this = module.exports = {
 
   async   getAssets() {
     let prices = await exchange.fetchTickers();
-    let assets = await exchange.fetchBalance();
+    Object.keys(assets).length || Object.assign(assets, await exchange.fetchBalance());
 
     return _.reduce(assets, (assets, balance, asset) => {
       let symbol = asset + '/BTC';
       let price = prices[symbol];
-      return price && balance.free * price.close > 0.001 ?
-        Object.assign(assets, { [asset]: Object.assign(balance, { btc: balance.total * price.close }) })
-        : asset === 'BTC' ?
-          Object.assign(assets, { [asset]: Object.assign(balance, { btc: balance.total }) })
-          : assets
+      if (asset === 'BTC') {
+        return Object.assign(assets, { [asset]: Object.assign(balance, { btc: balance.total }) })
+      } else if (price) {
+        let btc = balance.total * price.close;
+        if (btc > 0.001) {
+          return Object.assign(assets, { [asset]: Object.assign(balance, { btc }) });
+        }
+      }
+      return assets;
     }, {});
 
   },
@@ -48,7 +54,8 @@ const $this = module.exports = {
         symbolId: order.info.symbol,
         clientOrderId: order.info.clientOrderId,
         openPrice: order.price,
-        quantity: order.filled
+        quantity: order.filled,
+        timestamp: order.timestamp
       }
     }))
   },

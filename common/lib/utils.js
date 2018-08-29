@@ -17,7 +17,7 @@ module.exports = {
   loadAsset, delAsset, saveAsset,
   loadOrders, saveTrade, loadTrades, loadTrade, delTrade, saveOder, saveSellOder, delOder /*delExpiredOrders,*/,
   loadOrder, loadSellOrders, loadSellOrder, /*getFreeBalance,*/ loadMarkets, computeChange,
-  valuePercent, saveBalances, loadBalances, saveOderStrategy, loadOrderStrategy,
+  valuePercent, clearBalances, saveBalances, loadBalances, saveOderStrategy, loadOrderStrategy,
   humanizeDuration
 };
 
@@ -138,6 +138,10 @@ function saveBalances(balances) {
     hKey: "balances", id: 'binance',
     datum: balances
   });
+}
+function clearBalances() {
+  return delDatum({ hKey: "balances", id: 'binance' });
+
 }
 
 // function saveBalances(exchangeId, balances) {

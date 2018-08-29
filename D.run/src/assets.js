@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const { strategies } = require('common/settings');
-const { candleUtils, loadAsset, delAsset, saveAsset, saveBalances, exchange, redis } = require("common");
+const { candleUtils, loadAsset, delAsset, saveAsset, exchange, redis } = require("common");
 const { valuePercent, computeChange } = candleUtils;
 const { publish } = redis;
 const assets = {};
@@ -24,7 +24,7 @@ const $this = module.exports = {
       }
     }
   },
-  async onBuy({ symbolId, clientOrderId, openPrice, quantity, stopTick }) {
+  async onBuy({ symbolId, clientOrderId, openPrice, quantity, timestamp, stopTick }) {
     let strategyName = clientOrderId.split('_')[0];
     if (strategyName in strategies) {
       let asset = await loadAsset({ clientOrderId });
@@ -32,7 +32,7 @@ const $this = module.exports = {
         delAsset(asset)
       }
       assets[clientOrderId] = Object.assign({}, asset, {
-        symbolId, clientOrderId, strategyName,
+        symbolId, clientOrderId, strategyName, timestamp,
         strategy: Object.assign({}, strategies[strategyName]),
         openPrice, quantity, stopTick
       })
@@ -41,7 +41,7 @@ const $this = module.exports = {
       stopTick()
     }
   },
-  onSell({ symbolId, clientOrderId, price, quantity, }) {
+  onSell({ symbolId, clientOrderId, price, quantity }) {
     // debugger
     const asset = assets[clientOrderId];
     if (asset) {
@@ -50,17 +50,11 @@ const $this = module.exports = {
       // $this.onPriceChanged({ symbolId: asset.symbolId, lastPrice: price });
       publish("asset:sell:success", asset);
     } else {
-      publish("asset:sell:success", { symbolId, clientOrderId, price, quantity });
+      publish("asset:sell:success", { symbolId, clientOrderId, closePrice: price, quantity });
     }
 
   },
-  async onBalanceChanged(balances) {
-    debugger
-    let bal = _.mapValues(balances, b =>
-      ({ free: +b.available, used: +b.locked, total: +b.available + +b.locked }))
-    let bal2 = await exchange.fetchBalance();
-    saveBalances(bal)
-  },
+
   onPriceChanged({ symbolId, lastPrice }) {
 
     const assetsChanged = _.filter(assets, { symbolId })

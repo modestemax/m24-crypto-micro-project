@@ -1,7 +1,6 @@
 
 const { wait } = require('common')
 
-wait('F','D', async() => {
-    await require('./prices')();
+// wait('F','D', async() => {    
     require('./init');
-})
+// })

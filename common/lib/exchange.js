@@ -1,4 +1,4 @@
-const debug=require('debug')('common:exchange');
+const debug = require('debug')('common:exchange');
 const _ = require("lodash");
 const ccxt = require("ccxt");
 const { loadBalances } = require('./utils')
@@ -71,15 +71,15 @@ function rateLimit(exchange) {
   exchange.fetchTickers = _.wrap(exchange.fetchTickers, (fetchTickers, ...args) => {
     return new Promise((resolve) => {
       let unsubscribe = subscribe('m24:exchange:tickers', async (tickers) => {
-        resolve(tickers && Object.keys(tickers).length > 0 ? tickers : (await fetchTickers.apply(exchange)));
+        clearTimeout(timeout);
         unsubscribe();
+        resolve(tickers && Object.keys(tickers).length > 0 ? tickers : (await fetchTickers.apply(exchange)));
       });
+      let timeout = setTimeout(async() => {
+        unsubscribe();
+        resolve((await fetchTickers.apply(exchange)));
+      }, 1e3)
       publish('m24:exchange:fetchTickers');
     })
   });
 }
-
-
-
-// exchange.fetchTickers();
-// let assets = await exchange.fetchBalance();

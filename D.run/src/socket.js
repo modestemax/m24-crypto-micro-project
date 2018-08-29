@@ -1,10 +1,10 @@
 const debug = require("debug")("D:socket");
 const _ = require("lodash");
-const { tryToBuy, onBuy, onSell, onBalanceChanged, onPriceChanged } = require("./assets");
+const { tryToBuy, onBuy, onSell, onPriceChanged } = require("./assets");
 
 const { publish } = require('common/redis');
 
-const {binance} = require('common');
+const { binance } = require('common');
 
 module.exports = { listenToPriceChange, assetChangeManangement }
 
@@ -69,7 +69,7 @@ function assetChangeManangement() {
         }
         break;
       case "account":
-        onBalanceChanged(msg.balances);
+
         break;
     }
   });

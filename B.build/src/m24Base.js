@@ -3,7 +3,7 @@ const _ = require('lodash');
 const Template = require('./strategyBase');
 
 const { subscribe, publish, redisGet, redisSet, } = require("common/redis");
-const { candleUtils, exchange, humanizeDuration } = require("common");
+const { candleUtils, exchange, humanizeDuration, fetchTickers } = require("common");
 const { computeChange, valuePercent } = candleUtils;
 
 const redisSetThrottled = _.throttle(redisSet, 60 * 1e3);
@@ -19,22 +19,14 @@ module.exports = class extends Template {
     }
     async track24H() {
         this.startTime = Date.now();
-        let assets = this.assets = await redisGet('assets');
-        if (!assets) {
-            assets = this.assets = await exchange.fetchTickers();
-            _.forEach(assets, (asset, baseId) => {
-                this.initAsset(asset);
-            });
-        }
-
-        setInterval(async () => {
-            let prices = await exchange.fetchTickers();
-            _.forEach(assets, (asset, baseId) => {
-                prices[baseId] && this.assetChanged(asset, prices[baseId])
-            })
+        let assets = this.assets = (await redisGet('assets')) ||
+            (await exchange.fetchTickers().then(assets =>
+                _.forEach(assets, (asset) => this.initAsset(asset))
+            ));
+        fetchTickers((price) => {
+            this.assetChanged(assets[price.symbol], price);
             redisSetThrottled({ key: 'assets', data: assets, expire: 60 * 20 })//20 min
-        }, 10e3)
-
+        })
         // setInterval(async () => this.logTop5(assets), 5e3)
         setInterval(async () => this.logTop5(assets), process.env.NODE_ENV === 'production' ? 10 * 60e3 : 30e3)
     }
@@ -91,7 +83,6 @@ module.exports = class extends Template {
             ]));
             m24.lastQuoteVolume = newAsset.quoteVolume;
             m24.highPercentage = _.max([m24.percentage, m24.highPercentage]);
-
 
             m24.duration = now - m24.time;
             m24.prevChange = m24.change;

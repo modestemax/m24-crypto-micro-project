@@ -1,9 +1,9 @@
-const _=require('lodash');
-const {  subscribe, publish } = require('./redis');
+const _ = require('lodash');
+const { subscribe, publish } = require('./redis');
 const APP_NAME = process.env.APP_NAME //|| process.argv[1];
 const { exchange } = require("./exchange");
 
-const [publishThrottled,subscribeThrottled]=[_.throttle(publish,30e3),_.throttle(subscribe,30e3)]
+const [publishThrottled, subscribeThrottled] = [_.throttle(publish, 30e3), _.throttle(subscribe, 30e3)]
 module.exports = {
   wait, start
 };
@@ -11,7 +11,7 @@ module.exports = {
 
 function wait(APPA, APPB, callback) {
   console.log('Waiting', APPA)
-  subscribe('m24sync:' + APPA, async () => start(APPB, callback));
+  let unsubscribe = subscribe('m24sync:' + APPA, async () => (start(APPB, callback), unsubscribe()));
   publish('m24sync:waiting:' + APPA, APPB + ' is Waiting for ' + APPA + ' to start ');
 }
 
@@ -20,7 +20,7 @@ async function start(APP, callback) {
   await exchange.loadMarkets()
   await callback();
   publish('m24sync:' + APP, 'Starting ' + APP);
-  subscribe('m24sync:waiting:' + APP, () => publish('m24sync:' +APP))
+  subscribe('m24sync:waiting:' + APP, () => publish('m24sync:' + APP))
 }
 
 
