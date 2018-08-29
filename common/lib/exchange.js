@@ -20,6 +20,7 @@ function getExchange(auth) {
     options: {
       "warnOnFetchOpenOrdersWithoutSymbol": false,
       adjustForTimeDifference: true,
+      enableRateLimit:true,
       verbose: true, // if needed, not mandatory
       recvWindow: 10000000 // not really needed
     }
