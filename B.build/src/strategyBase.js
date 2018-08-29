@@ -57,13 +57,16 @@ module.exports = class Strategy {
 
         const [price, event] = side === 'BUY' ? [openPrice, 'crypto:buy_limit'] : [closePrice, 'crypto:sell_limit'];
 
-        publish(`m24:algo:pair_found`, { side, strategyName, symbolId, price }, { rateLimit: 60 * 5 });
+        this.pairFound({ side, symbolId, price });
         if (price) {
             publish(event, order);
             debug(`[strategy:${strategyName}] ${side} ${symbolId} at price: ${price}`)
         }
     }
 
+    pairFound({ side, symbolId, price }) {
+        publish(`m24:algo:pair_found`, { side, strategyName: this.name, symbolId, price });
+    }
     async getTicker({ exchange: exchangeId, symbolId }) {
         let tick = await tradingView({ filter: symbolId, exchangeId });
         return tick[symbolId]
