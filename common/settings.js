@@ -59,7 +59,7 @@ module.exports = {
             bidMarket: true
         },
         "BBEMA30M15": {
-            timeframe: 60,
+            timeframe: 15,
             timeInForce: 'GTC',
             isActive: true,
             bidMarket: true
@@ -71,7 +71,7 @@ module.exports = {
             bidMarket: true
         },
         "BBEMA3010M15": {
-            timeframe: 60,
+            timeframe: 15,
             timeInForce: 'GTC',
             isActive: true,
             bidMarket: true
@@ -83,7 +83,7 @@ module.exports = {
             bidMarket: true
         },
         "BBEMA20M15": {
-            timeframe: 60,
+            timeframe: 15,
             timeInForce: 'GTC',
             isActive: true,
             bidMarket: true
