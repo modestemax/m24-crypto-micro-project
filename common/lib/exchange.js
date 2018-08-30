@@ -39,27 +39,6 @@ const limiter = new RateLimiter(10, "second");
 
 function rateLimit(exchange) {
 
-  ['fetchBalance', 'fetchTickers', 'fetchOrder', 'fetchOrders', 'createOrder', 'cancelOrder'].forEach(apiName => {
-
-    exchange[apiName] = _.wrap(exchange[apiName], (apiCall, ...args) => {
-      return new Promise((resolve, reject) => {
-        limiter.removeTokens(1, async () => {
-          let unlock = await mutex.lock();
-          try {
-            resolve(await apiCall.apply(exchange, args));
-          } catch (error) {
-            reject(error);
-            debug(error);
-          } finally {
-            unlock();
-          }
-        });
-      })
-
-    })
-  })
-
-
   exchange.fetchBalance = _.wrap(exchange.fetchBalance, async (fetchBalance, ...args) => {
     let balance = await loadBalances();
     if (!balance) {
@@ -84,4 +63,27 @@ function rateLimit(exchange) {
       publish('m24:exchange:fetchTickers');
     })
   });
+
+
+  ['fetchBalance', 'fetchTickers', 'fetchOrder', 'fetchOrders', 'createOrder', 'cancelOrder'].forEach(apiName => {
+
+    exchange[apiName] = _.wrap(exchange[apiName], (apiCall, ...args) => {
+      return new Promise((resolve, reject) => {
+        limiter.removeTokens(1, async () => {
+          let unlock = await mutex.lock();
+          try {
+            resolve(await apiCall.apply(exchange, args));
+          } catch (error) {
+            reject(error);
+            debug(error);
+          } finally {
+            unlock();
+          }
+        });
+      })
+
+    })
+  })
+
+
 }
