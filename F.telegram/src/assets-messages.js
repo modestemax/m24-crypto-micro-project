@@ -106,8 +106,8 @@ const $this = module.exports = new class {
         `bid : ${openPrice || '?'}`,
         `sell : ${closePrice || '?'}`,
         `change : ${change ? change.toFixed(2) : '?'} [${targetStatus}]`,
-        `duration ${humanizeDuration(duration)}`
-          `#${result}`
+        `duration ${humanizeDuration(duration)}`,
+        `#${result}`
       ].join("\n")
     });
   }
