@@ -20,6 +20,7 @@ function wait(APPA, APPB, callback, { immediate = false } = {}) {
 }
 
 async function start(APP, callback) {
+  process.env.APP_NAME=process.env.APP_NAME||APP;
   console.log('\n\nStarting ' + (APP_NAME || APP) + ' at ' + new Date() + '\n\n');
   await exchange.loadMarkets()
   await callback();

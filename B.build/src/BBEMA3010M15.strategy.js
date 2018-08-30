@@ -23,7 +23,7 @@ module.exports = class extends Template {
                                         ||
                                         (last.ema100 < last.bbb20 && last.ema200 < last.bbb20 && last.ema50 <= last.bbb20)
                                     )
-                                        if (last.price < last.bbu20) {
+                                        if (last.close < last.bbu20) {
                                             let ticker = await this.getTicker({ exchange, symbolId });
                                             // if (ticker && ticker.ask) {
                                             //     debug(`${symbolId} BID AT ${ticker.ask}`);

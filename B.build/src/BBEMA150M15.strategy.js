@@ -22,7 +22,8 @@ module.exports = class extends Template {
                                         let ticker = await this.getTicker({ exchange, symbolId });
                                         if (ticker && ticker.ask) {
                                             debug(`${symbolId} BID AT ${ticker.ask}`);
-                                            return ticker.ask;
+                                           // return ticker.ask;
+                                           this.pairFound({ side: 'BUY', symbolId, price: ticker.ask })
                                         }
                                     }
                                 }
