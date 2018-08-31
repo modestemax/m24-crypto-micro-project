@@ -18,7 +18,7 @@ module.exports = {
           redisSet({ key: 'errorstack' + stackId, data: stack, expire: 24 * 60 * 60 }) //24 hour
           stackCmd = `get error stack at /error_stack providing this id: ${stackId}`;
         }
-        text = ["Error", message, stackCmd].join("\n")
+        text = ["#error", message, stackCmd].join("\n")
         break;
       case `m24:algo:pair_found`:
         const { side, strategyName, symbolId, price } = data;
