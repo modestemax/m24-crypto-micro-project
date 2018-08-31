@@ -67,31 +67,31 @@ module.exports = {
         "BBEMA30H1": {
             timeframe: 60,
             timeInForce: 'GTC',
-            isActive: true,
+            // isActive: true,
             bidMarket: true
         },
         "BBEMA3010M15": {
             timeframe: 15,
             timeInForce: 'GTC',
-            isActive: true,
+            // isActive: true,
             bidMarket: true
         },
         "BBEMA3010H1": {
             timeframe: 60,
             timeInForce: 'GTC',
-            isActive: true,
+            // isActive: true,
             bidMarket: true
         },
         "BBEMA20M15": {
             timeframe: 15,
             timeInForce: 'GTC',
-            isActive: true,
+            // isActive: true,
             bidMarket: true
         },
         "BBEMA20H1": {
             timeframe: 60,
             timeInForce: 'GTC',
-            isActive: true,
+            // isActive: true,
             bidMarket: true
         },
         "binance24h": {
