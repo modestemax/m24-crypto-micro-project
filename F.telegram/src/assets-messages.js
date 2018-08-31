@@ -61,12 +61,13 @@ const $this = module.exports = new class {
       chat_id: M24_CHAT_ID,
       message_id,
       text: [
-        "#trade_changed /sell",
+        "💎 #trade_changed",
         `#${strategyName}, #${symbolId}`,
         `max ${maxChange.toFixed(2)}% : min ${minChange.toFixed(2)}%`,
         `stop ${strategy.stopLoss} : profit ${strategy.takeProfit}`,
         `change  ${change.toFixed(2)}% [${targetStatus}]`,
-        `since ${humanizeDuration(duration)}`
+        `since ${humanizeDuration(duration)}`,
+        `/sell`
       ].join("\n")
     };
     if (!message_id) {
