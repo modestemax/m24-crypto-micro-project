@@ -1,7 +1,7 @@
 const debug = require('debug')('tv');
 const curl = require('curl');
 const _ = require('lodash');
-const { getNewCandleId, getCandleTime } = require('./candle-utils');
+const { getNewCandleId, getCandleTime, computeChange } = require('./candle-utils');
 
 const params = ({ timeframe, filter = 'btc$', exchangeId = 'binance' } = {}) => {
     let timeframeFilter = !timeframe || /1d/i.test(timeframe) || +timeframe === 60 * 24 ? '' : '|' + timeframe;
@@ -102,6 +102,7 @@ const beautify = (data, timeframe) => {
             green: d[21] > 0,
             bid: d[28],
             ask: d[29],
+            spreadPercentage: computeChange(d[28], d[29]),
             bbl20: d[30],
             bbu20: d[31],
             bbb20: (d[30] + d[31]) / 2,

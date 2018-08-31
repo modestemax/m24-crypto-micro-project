@@ -49,13 +49,13 @@ module.exports = {
         "BBEMA180M15": {
             timeframe: 15,
             timeInForce: 'FOK',
-            isActive: true,
+            // isActive: true,
             bidMarket: true
         },
         "BBEMA180H1": {
             timeframe: 60,
             timeInForce: 'FOK',
-            isActive: true,
+            // isActive: true,
             bidMarket: true
         },
         "BBEMA30M15": {

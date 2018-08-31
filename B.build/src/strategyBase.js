@@ -13,16 +13,19 @@ module.exports = class Strategy {
     }
 
     async check(signal) {
-        let bid = await this.canBuy(signal);
-        let ask = await this.canSell(signal);
-        const { exchange, symbolId, timeframe } = signal.candle;
-        Object.assign(this, { symbolId, bid, ask, timeframe, exchange });
-        if (bid) {
-            debug(`${this.name} Buy OK`);
-            this.notifyBuy();
-        } else if (ask) {
-            debug(`${this.name} Sell OK`);
-            this.notifySell();
+        const { exchange, symbolId, timeframe, spreadPercentage } = signal.candle;
+        if (spreadPercentage < 1) {
+            let bid = await this.canBuy(signal);
+            let ask = await this.canSell(signal);
+
+            Object.assign(this, { symbolId, bid, ask, timeframe, exchange });
+            if (bid) {
+                debug(`${this.name} Buy OK`);
+                this.notifyBuy();
+            } else if (ask) {
+                debug(`${this.name} Sell OK`);
+                this.notifySell();
+            }
         }
     }
     selfSell(asset) {

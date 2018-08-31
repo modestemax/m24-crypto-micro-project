@@ -22,7 +22,7 @@ module.exports = {
         break;
       case `m24:algo:pair_found`:
         const { side, strategyName, symbolId, price } = data;
-        text = [`Pair found #${strategyName} ${side}`, `${symbolId} at ${price}`].join("\n")
+        text = [`#pair_found #${strategyName} ${side}`, `${symbolId} at ${price}`].join("\n")
         break;
       case `m24:algo:loaded`:
         text = ["Algo loaded", JSON.stringify(data)].join('\n')
