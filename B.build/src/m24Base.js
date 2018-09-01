@@ -43,6 +43,7 @@ module.exports = class extends Template {
             .map(m24 => ({
                 symbolId: m24.symbolId,
                 change: m24.change.toFixed(2),
+                minChange: m24.minChange.toFixed(2),
                 duration: m24.duration
             }))
             .value();
@@ -58,7 +59,7 @@ module.exports = class extends Template {
                 text: top5.map(t => `#${t.symbolId} ${t.change} [ since ${humanizeDuration(t.duration)} ]`).join('\n')
             });
             console.log("top5", this.name)
-            top5.map(t => `${t.symbolId} ${t.change}  since ${humanizeDuration(t.duration)}`).map(str => console.log(str))
+            top5.map(t => `${t.symbolId} ${t.change} [${t.minChange}]  since ${humanizeDuration(t.duration)}`).map(str => console.log(str))
         } else {
             publish('m24:algo:tracking', {
                 strategyName: this.name,
