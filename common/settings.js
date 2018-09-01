@@ -75,13 +75,13 @@ module.exports = {
         "BBEMA3010M15": {
             timeframe: 15,
             timeInForce: 'GTC',
-            isActive: true,
+            // isActive: true,
             bidMarket: true
         },
         "BBEMA3010H1": {
             timeframe: 60,
             timeInForce: 'GTC',
-            isActive: true,
+            // isActive: true,
             bidMarket: true
         },
         "BBEMA20M15": {
