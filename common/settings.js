@@ -112,7 +112,7 @@ module.exports = {
             isActive: true,
         },
         "binance24h": {
-            isActive: false,
+            isActive: true,
             doTrade: true,
             timeInForce: 'GTC',
             selfStop: true
