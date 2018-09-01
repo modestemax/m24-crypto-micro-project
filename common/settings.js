@@ -6,8 +6,9 @@ const defaultStrategyOptions = {
     takeProfit: 1.2,
     stopLoss: -3,
     trailingStop: 1.5,
-    cancelBidAfterSecond: 60 * 20,//1hour,
+    cancelBidAfterSecond: 60 * 20,//20 min,
     ownerTelegramChatId: "475514014",//"@modestemax";
+    doTrade: false,
 };
 
 module.exports = {
@@ -16,6 +17,7 @@ module.exports = {
     defaultStrategyOptions,
     strategies: filterActive({
         "testEma01": {
+            timeframe: 15,
             timeInForce: 'GTC',
             cancelBidAfterSecond: 30,
             isActive: process.env.NODE_ENV != 'production',
@@ -92,16 +94,32 @@ module.exports = {
             timeframe: 60,
             timeInForce: 'GTC',
             // isActive: true,
-            bidMarket: true
+        },
+        "BBEMA110": {
+            timeframe: 15,
+            timeInForce: 'GTC',
+            doTrade: true,
+            isActive: true,
+        },
+        "K3EMA100": {
+            timeframe: 15,
+            timeInForce: 'GTC',
+            isActive: true,
+        },
+        "K3EMA50": {
+            timeframe: 15,
+            timeInForce: 'GTC',
+            isActive: true,
         },
         "binance24h": {
-            isActive: true,
-            timeInForce: 'GTC',            
+            isActive: false,
+            doTrade: true,
+            timeInForce: 'GTC',
             selfStop: true
         },
-          "m24Scalping": {
+        "m24Scalping": {
             isActive: false,
-            timeInForce: 'GTC',            
+            timeInForce: 'GTC',
             selfStop: true,
             cancelBidAfterSecond: 60 * 5,
         }

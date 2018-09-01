@@ -1,7 +1,7 @@
 const debug = require('debug')('A:save-signal');
 const _ = require('lodash');
 const { candleUtils } = require('common');
-const {  publish, redisSet } = require('common/redis');
+const { publish, redisSet } = require('common/redis');
 const { getKeyById } = candleUtils;
 
 
@@ -16,6 +16,7 @@ process.on('analyse:newData', async (signal) => {
     });
     const jsData = (_.omit(signal, ['points']));
     await publish(`newData:m${timeframe}`, jsData);
+    console.log(`newData:m${timeframe} published`);
     // await redisSet({ key, data: jsData, expire: timeframe * 2 * 60 }); //last 7 days
     //console.log(key + ' saved');
 });

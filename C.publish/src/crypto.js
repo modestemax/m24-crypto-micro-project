@@ -63,9 +63,13 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
       let lastAsk = await getLastAsk({ clientOrderId: newClientOrderId });
       if (lastAsk) {
         if (+lastAsk.price !== +exchange.priceToPrecision(market.symbol, closePrice)) {
-          await exchange.editLimitSellOrder(lastAsk.orderId, market.symbol, totalQuantity, closePrice, {
-            newClientOrderId: newClientOrderId || `${strategyName}_${symbolId}`,
-          });
+          try {
+            await exchange.editLimitSellOrder(lastAsk.orderId, market.symbol, totalQuantity, closePrice, {
+              newClientOrderId: newClientOrderId || `${strategyName}_${symbolId}`,
+            });
+          } catch (ex) {
+            publish('m24:error', ex)
+          }
           exchange
         }
       }
