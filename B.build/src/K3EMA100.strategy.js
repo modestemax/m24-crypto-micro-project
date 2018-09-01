@@ -9,15 +9,16 @@ module.exports = class extends Template {
         // const prev = signalH1_1 && signalH1_1.candle;
         if (last && prev)
             if (prev.ema100 <= prev.bbb20)
-                if (last.ema100 > last.bbb20) {
-                    let ticker = await this.getTicker({ exchange, symbolId });
-                    if (ticker && ticker.bid) {
-                        debug(`${symbolId} BID AT ${ticker.bid}`);
-                        return ticker.bid;
-                    }
-                    // this.pairFound({ side: 'BUY', symbolId, price: ticker.bid })
+                if (last.ema100 > last.bbb20)
+                    if (last.macd < last.macdSignal) {
+                        let ticker = await this.getTicker({ exchange, symbolId });
+                        if (ticker && ticker.bid) {
+                            debug(`${symbolId} BID AT ${ticker.bid}`);
+                            return ticker.bid;
+                        }
+                        // this.pairFound({ side: 'BUY', symbolId, price: ticker.bid })
 
-                }
+                    }
     }
 };
 

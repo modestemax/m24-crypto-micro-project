@@ -9,15 +9,16 @@ module.exports = class extends Template {
         // const signalH1_1 = await this.findSignal({ exchange, symbolId, timeframe: 60, position: 1 });
         // const prev = signalH1_1 && signalH1_1.candle;
         if (last && prev)
-            if (prev.ema50 <= prev.bbb20)
-                if (last.ema50 > last.bbb20) {
-                    let ticker = await this.getTicker({ exchange, symbolId });
-                    if (ticker && ticker.bid) {
-                        debug(`${symbolId} BID AT ${ticker.bid}`);
-                        return ticker.bid;
+            if (prev.ema50 <= prev.bb20)
+                if (last.ema50 > last.bb20)
+                    if (last.macd < last.macdSignal) {
+                        let ticker = await this.getTicker({ exchange, symbolId });
+                        if (ticker && ticker.bid) {
+                            debug(`${symbolId} BID AT ${ticker.bid}`);
+                            return ticker.bid;
+                        }
+                        // this.pairFound({ side: 'BUY', symbolId, price: ticker.bid })
                     }
-                    // this.pairFound({ side: 'BUY', symbolId, price: ticker.bid })
-                }
     }
 };
 
