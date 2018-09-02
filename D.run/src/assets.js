@@ -68,7 +68,7 @@ const $this = module.exports = {
           asset.maxChange = _.max([asset.maxChange, asset.change]);
           asset.minChange = _.min([asset.minChange, asset.change]);
 
-          if (Math.abs(asset.prevChange - asset.change) > 0.1) {
+          if (!asset.prevChange||Math.abs(asset.prevChange - asset.change) > 0.1) {
             publish("asset:value_changed", asset);
           }
         }

@@ -16,6 +16,12 @@ module.exports = {
     MAX_TRADE_COUNT: 5,
     defaultStrategyOptions,
     strategies: filterActive({
+        pc:{
+            isActive:true,
+        },
+        web:{
+            isActive:true,
+        },
         "testEma01": {
             timeframe: 15,
             timeInForce: 'GTC',
@@ -117,6 +123,7 @@ module.exports = {
             timeInForce: 'GTC',
             selfStop: true
         },
+        "binance-24h":{isActive: true},
         "m24Scalping": {
             isActive: false,
             timeInForce: 'GTC',
