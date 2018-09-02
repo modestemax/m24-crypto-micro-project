@@ -70,7 +70,7 @@ module.exports = class extends Template {
         }
 
     }
-    initAsset(asset, newAsset) {
+    initAsset(asset, newAsset,{minChange=0}) {
         const now = Date.now();
         const goodAsset = newAsset || asset;
         const m24 = {
@@ -80,7 +80,7 @@ module.exports = class extends Template {
             percentage: goodAsset.percentage,
             lastQuoteVolume: goodAsset.quoteVolume,
             time: now,
-            upCount: 0, downCount: 0,minChange:0
+            upCount: 0, downCount: 0,minChange
         };
         _.extend(asset, { m24 }, newAsset)
     }

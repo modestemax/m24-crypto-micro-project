@@ -108,11 +108,11 @@ module.exports = class extends M24Base {
 
     }
     tryReset(asset, newAsset) {
-        const { bid, delta, change, maxChange, maxInstantDelta, duration, highPercentage, percentage } = asset.m24;
+        const { bid, delta, change, maxChange,minChange, maxInstantDelta, duration, highPercentage, percentage } = asset.m24;
 
         if (change < -1 || maxChange - change > 2 ||
             maxInstantDelta > 1 || duration > 1e3 * 60 * 60 * 6) {
-            this.initAsset(asset, newAsset);
+            this.initAsset(asset, newAsset,{minChange});
         }
     }
 
