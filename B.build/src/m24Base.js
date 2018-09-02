@@ -12,7 +12,7 @@ module.exports = class extends Template {
     constructor(options) {
         super(options);
         this.track24H()
-        subscribe('m24:algo:get_top5', () => this.logTop5())
+        subscribe('m24:algo:get_top5', (...args) => this.logTop5(null,...args))
     }
     test(m24, BREAK_CHANGE = 3) {
 
@@ -49,12 +49,13 @@ module.exports = class extends Template {
             .value();
         return top;
     }
-    logTop5(assets) {
+    logTop5(assets,options) {
         assets = assets || this.assets;
         let top5 = this.getTop(5, assets);
 
         if (top5.length) {
             publish('m24:algo:tracking', {
+                ...options,
                 strategyName: this.name,
                 text: top5.map(t => `#${t.symbolId} ${t.change} [min: ${t.minChange}] [ since ${humanizeDuration(t.duration)} ]`).join('\n')
             });
@@ -62,6 +63,7 @@ module.exports = class extends Template {
             top5.map(t => `${t.symbolId} ${t.change} [${t.minChange}]  since ${humanizeDuration(t.duration)}`).map(str => console.log(str))
         } else {
             publish('m24:algo:tracking', {
+                ...options,
                 strategyName: this.name,
                 text: assets ? 'Empty' : 'assets is undefined'
             });

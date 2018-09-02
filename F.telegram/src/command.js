@@ -44,7 +44,7 @@ const commands = {
 		// });
 	},
 	"top5"(message) {
-		publish('m24:algo:get_top5')
+		publish('m24:algo:get_top5', { chat_id: message.chat.id })
 	}
 }
 
