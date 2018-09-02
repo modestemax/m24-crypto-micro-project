@@ -99,12 +99,12 @@ module.exports = class extends Template {
             m24.prevChange = m24.change;
             m24.change = computeChange(asset.close, newAsset.close);
             m24.maxChange = _.max([m24.change, m24.maxChange]);            
-            if(m24.change<1 ){
+            // if(m24.change<1 ){
                 m24.minChange = _.min([m24.change, m24.minChange]);
-            }else if(!m24.minChange||m24.minChange>-1){
-                this.initAsset(asset, newAsset);
-                return;
-            }
+            // }else if(!m24.minChange||m24.minChange>-1){
+            //     this.initAsset(asset, newAsset);
+            //     return;
+            // }
             // m24.maxDrop = _.max([m24.maxChange - m24.change, m24.maxDrop]);
 
             m24.instantDelta = Math.abs(m24.change - m24.prevChange);
