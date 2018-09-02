@@ -1,6 +1,11 @@
 const { strategies } = require('common/settings');
 const _ = require('lodash');
 
-module.exports = _.mapValues(strategies, (strategyOptions, name) =>
-    new (require(`./${name}.strategy`))(Object.assign({ name }, strategyOptions))
+let sClasses= _.mapValues(strategies, (strategyOptions, name) =>
+    strategyOptions.virtual || new (require(`./${name}.strategy`))(Object.assign({ name }, strategyOptions))
 );
+
+for(let [key,val] of Object.entries( sClasses)){
+if(+val)delete sClasses[key];
+}
+module.exports =sClasses;
