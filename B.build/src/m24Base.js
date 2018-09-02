@@ -70,7 +70,7 @@ module.exports = class extends Template {
         }
 
     }
-    initAsset(asset, newAsset,{minChange=0}) {
+    initAsset(asset, newAsset,{minChange=0}={}) {
         const now = Date.now();
         const goodAsset = newAsset || asset;
         const m24 = {
