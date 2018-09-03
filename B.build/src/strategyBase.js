@@ -2,7 +2,8 @@ const debug = require('debug')('B:strategy-base');
 const _ = require('lodash');
 
 const { publish } = require('common/redis');
-const { tradingView, candleUtils, computeChange } = require('common');
+const { tradingView, candleUtils, computeChange, exchange, market } = require('common');
+const { getAssetBalance } = market;
 const { findSignal } = candleUtils;
 
 module.exports = class Strategy {
@@ -50,11 +51,20 @@ module.exports = class Strategy {
     }
     canSell({ exchange, symbolId, timeframe }, last, prev, signal) {
     }
-    notifyBuy() {
-        this.notify('BUY')
+    async notifyBuy() {
+        const market = exchange.marketsById[this.symbolId];
+        const balance = await getAssetBalance(market.baseId);
+        const balanceBTC = await getAssetBalance(market.quoteId, 'free');
+        if (!balance && balanceBTC > market.limits.cost.min) {
+            this.notify('BUY');
+        }
     }
-    notifySell() {
-        this.notify('SELL')
+    async notifySell() {
+        const market = exchange.marketsById[this.symbolId];
+        const balance = await getAssetBalance(market.baseId, 'free');
+        if (balance) {
+            this.notify('SELL')
+        }
     }
     notify(side) {
         const { name: strategyName, options, ask: closePrice, bid: openPrice, symbolId, timeframe } = this;

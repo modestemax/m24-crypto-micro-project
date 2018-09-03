@@ -1,11 +1,11 @@
 const debug = require("debug")("C:market");
 const _ = require("lodash");
 
-// const exchange = require("./exchange");
-const { exchange, fetchBalance } = require("common");
+const { fetchBalance } = require("./prices");
+const { exchange } = require("./exchange");
 const assets = {};
 
-fetchBalance((balance) => Object.assign(assets, balance))
+fetchBalance((balance) => Object.assign(assets, balance));
 
 const $this = module.exports = {
   async   getOpenOrders() {
@@ -21,6 +21,13 @@ const $this = module.exports = {
       }
     })
     return orders;
+  },
+  async getAssetBalance(assetId, part) {
+    let assets = await $this.getAssets();
+    if (assets && assets[assetId]) {
+      return assets[assetId][part || 'total'];
+    }
+    return 0;
   },
 
   async   getAssets() {

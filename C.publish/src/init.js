@@ -1,4 +1,5 @@
-const { getOpenOrders, getTrades } = require('./market');
+const {  market } = require('common');
+const { getOpenOrders, getTrades  }=market;
 const _ = require('lodash');
 const { publish, subscribe } = require('common/redis');
 

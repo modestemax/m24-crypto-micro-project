@@ -111,7 +111,7 @@ const $this = module.exports = new class {
         `sell : ${closePrice || '?'}`,
         `change : ${change ? change.toFixed(2) : '?'}`,
         `duration ${humanizeDuration(duration)}`,
-        `#${result}`
+        `${result}`
       ].join("\n")
     });
   }

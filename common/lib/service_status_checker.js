@@ -9,9 +9,9 @@ module.exports = {
 };
 
 
-function wait(APPA, APPB, callback, { immediate = false, loadMarkets=true } = {}) {
+function wait(APPA, APPB, callback, { immediate = false, loadMarkets = true } = {}) {
   if (immediate) {
-    start(APPB, callback,{loadMarkets})
+    start(APPB, callback, { loadMarkets })
   } else {
     console.log('Waiting', APPA)
     let unsubscribe = subscribe('m24sync:' + APPA, async () => (start(APPB, callback, { loadMarkets }), unsubscribe()));
@@ -25,6 +25,7 @@ async function start(APP, callback, { loadMarkets } = {}) {
   try {
     loadMarkets && await exchange.loadMarkets()
     await callback();
+    autoRestart(APP);
     console.log('\n\nStarted ' + (process.env.APP_NAME) + ' at ' + new Date() + '\n\n');
   } catch (ex) {
     console.error(ex);
@@ -54,3 +55,10 @@ process.on('uncaughtException', (err) => {
     publishThrottled('m24:error', { message: process.env.APP_NAME + ' uncaughtException ' + err.toString(), stack: err.stack })
   }
 });
+
+function autoRestart(APP) {
+  setTimeout(() => {
+    console.log('Restarting ', APP)
+    process.exit(1);
+  }, 1e3 * 60 * 60);
+}
