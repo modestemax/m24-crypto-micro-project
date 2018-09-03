@@ -76,7 +76,7 @@ function rateLimit(exchange) {
           let unlock;
           // let unlock = await mutex.lock();
           try {
-            console.log("binance api call " + apiName)
+            apiCall.name !== 'wrapper' && console.log("binance api call " + apiName)
             resolve(await apiCall.apply(exchange, args));
           } catch (error) {
             reject(error);
