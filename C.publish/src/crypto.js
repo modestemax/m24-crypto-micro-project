@@ -9,6 +9,8 @@ const { MAX_TRADE_COUNT, strategies } = require("common/settings");
 
 const { getAssets, estimatedValue } = require('./market');
 
+const bid_ask = {};
+
 redisSubscribe('crypto:*', {
   'crypto:cancel_order': function ({ orderId, symbolId }) {
     const market = exchange.marketsById[symbolId];
@@ -17,7 +19,8 @@ redisSubscribe('crypto:*', {
   'crypto:sell_market': cryptoSell,
   'crypto:sell_limit': cryptoSell,
   'crypto:buy_limit': async function ({ symbolId, openPrice, strategyName }) {
-
+    const newClientOrderId = `${strategyName}_${symbolId}`;
+    if (bid_ask[newClientOrderId] === 'bid') return;
     let unlock;
     try {
       // unlock = await mutex.lock();
@@ -31,11 +34,17 @@ redisSubscribe('crypto:*', {
           if (cost > assets.BTC.free) cost = assets.BTC.free;
           if (market.limits.cost.min < cost) {
             let quantity = exchange.amount_to_precision(market.symbol, cost / openPrice);
-            exchange.createLimitBuyOrder(market.symbol, quantity, openPrice, {
-              newClientOrderId: `${strategyName}_${symbolId}`,
-              timeInForce: strategy.timeInForce
-            });
-            debug("order posted " + symbolId);
+            try {
+              await exchange.createLimitBuyOrder(market.symbol, quantity, openPrice, {
+                newClientOrderId,
+                timeInForce: strategy.timeInForce
+              });
+              bid_ask[newClientOrderId] = 'bid';
+              debug("order posted " + symbolId);
+            } catch (ex) {
+              publish('m24:fatal', "BID FAILLED " + newClientOrderId + ' at ' + openPrice)
+              publish('m24:error', ex)
+            }
           }
         }
       }
@@ -46,6 +55,8 @@ redisSubscribe('crypto:*', {
 });
 
 async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity, closePrice, strategyName }) {
+  newClientOrderId = newClientOrderId || `${strategyName}_${symbolId}`
+  if (bid_ask[newClientOrderId] === 'ask') return;
   let unlock;
   try {
     // unlock = await mutex.lock();
@@ -67,12 +78,13 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
         if (+lastAsk.price !== +exchange.priceToPrecision(market.symbol, closePrice)) {
           try {
             await exchange.editLimitSellOrder(lastAsk.orderId, market.symbol, totalQuantity, closePrice, {
-              newClientOrderId: newClientOrderId || `${strategyName}_${symbolId}`,
+              newClientOrderId: newClientOrderId,
             });
+            bid_ask[newClientOrderId] = 'ask';
           } catch (ex) {
+            publish('m24:fatal', "ASK FAILLED " + newClientOrderId + ' at ' + closePrice)
             publish('m24:error', ex)
           }
-          exchange
         }
       }
     }

@@ -1,6 +1,6 @@
 const debug = require('debug')('F:index');
 
-const { bot, tme, M24_LOG_CHAT_ID, M24_CHAT_ID } = require('./bot');
+const { bot, tme, M24_LOG_CHAT_ID,M24_FATAL_CHAT_ID, M24_CHAT_ID } = require('./bot');
 
 const _ = require('lodash')
 const { redisSet } = require('common/redis');
@@ -10,6 +10,9 @@ module.exports = {
   'm24:*': function (data, channel) {
     let text;
     switch (channel) {
+      case "m24:fatal":
+        text = [data];
+        data = { chat_id: M24_FATAL_CHAT_ID };
       case "m24:error":
         const { message, stack } = data;
         let stackCmd = '';

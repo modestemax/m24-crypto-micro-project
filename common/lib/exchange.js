@@ -17,7 +17,7 @@ function getExchange(auth) {
     apiKey: auth.api_key,
     secret: auth.secret,
     verbose: true,
-    timeout: process.env.NODE_ENV === 'production' ? 5e3 : 20e3,
+    timeout: process.env.NODE_ENV === 'production' ? 10e3 : 20e3,
     enableRateLimit: true,
     options: {
       "warnOnFetchOpenOrdersWithoutSymbol": false,
