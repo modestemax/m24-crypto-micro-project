@@ -11,7 +11,7 @@ module.exports = {
     let text;
     switch (channel) {
       case "m24:fatal":
-        text = [data];
+        text = ["#JUDE_ACTION",data].join('\n');
         data = { chat_id: M24_FATAL_CHAT_ID };
       case "m24:error":
         const { message, stack } = data;
