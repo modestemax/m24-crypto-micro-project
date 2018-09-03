@@ -3,7 +3,11 @@ const _ = require('lodash');
 const { computeChange, valuePercent, saveTrade, humanizeDuration } = require("common");
 
 const { bot, tme, M24_LOG_CHAT_ID, M24_CHAT_ID } = require('./bot');
-
+const WIN = "❤️";
+const LOST = "😭"
+const SUCCESS = "👌🏼";
+const WINNING = "👍🏻";
+const LOOSING = "👎🏽";
 const tradesMessageId = {};
 
 const $this = module.exports = new class {
@@ -55,8 +59,9 @@ const $this = module.exports = new class {
     let duration = Date.now() - timestamp;
     //--
     const strategyName = clientOrderId.split("_")[0];
-    const targetStatus = change >= strategy.takeProfit ? "Success" :
-      change > .15 ? "Ok" : change < .15 ? "Fail" : "?";
+
+    const targetStatus = change >= strategy.takeProfit ? SUCCESS :
+      change > .15 ? WINNING : change < .15 ? LOOSING : "?";
     let msg = {
       chat_id: M24_CHAT_ID,
       message_id,
@@ -95,18 +100,16 @@ const $this = module.exports = new class {
       change = computeChange(openPrice, closePrice);
     }
     let duration = Date.now() - timestamp;
-
-    const targetStatus = change > 1.15 ? "Success" : change < 1.15 ? "Fail" : "?";
-    const result = change > 0.15 ? "Win" : change < 0.15 ? "Lost" : "?";
+    const result = change > 0.15 ? WIN : change < 0.15 ? LOST : "?";
 
     tme.sendMessage({
       chat_id: M24_CHAT_ID,
       text: [
-        "#trade_ended",
+        "🔓 #trade_ended",
         `#${strategyName}, #${symbolId}`,
         `bid : ${openPrice || '?'}`,
         `sell : ${closePrice || '?'}`,
-        `change : ${change ? change.toFixed(2) : '?'} [${targetStatus}]`,
+        `change : ${change ? change.toFixed(2) : '?'}`,
         `duration ${humanizeDuration(duration)}`,
         `#${result}`
       ].join("\n")
