@@ -27,10 +27,14 @@ function getExchange(auth) {
     }
   });
   exchange.loadMarkets();
+  overrides(exchange);
   rateLimit(exchange);
   return exchange;
 }
 
+function overrides(exchange){
+  exchange._fetchTickers = exchange.fetchTickers;
+}
 
 const Mutex = new require("await-mutex").default;
 const mutex = new Mutex();

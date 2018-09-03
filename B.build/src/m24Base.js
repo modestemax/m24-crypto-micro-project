@@ -12,27 +12,28 @@ module.exports = class extends Template {
     constructor(options) {
         super(options);
         this.track24H()
-        subscribe('m24:algo:get_top5', (...args) => this.logTop5(null,...args))
+        subscribe('m24:algo:get_top5', (...args) => this.logTop5(null, ...args))
     }
     test(m24, BREAK_CHANGE = 3) {
 
     }
-    tick(price){
-        
+    tick(price) {
+
     }
     async track24H() {
         this.startTime = Date.now();
-        let assets = this.assets = (await redisGet('assets')) ||
-            (await exchange.fetchTickers().then(assets =>
-                _.forEach(assets, (asset) => this.initAsset(asset))
-            ));
-        fetchTickers((price) => {
-            this.assetChanged(assets[price.symbol], price);
+        this.assets = (await redisGet('assets'));
+        fetchTickers((price, assets) => {
+            if (!this.assets) {
+                this.assets = _.cloneDeep(assets);
+                _.forEach(this.assets, (asset) => this.initAsset(asset))
+            }
+            this.assetChanged(this.assets[price.symbol], price);
             this.tick(price)
-            redisSetThrottled({ key: 'assets', data: assets, expire: 60 * 20 })//20 min
+            redisSetThrottled({ key: 'assets', data: this.assets, expire: 60 * 20 })//20 min
         })
         // setInterval(async () => this.logTop5(assets), 5e3)
-        setInterval(async () => this.logTop5(assets), process.env.NODE_ENV === 'production' ? 10 * 60e3 : 30e3)
+        setInterval(async () => this.logTop5(), process.env.NODE_ENV === 'production' ? 10 * 60e3 : 30e3)
     }
     getTop(count = 5, assets) {
         assets = assets || this.assets;
@@ -49,7 +50,7 @@ module.exports = class extends Template {
             .value();
         return top;
     }
-    logTop5(assets,options) {
+    logTop5(assets, options) {
         assets = assets || this.assets;
         let top5 = this.getTop(5, assets);
 
@@ -70,7 +71,7 @@ module.exports = class extends Template {
         }
 
     }
-    initAsset(asset, newAsset,{minChange=0}={}) {
+    initAsset(asset, newAsset, { minChange = 0 } = {}) {
         const now = Date.now();
         const goodAsset = newAsset || asset;
         const m24 = {
@@ -80,7 +81,7 @@ module.exports = class extends Template {
             percentage: goodAsset.percentage,
             lastQuoteVolume: goodAsset.quoteVolume,
             time: now,
-            upCount: 0, downCount: 0,minChange
+            upCount: 0, downCount: 0, minChange
         };
         _.extend(asset, { m24 }, newAsset)
     }
@@ -100,9 +101,9 @@ module.exports = class extends Template {
             m24.duration = now - m24.time;
             m24.prevChange = m24.change;
             m24.change = computeChange(asset.close, newAsset.close);
-            m24.maxChange = _.max([m24.change, m24.maxChange]);            
+            m24.maxChange = _.max([m24.change, m24.maxChange]);
             // if(m24.change<1 ){
-                m24.minChange = _.min([m24.change, m24.minChange]);
+            m24.minChange = _.min([m24.change, m24.minChange]);
             // }else if(!m24.minChange||m24.minChange>-1){
             //     this.initAsset(asset, newAsset);
             //     return;
@@ -124,7 +125,8 @@ module.exports = class extends Template {
             const { bid, delta, change, duration, highPercentage, percentage } = m24;
             if (this.test(m24)) {//quantité de bid relativement petite
                 {//1heure
-                    m24.openPrice = this.getOpenPrice(m24)
+                    m24.openPrice = this.getOpenPrice(m24);
+                    this.logTop5();
                     console.log(new Date(now), symbol + ' ' + m24.bid + ' [' + m24.openPrice.toFixed(8) + '] ' + change.toFixed(2) + '%', ' since ' + humanizeDuration(duration));
                     this.buy(asset);
                     //  this.initAsset(asset, newAsset);
