@@ -10,7 +10,7 @@ module.exports = class Strategy {
     constructor({ name, ...options }) {
         Object.assign(this, { bid: null, name, options });
         publish('m24:algo:loaded', this)
-    }   
+    }
 
     async check(signal) {
         const { exchange, symbolId, timeframe, spreadPercentage } = signal.candle;
@@ -62,15 +62,15 @@ module.exports = class Strategy {
 
         const [price, event] = side === 'BUY' ? [openPrice, 'crypto:buy_limit'] : [closePrice, 'crypto:sell_limit'];
 
-        this.pairFound({ side, symbolId, price });
+        this.pairFound({ side, symbolId, price, test: !options.doTrade });
         if (price && options.doTrade) {
             publish(event, order);
             debug(`[strategy:${strategyName}] ${side} ${symbolId} at price: ${price}`)
         }
     }
 
-    pairFound({ side, symbolId, price }) {
-        publish(`m24:algo:pair_found`, { side, strategyName: this.name, symbolId, price });
+    pairFound({ side, symbolId, price, test }) {
+        publish(`m24:algo:pair_found`, { side, strategyName: this.name, symbolId, price, test });
     }
     async getTicker({ exchange: exchangeId, symbolId }) {
         let tick = await tradingView({ filter: symbolId, exchangeId });

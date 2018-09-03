@@ -21,8 +21,10 @@ module.exports = {
         text = ["#error", message, stackCmd].join("\n")
         break;
       case `m24:algo:pair_found`:
-        const { side, strategyName, symbolId, price } = data;
-        text = [`#pair_found #${strategyName} ${side}`, `${symbolId} at ${price}`].join("\n")
+        const { side, strategyName, symbolId, price, test } = data;
+        text = [`#pair_found #${strategyName} ${side}`,
+        `${symbolId} at ${price}`,
+        test ? "Test (will not bid)" : "Will Bid"].join("\n")
         break;
       case `m24:algo:loaded`:
         text = ["Algo loaded", JSON.stringify(data)].join('\n')
