@@ -16,7 +16,7 @@ function getExchange(auth) {
   const exchange = new ccxt['binance']({
     apiKey: auth.api_key,
     secret: auth.secret,
-    verbose: true,
+    verbose: process.env.NODE_ENV !== 'production',
     timeout: process.env.NODE_ENV === 'production' ? 10e3 : 20e3,
     enableRateLimit: true,
     options: {
@@ -74,10 +74,11 @@ function rateLimit(exchange) {
           let unlock;
           // let unlock = await mutex.lock();
           try {
+            console.log("binance api call " + apiName)
             resolve(await apiCall.apply(exchange, args));
           } catch (error) {
             reject(error);
-            debug(error);
+            console.error(error);
           } finally {
             unlock && unlock();
           }
