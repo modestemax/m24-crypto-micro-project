@@ -18,8 +18,9 @@ redisSubscribe('crypto:*', {
   'crypto:sell_limit': cryptoSell,
   'crypto:buy_limit': async function ({ symbolId, openPrice, strategyName }) {
 
-    let unlock = await mutex.lock();
+    let unlock;
     try {
+      // unlock = await mutex.lock();
       const assets = await getAssets();
       if (Object.keys(assets).filter(asset => !/BTC|BNB/.test(asset)).length < MAX_TRADE_COUNT) {
         const market = exchange.marketsById[symbolId];
@@ -39,14 +40,15 @@ redisSubscribe('crypto:*', {
         }
       }
     } finally {
-      unlock();
+      unlock && unlock();
     }
   }
 });
 
 async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity, closePrice, strategyName }) {
-  let unlock = await mutex.lock();
+  let unlock;
   try {
+    // unlock = await mutex.lock();
     const market = exchange.marketsById[symbolId];
     const assets = await getAssets();
     const asset = assets[market.baseId];
@@ -75,6 +77,6 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
       }
     }
   } finally {
-    unlock();
+    unlock && unlock();
   }
 }

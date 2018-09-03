@@ -1,7 +1,7 @@
 const debug = require('debug')('common:exchange');
 const _ = require("lodash");
 const ccxt = require("ccxt");
-const { saveBalances,loadBalances } = require('./utils')
+const { saveBalances, loadBalances } = require('./utils')
 const { subscribe, publish } = require('./redis');
 const auth = require(process.env.HOME + '/.api.json').KEYS;
 
@@ -16,8 +16,9 @@ function getExchange(auth) {
   const exchange = new ccxt['binance']({
     apiKey: auth.api_key,
     secret: auth.secret,
-    // verbose: true,
-    enableRateLimit:true,
+    verbose: true,
+    timeout: process.env.NODE_ENV === 'production' ? 5e3 : 20e3,
+    enableRateLimit: true,
     options: {
       "warnOnFetchOpenOrdersWithoutSymbol": false,
       adjustForTimeDifference: true,
@@ -56,7 +57,7 @@ function rateLimit(exchange) {
         unsubscribe();
         resolve(tickers && Object.keys(tickers).length > 0 ? tickers : (await fetchTickers.apply(exchange)));
       });
-      let timeout = setTimeout(async() => {
+      let timeout = setTimeout(async () => {
         unsubscribe();
         resolve((await fetchTickers.apply(exchange)));
       }, 1e3)
@@ -70,14 +71,14 @@ function rateLimit(exchange) {
     exchange[apiName] = _.wrap(exchange[apiName], (apiCall, ...args) => {
       return new Promise((resolve, reject) => {
         limiter.removeTokens(1, async () => {
-          let unlock = await mutex.lock();
+          // let unlock = await mutex.lock();
           try {
             resolve(await apiCall.apply(exchange, args));
           } catch (error) {
             reject(error);
             debug(error);
           } finally {
-            unlock();
+            unlock && unlock();
           }
         });
       })
