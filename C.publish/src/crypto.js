@@ -5,10 +5,10 @@ const mutex = new Mutex();
 const _ = require('lodash');
 
 const { subscribe: redisSubscribe, publish } = require('common/redis');
-const { exchange, getLastAsk } = require("common");
+const { exchange, getLastAsk, market } = require("common");
 const { MAX_TRADE_COUNT, strategies } = require("common/settings");
 
-const { getAssets, estimatedValue } = require('./market');
+const { getAssets, estimatedValue } = market
 
 const [cryptoBuyThrottled, cryptoSellThrottled] = [_.throttle(cryptoBuy, 2e3), _.throttle(cryptoSell, 2e3)]
 
