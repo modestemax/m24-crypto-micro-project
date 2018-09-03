@@ -71,6 +71,7 @@ function rateLimit(exchange) {
     exchange[apiName] = _.wrap(exchange[apiName], (apiCall, ...args) => {
       return new Promise((resolve, reject) => {
         limiter.removeTokens(1, async () => {
+          let unlock;
           // let unlock = await mutex.lock();
           try {
             resolve(await apiCall.apply(exchange, args));
