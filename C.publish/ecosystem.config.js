@@ -23,7 +23,7 @@ module.exports = {
       production: {
           "key": "/home/max/.ssh/keysvirginia.pem",
           user: 'ubuntu',
-          host: '34.229.181.14',
+          host: '54.210.121.117',
           ref: 'origin/master',
           repo: ' https://github.com/modestemax/m24_trading_bot.git',
           path: '/home/ubuntu/bot/prod',
@@ -32,7 +32,7 @@ module.exports = {
       dev: {
           "key": "/home/max/.ssh/keysvirginia.pem",
           user: 'ubuntu',
-          host: '34.229.181.14',
+          host: '54.210.121.117',
           ref: 'origin/master',
           repo: ' https://github.com/modestemax/m24_trading_bot.git',
           path: '/home/ubuntu/bot/dev',
