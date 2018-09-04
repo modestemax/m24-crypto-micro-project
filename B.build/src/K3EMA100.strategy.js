@@ -23,7 +23,7 @@ module.exports = class extends Template {
 
                                 }
     }
-    canSell({ exchange, symbolId, timeframe }, last, prev, signal) {
+    async   canSell({ exchange, symbolId, timeframe }, last, prev, signal) {
         if (last && prev)
             if ((prev.ema100 >= prev.bbb20 && last.ema100 < last.bbb20) || (prev.ema200 >= prev.bbb20 && last.ema200 < last.bbb20)) {
                 let ticker = await this.getTicker({ exchange, symbolId });

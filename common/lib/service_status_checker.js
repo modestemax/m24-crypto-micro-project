@@ -28,7 +28,7 @@ async function start(APP, callback, { loadMarkets } = {}) {
     autoRestart(APP);
     console.log('\n\nStarted ' + (process.env.APP_NAME) + ' at ' + new Date() + '\n\n');
   } catch (ex) {
-    console.error(ex);
+    console.error(ex,ex.stack);
     publish('m24:error', { message: process.env.APP_NAME + ' fail to start\n' + ex.message, stack: ex.stack });
     process.exit(1);
   }
