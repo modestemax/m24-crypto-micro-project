@@ -24,7 +24,15 @@ const $this = module.exports = new class {
   resetMessage() {
     Object.keys(tradesMessageId).forEach(k => delete tradesMessageId[k])
   }
-
+  estimatedBalanceChanged({ text }) {
+    tme.sendMessage({
+      chat_id: M24_CHAT_ID,
+      text: [
+        "#estimated_balance",
+        text
+      ].join("\n")
+    });
+  }
   newOrder(order) {
     const { price: bid, symbolId, clientOrderId } = order;
     const strategyName = clientOrderId.split("_")[0];

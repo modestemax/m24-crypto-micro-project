@@ -5,19 +5,19 @@ module.exports = class extends Template {
     //     super({ name: 'testEma', options })
     // }
 
-    async canBuy({ exchange, symbolId, timeframe }, last, prev, signal) {
-        const { exchange, symbolId, timeframe } = signal.candle;
+    async canBuy({  symbolId, timeframe }, last, prev, signal) {
+        const {  symbolId, timeframe } = signal.candle;
         // if (signal.ema10Above20 && signal.plusDiAboveMinusDi /*&& signal.adxAboveRef && signal.adxIsTrendingUp*/) {
         if (symbolId === 'TUSDBTC') {
-            let ticker = await this.getTicker({ exchange, symbolId });
+            let ticker = await this.getTicker({  symbolId });
             return ticker.bid;
         }
     }
-    async canSell({ exchange, symbolId, timeframe }, last, prev, signal) {
+    async canSell({  symbolId, timeframe }, last, prev, signal) {
 
         // if (signal.ema10Above20 && signal.plusDiAboveMinusDi /*&& signal.adxAboveRef && signal.adxIsTrendingUp*/) {
         if (symbolId === 'TUSDBTC') {
-            let ticker = await this.getTicker({ exchange, symbolId });
+            let ticker = await this.getTicker({  symbolId });
             //return ticker.ask;            
         }
     }

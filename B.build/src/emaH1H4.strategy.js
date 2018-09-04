@@ -7,35 +7,35 @@ module.exports = class extends Template {
     //     super({ name: 'EMAH1H4', options })
     // }
 
-    async canBuy({ exchange, symbolId, timeframe }, last, prev, signalH4) {
-
+    async canBuy({  symbolId, timeframe }, last, prev, signalH4, asset) {
+        const [lastH1, prevH1] = [signalH4.candleH1, signalH4.candleH1_1];
         //timeframe H4
-        if (signalH4.ema10Above20) {
-            debug(`${symbolId} EMA H4 OK`);
-            const signal24H = await this.findSignal({ exchange, symbolId, timeframe, position: 6 });
-            //24H change must >2
-            if (signal24H && this.change({ open: signal24H.candle.open, close: signalH4.candle.close }) > 2) {
-                debug(`${symbolId} Change24h > 2% OK`);
-                const signalH4_1 = await this.findSignal({ exchange, symbolId, timeframe, position: 1 });
+        if (last && prev && lastH1 && prevH1)
+            if (last.ema10 > last.ema20) {
+                debug(`${symbolId} EMA H4 OK`);
                 //crossing signal
-                if (signalH4_1 && !signalH4_1.ema10Above20) {
+                if (prev.ema10 <= prev.ema20) {
                     debug(`${symbolId} EMA H4 Crossing OK`);
-                    const signalH1 = await this.findSignal({ exchange, symbolId, timeframe: 60, position: 0 });
-                    const signalH1_1 = await this.findSignal({ exchange, symbolId, timeframe: 60, position: 1 });
+                    // const asset = await this.getAsset({ symbolId });
+                    //24H change must >2
+                    if (asset && asset.percentage > 2) {
+                        debug(`${symbolId} Change24h > 2% OK`);
+                      
+                        if (lastH1 && prevH1)
+                            if (lastH1.ema10 > lastH1.ema20)
+                                if (prevH1.ema10 < lastH1.ema10) {
+                                    debug(`${symbolId} EMA H1 OK`);
+                                    debug(`${symbolId} EMA H1 Trend OK`);
+                                    let ticker = await this.getTicker({  symbolId });
+                                    if (ticker && ticker.bid) {
+                                        debug(`${symbolId} BID AT ${ticker.bid}`);
+                                        return Math.min(ticker.bid, last.open);
+                                    }
+                                }
 
-                    if (signalH1 && signalH1_1 && signalH1.ema10Above20 && signalH1_1.candle.ema10 < signalH1.candle.ema10) {
-                        debug(`${symbolId} EMA H1 OK`);
-                        debug(`${symbolId} EMA H1 Trend OK`);
-                        let ticker = await this.getTicker({ exchange, symbolId });
-                        if (ticker && ticker.bid) {
-                            debug(`${symbolId} BID AT ${ticker.bid}`);
-                            return Math.min(ticker.bid, signalH4.candle.open);
-                        }
                     }
-
                 }
             }
-        }
     }
 };
 

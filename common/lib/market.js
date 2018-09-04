@@ -71,3 +71,5 @@ const $this = module.exports = {
     return _.sumBy(_.toArray(myAssets), 'btc')
   }
 }
+
+fetchBalance((balance) => publish('asset:estimated_balance',{text:$this.estimatedValue(balance)}));

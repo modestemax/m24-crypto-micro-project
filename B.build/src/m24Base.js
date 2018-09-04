@@ -55,19 +55,12 @@ module.exports = class extends Template {
         let top5 = this.getTop(5, assets);
 
         if (top5.length) {
-            publish('m24:algo:tracking', {
-                ...options,
-                strategyName: this.name,
-                text: top5.map(t => `#${t.symbolId} ${t.change} [min: ${t.minChange}] [ since ${humanizeDuration(t.duration)} ]`).join('\n')
-            });
+            this.StrategyLog(top5.map(t => `#${t.symbolId} ${t.change} [min: ${t.minChange}] [ since ${humanizeDuration(t.duration)} ]`).join('\n'),
+                options);
             console.log("top5", this.name)
             top5.map(t => `${t.symbolId} ${t.change} [${t.minChange}]  since ${humanizeDuration(t.duration)}`).map(str => console.log(str))
         } else {
-            publish('m24:algo:tracking', {
-                ...options,
-                strategyName: this.name,
-                text: assets ? 'Empty' : 'assets is undefined'
-            });
+            this.StrategyLog(assets ? 'Empty' : 'assets is undefined', options)
         }
 
     }
@@ -125,7 +118,7 @@ module.exports = class extends Template {
             const { bid, delta, change, duration, highPercentage, percentage } = m24;
             if (this.test(m24)) {//quantité de bid relativement petite
                 {//1heure
-                    m24.openPrice = m24.openPrice ||this.getOpenPrice(m24);
+                    m24.openPrice = m24.openPrice || this.getOpenPrice(m24);
                     this.logTop5();
                     console.log(new Date(now), symbol + ' ' + m24.bid + ' [' + m24.openPrice.toFixed(8) + '] ' + change.toFixed(2) + '%', ' since ' + humanizeDuration(duration));
                     this.buy(asset);

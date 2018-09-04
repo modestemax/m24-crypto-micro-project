@@ -101,7 +101,11 @@ async function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQ
         if (last) {
 
             const specialData = getSpecialData({ symbolId, timeframe });
-
+            if (+timeframe === 60 * 4) {
+                const pointsH1 = await backupLastPoints.getLastPoints({ symbolId, timeframe: 60 });
+                const [candleH1, candleH1_1] = (pointsH1 || []).concat().reverse();
+                _.extend(specialData, { candleH1, candleH1_1 });
+            }
             _.extend(specialData, { points, candle: last, candle_1: prev });
             close();
             ema();

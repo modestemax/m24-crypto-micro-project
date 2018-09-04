@@ -4,7 +4,7 @@ const { publish } = require('common/redis');
 const Template = require('./strategyBase');
 module.exports = class extends Template {
 
-    async canBuy({ exchange, symbolId, timeframe }, last, prev) {
+    async canBuy({  symbolId, timeframe }, last, prev) {
 
         if (last && prev) {
             if (prev.ema100 >= prev.ema10) {
@@ -20,7 +20,7 @@ module.exports = class extends Template {
                                 // publish('m24:algo:tracking', {
                                 //     strategyName: this.name, text: `${tfSymbol} [OK] ((last.ema100 > last.bbb && last.close <= last.ema100) ||
                                 //     (last.ema100 < last.bbb && last.close <= last.ema30))` });
-                                let ticker = await this.getTicker({ exchange, symbolId });
+                                let ticker = await this.getTicker({  symbolId });
                                 if (ticker && ticker.ask) {
                                     debug(`${symbolId} BID AT ${ticker.ask}`);
                                     return ticker.ask;

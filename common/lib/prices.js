@@ -3,19 +3,20 @@ const { exchange, binance } = require('./exchange')
 const { subscribe, publish } = require("./redis");
 const { saveBalances, clearBalances } = require('./utils')
 const assets = {};
-const callbacks = [];
-let started;
+const tickCallbacks = [];
+const balanceCallbacks = [];
+
 
 module.exports = {
   async   fetchTickers(callback) {
 
-    callback && callbacks.push(callback);
-    if (!started) {
-      started = true;
+
+    if (!tickCallbacks.length) {
+      tickCallbacks.push(callback);
       Object.assign(assets, await exchange._fetchTickers());
       subscribe('m24:exchange:fetchTickers', function () {
         publish('m24:exchange:tickers', assets)
-      });      
+      });
       // setInterval(() => _.mapValues(assets, a => null), 30e3);
 
       const symbols = Object.keys(exchange.marketsById).filter(s => /BTC$/.test(s));
@@ -45,24 +46,28 @@ module.exports = {
         });
         price = exchange.parseTicker(price);
         assets[price.symbol] = price;
-        callbacks.forEach(cb => cb(price, assets));
+        tickCallbacks.forEach(cb => cb(price, assets));
       });
       console.log('listening tick for ', symbols.length, ' symbols')
     }
   },
 
   fetchBalance(callback) {
-    clearBalances()
-    binance.ws.user(async msg => {
-      switch (msg.eventType) {
-        case "account":
-          let bal = _.mapValues(msg.balances, b =>
-            ({ free: +b.available, used: +b.locked, total: +b.available + +b.locked }))
-          // let bal2 = await exchange.fetchBalance();
-          saveBalances(bal)
-          callback(bal);
-          break;
-      }
-    });
+    if (!balanceCallbacks.length) {
+      balanceCallbacks.push(callback);
+      clearBalances()
+      binance.ws.user(async msg => {
+        switch (msg.eventType) {
+          case "account":
+            let bal = _.mapValues(msg.balances, b =>
+              ({ free: +b.available, used: +b.locked, total: +b.available + +b.locked }))
+            // let bal2 = await exchange.fetchBalance();            
+            saveBalances(bal)
+            balanceCallbacks.forEach(cb => cb(bal));
+            break;
+        }
+      });
+    }
+
   }
 }
