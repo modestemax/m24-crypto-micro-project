@@ -125,7 +125,7 @@ module.exports = class extends Template {
             const { bid, delta, change, duration, highPercentage, percentage } = m24;
             if (this.test(m24)) {//quantité de bid relativement petite
                 {//1heure
-                    m24.openPrice = this.getOpenPrice(m24);
+                    m24.openPrice = m24.openPrice ||this.getOpenPrice(m24);
                     this.logTop5();
                     console.log(new Date(now), symbol + ' ' + m24.bid + ' [' + m24.openPrice.toFixed(8) + '] ' + change.toFixed(2) + '%', ' since ' + humanizeDuration(duration));
                     this.buy(asset);
