@@ -32,9 +32,7 @@ module.exports = {
         "emaH1H4": {
             timeframe: 4 * 60,
             timeInForce: 'GTC',
-            takeProfit: null,
-            trailingStop: 1,
-            // isActive: true,
+            isActive: true,
         },
         "bbemaH1": {
             timeframe: 60,
