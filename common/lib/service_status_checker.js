@@ -57,11 +57,11 @@ process.on('uncaughtException', (err) => {
 });
 
 function autoRestart(APP) {
-  const H = 1e3 * 60 * 60;
-  const now = Date.now();
-  let r = (1 + Math.trunc(now / H)) * H - now
-  setTimeout(() => {
-    console.log('Restarting ', APP)
-    process.exit(1);
-  }, r);
+  // const H = 1e3 * 60 * 60;
+  // const now = Date.now();
+  // let r = (1 + Math.trunc(now / H)) * H - now
+  // setTimeout(() => {
+  //   console.log('Restarting ', APP)
+  //   process.exit(1);
+  // }, r);
 }
