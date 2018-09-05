@@ -14,17 +14,24 @@ TIMEFRAMES.split(',').forEach((timeframe) => {
     timeframe = +timeframe;
 
     //get signal max 1 time per second
-    const throttledGetSignals = _.throttle(() =>
-        tradingView({ timeframe, filter: SYMBOLS_FILTER, exchangeId: EXCHANGE })
-            .then(
-                data => process.emit('tv:signals', { markets: data, timeframe }),
-                (err) =>
-                    publish('m24:error', { message: typeof err === 'string' ? err : err.message, stack: err.stack })
-            )
-        , 10e3);
+    // const throttledGetSignals = _.throttle(() =>
+    //     tradingView({ timeframe, filter: SYMBOLS_FILTER, exchangeId: EXCHANGE })
+    //         .then(
+    //             data => process.emit('tv:signals', { markets: data, timeframe }),
+    //             (err) =>
+    //                 publish('m24:error', { message: typeof err === 'string' ? err : err.message, stack: err.stack })
+    //         )
+    //     , 10e3);
 
-    throttledGetSignals();
-    schedule.scheduleJob(getScheduleRule(timeframe), throttledGetSignals);
+    const getSignals = () => tradingView({ timeframe, filter: SYMBOLS_FILTER, exchangeId: EXCHANGE })
+        .then(
+            data => process.emit('tv:signals', { markets: data, timeframe }),
+            (err) =>
+                publish('m24:error', { message: typeof err === 'string' ? err : err.message, stack: err.stack })
+        );
+
+    getSignals();
+    schedule.scheduleJob(getScheduleRule(timeframe), getSignals);
 });
 
 
