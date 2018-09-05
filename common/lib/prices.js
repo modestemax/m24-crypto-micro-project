@@ -60,6 +60,7 @@ async function fetchBalance(callback) {
   balanceCallbacks.push(callback);
   if (balanceCallbacks.length === 1) {
     clearBalances()
+    console.log('listen to balance')
     Object.assign(assets, await exchange.fetchBalance());
     dispatchBalance()
     binance.ws.user(async msg => {
