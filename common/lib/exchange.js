@@ -56,10 +56,10 @@ function rateLimit(exchange) {
 
   exchange.fetchTickers = _.wrap(exchange.fetchTickers, (fetchTickers, ...args) => {
     return new Promise((resolve) => {
-      console.log('fetchTickers from redis event')
+      // console.log('fetchTickers from redis event')
       let unsubscribe = subscribe('m24:exchange:tickers', async (tickers) => {
         // clearTimeout(timeout);
-        console.log('fetchTickers from redis event OK')
+        // console.log('fetchTickers from redis event OK')
         unsubscribe();
         resolve(tickers && Object.keys(tickers).length > 0 ? tickers : (await fetchTickers.apply(exchange)));
       });

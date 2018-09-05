@@ -171,6 +171,6 @@ function getSignals({ options = params(), rate = 1e3 } = {}) {
 }
 
 module.exports = function ({ timeframe, filter, exchangeId }) {
-    console.log('loading data timeframe',timeframe,new Date())
+    // console.log('loading data timeframe',timeframe,new Date())
     return getSignals({ options: params({ timeframe, filter, exchangeId }) })
 }
