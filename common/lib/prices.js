@@ -2,22 +2,23 @@ const _ = require('lodash')
 const { exchange, binance } = require('./exchange')
 const { subscribe, publish } = require("./redis");
 const { saveBalances, clearBalances } = require('./utils')
+const tickers = {};
 const assets = {};
 const tickCallbacks = [];
 const balanceCallbacks = [];
 
 
-module.exports = { fetchBalance, fetchTickers };
+module.exports = { fetchBalance, fetchTickers, tickers, assets };
 
-fetchTickers();fetchBalance();
+fetchTickers(); fetchBalance();
 
 async function fetchTickers(callback) {
   callback = callback || _.noop;
   tickCallbacks.push(callback);
   if (tickCallbacks.length === 1) {
-    Object.assign(assets, await exchange._fetchTickers());
+    Object.assign(tickers, await exchange._fetchTickers());
     subscribe('m24:exchange:fetchTickers', function () {
-      publish('m24:exchange:tickers', assets)
+      publish('m24:exchange:tickers', tickers)
     });
     // setInterval(() => _.mapValues(assets, a => null), 30e3);
 
@@ -47,29 +48,35 @@ async function fetchTickers(callback) {
         weightedAvgPrice: rawPrice.weightedAvg
       });
       price = exchange.parseTicker(price);
-      assets[price.symbol] = price;
-      tickCallbacks.forEach(cb => cb(price, assets));
+      tickers[price.symbol] = price;
+      tickCallbacks.forEach(cb => cb(price, tickers));
     });
     console.log('listening tick for ', symbols.length, ' symbols')
   }
 }
 
-function fetchBalance(callback) {
+async function fetchBalance(callback) {
   callback = callback || _.noop;
   balanceCallbacks.push(callback);
   if (balanceCallbacks.length === 1) {
     clearBalances()
+    Object.assign(assets, await exchange.fetchBalance());
+    dispatchBalance()
     binance.ws.user(async msg => {
       switch (msg.eventType) {
         case "account":
-          let bal = _.mapValues(msg.balances, b =>
-            ({ free: +b.available, used: +b.locked, total: +b.available + +b.locked }))
+          Object.assign(assets, _.mapValues(msg.balances, b =>
+            ({ free: +b.available, used: +b.locked, total: +b.available + +b.locked })));
           // let bal2 = await exchange.fetchBalance();            
-          saveBalances(bal)
-          balanceCallbacks.forEach(cb => cb(bal));
+          dispatchBalance()
           break;
       }
     });
+  }
+
+  function dispatchBalance() {
+    saveBalances(assets)
+    balanceCallbacks.forEach(cb => cb(assets));
   }
 
 }

@@ -44,14 +44,14 @@ const limiter = new RateLimiter(10, "second");
 
 function rateLimit(exchange) {
 
-  exchange.fetchBalance = _.wrap(exchange.fetchBalance, async (fetchBalance, ...args) => {
-    let balance = await loadBalances();
-    if (!balance) {
-      balance = await fetchBalance.apply(exchange, args)
-      saveBalances(balance);
-    }
-    return balance;
-  });
+  // exchange.fetchBalance = _.wrap(exchange.fetchBalance, async (fetchBalance, ...args) => {
+  //   let balance = await loadBalances();
+  //   if (!balance) {
+  //     balance = await fetchBalance.apply(exchange, args)
+  //     saveBalances(balance);
+  //   }
+  //   return balance;
+  // });
 
 
   exchange.fetchTickers = _.wrap(exchange.fetchTickers, (fetchTickers, ...args) => {

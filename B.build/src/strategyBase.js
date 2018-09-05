@@ -2,9 +2,14 @@ const debug = require('debug')('B:strategy-base');
 const _ = require('lodash');
 
 const { publish } = require('common/redis');
-const { tradingView, candleUtils, computeChange, exchange, market } = require('common');
+const { tradingView, candleUtils, computeChange, exchange, market, fetchTickers,fetchBalance } = require('common');
 const { getAssetBalance } = market;
 const { findSignal } = candleUtils;
+const tickers = {};
+// const assets = {};
+
+fetchTickers((price, _tickers) => Object.assign(tickers, _tickers));
+// fetchBalance(_bal => Object.assign(assets, _bal));
 
 module.exports = class Strategy {
 
@@ -18,7 +23,7 @@ module.exports = class Strategy {
         if (+timeframe === this.options.timeframe && spreadPercentage < 1) {
             const last = signal.candle;
             const prev = signal.candle_1;
-            let tickers = await exchange.fetchTickers();
+
             const market = exchange.marketsById[symbolId];
 
             let bid = await this.canBuy(signal.candle, last, prev, signal, tickers[market.symbol]);

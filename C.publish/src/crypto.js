@@ -8,7 +8,7 @@ const { subscribe: redisSubscribe, publish } = require('common/redis');
 const { exchange, getLastAsk, market } = require("common");
 const { MAX_TRADE_COUNT, strategies } = require("common/settings");
 
-const { getAssets, estimatedValue } = market
+const { getNonNulAssets, estimatedValue } = market
 
 const [cryptoBuyThrottled, cryptoSellThrottled] = [_.throttle(cryptoBuy, 2e3), _.throttle(cryptoSell, 2e3)]
 
@@ -25,14 +25,15 @@ redisSubscribe('crypto:*', {
 });
 
 async function cryptoBuy({ symbolId, openPrice, strategyName }) {
-  console.log('about buy', strategyName, symbolId);
+  console.log('about buy', strategyName, symbolId);  
   const newClientOrderId = `${strategyName}_${symbolId}`;
   if (bid_ask[newClientOrderId] === 'bid') return;
   let unlock;
   try {
+    publish(`m24:algo:tracking`, { strategyName, text:"buy process started "+symbolId+' at '+openPrice });
     // unlock = await mutex.lock();
     console.log('load assets');
-    const assets = await getAssets();
+    const assets = await getNonNulAssets();
     console.log('assets loaded');
     if (Object.keys(assets).filter(asset => !/BTC|BNB/.test(asset)).length < MAX_TRADE_COUNT) {
       const market = exchange.marketsById[symbolId];
@@ -52,6 +53,7 @@ async function cryptoBuy({ symbolId, openPrice, strategyName }) {
               timeInForce: strategy.timeInForce
             });
             bid_ask[newClientOrderId] = 'bid';
+            publish(`m24:algo:tracking`, { strategyName, text:"buy process done "+symbolId+' at '+openPrice });
             console.log("order posted " + symbolId);
           } catch (ex) {
             console.log('error buy ', newClientOrderId, ex);
@@ -72,7 +74,7 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
   try {
     // unlock = await mutex.lock();
     const market = exchange.marketsById[symbolId];
-    const assets = await getAssets();
+    const assets = await getNonNulAssets();
     const asset = assets[market.baseId];
     const freeQuantity = asset && asset.free;
     const totalQuantity = asset && asset.total;

@@ -1,11 +1,9 @@
 const debug = require("debug")("C:market");
 const _ = require("lodash");
 
-const { fetchBalance } = require("./prices");
+const { fetchBalance,tickers, assets} = require("./prices");
 const { exchange } = require("./exchange");
-const assets = {};
-
-fetchBalance((balance) => Object.assign(assets, balance));
+const { publish } = require("./redis");
 
 const $this = module.exports = {
   async   getOpenOrders() {
@@ -23,38 +21,35 @@ const $this = module.exports = {
     return orders;
   },
   async getAssetBalance(assetId, part) {
-    let assets = await $this.getAssets();
-    if (assets && assets[assetId]) {
-      return assets[assetId][part || 'total'];
+    let nonNulAssets = await $this.getNonNulAssets();
+    if (nonNulAssets && nonNulAssets[assetId]) {
+      return nonNulAssets[assetId][part || 'total'];
     }
     return 0;
   },
 
-  async   getAssets() {
-    let prices = await exchange.fetchTickers();
-    Object.keys(assets).length || Object.assign(assets, await exchange.fetchBalance());
-
-    return _.reduce(assets, (assets, balance, asset) => {
+  async   getNonNulAssets() {  
+    return _.reduce(assets, (nonNulAssets, balance, asset) => {
       let symbol = asset + '/BTC';
-      let price = prices[symbol];
+      let ticker = tickers[symbol];
       if (asset === 'BTC') {
-        return Object.assign(assets, { [asset]: Object.assign(balance, { btc: balance.total }) })
-      } else if (price) {
-        let btc = balance.total * price.close;
+        return Object.assign(nonNulAssets, { [asset]: Object.assign(balance, { btc: balance.total }) })
+      } else if (ticker) {
+        let btc = balance.total * ticker.close;
         if (btc > 0.001) {
-          return Object.assign(assets, { [asset]: Object.assign(balance, { btc }) });
+          return Object.assign(nonNulAssets, { [asset]: Object.assign(balance, { btc }) });
         }
       }
-      return assets;
+      return nonNulAssets;
     }, {});
 
   },
 
   async   getTrades() {
 
-    let myAssets = await $this.getAssets();
+    let nonNulAssets = await $this.getNonNulAssets();
 
-    return Promise.all(_.map(_.omit(myAssets, ['BTC', 'BNB']), async (balance, asset) => {
+    return Promise.all(_.map(_.omit(nonNulAssets, ['BTC', 'BNB']), async (balance, asset) => {
       let orders = await exchange.fetchClosedOrders(asset + '/BTC');
       let order = _(orders).filter({ side: 'buy', status: 'closed' }).last();
       return {
@@ -66,9 +61,8 @@ const $this = module.exports = {
       }
     }))
   },
-  async estimatedValue(assets) {
-    let myAssets = assets || await $this.getAssets();
-    return _.sumBy(_.toArray(myAssets), 'btc')
+  async estimatedValue() {    
+    return _.sumBy(_.toArray( await $this.getNonNulAssets()), 'btc')
   }
 }
 

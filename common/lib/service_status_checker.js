@@ -1,4 +1,5 @@
 const _ = require('lodash');
+var schedule = require('node-schedule');
 const { subscribe, publish } = require('./redis');
 
 const { exchange } = require("./exchange");
@@ -57,11 +58,5 @@ process.on('uncaughtException', (err) => {
 });
 
 function autoRestart(APP) {
-  // const H = 1e3 * 60 * 60;
-  // const now = Date.now();
-  // let r = (1 + Math.trunc(now / H)) * H - now
-  // setTimeout(() => {
-  //   console.log('Restarting ', APP)
-  //   process.exit(1);
-  // }, r);
+  schedule.scheduleJob('* 8 * * * *', process.exit(1));
 }
