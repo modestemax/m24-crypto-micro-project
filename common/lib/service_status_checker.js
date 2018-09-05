@@ -20,18 +20,21 @@ function wait(APPA, APPB, callback, { immediate = false, loadMarkets = true } = 
   }
 }
 
-async function start(APP, callback, { loadMarkets } = {}) {
+async function start(APP, main, { loadMarkets } = {}) {
   process.env.APP_NAME = process.env.APP_NAME || APP;
   console.log('\n\nStarting ' + (process.env.APP_NAME) + ' at ' + new Date() + '\n\n');
   try {
+    console.log('loading markets')
     loadMarkets && await exchange.loadMarkets()
-    await callback();
+    console.log('run main')
+    await main();
+    console.log('set auto start')
     autoRestart(APP);
     console.log('\n\nStarted ' + (process.env.APP_NAME) + ' at ' + new Date() + '\n\n');
   } catch (ex) {
-    console.error(ex,ex.stack);
+    console.error(ex, ex.stack);
     publish('m24:error', { message: process.env.APP_NAME + ' fail to start\n' + ex.message, stack: ex.stack });
-    process.exit(1);
+    // process.exit(1);
   }
   publish('m24sync:' + APP, 'Starting ' + APP);
   subscribe('m24sync:waiting:' + APP, () => publish('m24sync:' + APP))
@@ -58,5 +61,8 @@ process.on('uncaughtException', (err) => {
 });
 
 function autoRestart(APP) {
-  schedule.scheduleJob('* 8 * * * *', process.exit(1));
+  schedule.scheduleJob('* 8 * * * *', () => {
+    console.log('restarting ' + APP);
+    process.exit(1);
+  });
 }
