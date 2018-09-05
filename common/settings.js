@@ -119,7 +119,8 @@ module.exports = {
             isActive: true,
             doTrade: true,
             timeInForce: 'GTC',
-            selfStop: true
+            selfStop: true,
+            timeframe:1
         },
         "binance-24h": { isActive: true, virtual: true },
         "m24Scalping": {

@@ -63,8 +63,8 @@ module.exports = {
         APP_NAME:'Signal Compiler',
         SYMBOLS_FILTER: 'btc$',
         // SYMBOLS_FILTER: '(eth|xrp|bcc|ltc|eos|ada|xlm|miota|trx|neo|tusd|bcn|xmr|dash|xem|ven|bnb|etc|qtum|ont)btc$',
-        //TIMEFRAMES: '15,60,240'
-        TIMEFRAMES: '15,60'
+        TIMEFRAMES: '15,60,240'
+        // TIMEFRAMES: '15,60'
       },
       env_production: {
         NODE_ENV: 'production'
@@ -79,9 +79,13 @@ module.exports = {
    */
   deploy: {
     production: {
-      "key": "/home/max/.ssh/keysvirginia.pem",
       user: 'ubuntu',
-      host: '54.210.121.117',
+      "--aws--":"",
+      "key1": "/home/max/.ssh/keysvirginia.pem",      
+      host1: '54.210.121.117',
+      "--ovh--":"",
+      "key": "/home/max/.ssh/id_rsa",
+      host:'142.44.246.201',
       ref: 'origin/master',
       repo: 'https://github.com/modestemax/m24-crypto-micro-project',
       path: '/home/ubuntu/m24/prod',

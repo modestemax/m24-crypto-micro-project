@@ -7,7 +7,7 @@ module.exports = class extends Template {
     //     super({ name: 'EMAH1H4', options })
     // }
 
-    async canBuy({  symbolId, timeframe }, last, prev, signalH4, asset) {
+    async canBuy({  symbolId, timeframe }, last, prev, signalH4, ticker) {
         const [lastH1, prevH1] = [signalH4.candleH1, signalH4.candleH1_1];
         //timeframe H4
         if (last && prev && lastH1 && prevH1)
@@ -18,7 +18,7 @@ module.exports = class extends Template {
                     debug(`${symbolId} EMA H4 Crossing OK`);
                     // const asset = await this.getAsset({ symbolId });
                     //24H change must >2
-                    if (asset && asset.percentage > 2) {
+                    if (ticker && ticker.percentage > 2) {
                         debug(`${symbolId} Change24h > 2% OK`);
                       
                         if (lastH1 && prevH1)

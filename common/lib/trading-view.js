@@ -88,6 +88,7 @@ const beautify = (data, timeframe) => {
             plusDi: d[11],
             macd: d[15],
             macdSignal: d[16],
+            macdOscillator: d[15]-d[16],
             rsi: d[12],
             volatility: d[22],
             stochasticK: d[23],
@@ -170,5 +171,6 @@ function getSignals({ options = params(), rate = 1e3 } = {}) {
 }
 
 module.exports = function ({ timeframe, filter, exchangeId }) {
+    console.log('loading data timeframe',timeframe,new Date())
     return getSignals({ options: params({ timeframe, filter, exchangeId }) })
 }

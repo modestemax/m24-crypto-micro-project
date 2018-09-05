@@ -16,13 +16,13 @@ function getExchange(auth) {
   const exchange = new ccxt['binance']({
     apiKey: auth.api_key,
     secret: auth.secret,
-    verbose: process.env.NODE_ENV !== 'production',
+    // verbose: process.env.NODE_ENV !== 'production',
     timeout: process.env.NODE_ENV === 'production' ? 20e3 : 20e3,
     enableRateLimit: true,
     options: {
       "warnOnFetchOpenOrdersWithoutSymbol": false,
       adjustForTimeDifference: true,
-      verbose: true, // if needed, not mandatory
+      // verbose: true, // if needed, not mandatory
       recvWindow: 10000000 // not really needed
     }
   });

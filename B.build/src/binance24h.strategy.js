@@ -15,10 +15,12 @@ module.exports = class extends M24Base {
     }
 
     test(m24, BREAK_CHANGE = 3, DURATION = 1e3 * 60 * 60 * 1) {//1hour
-        const { change, maxChange, bid, symbol, maxInstantDelta, delta, growingUpSmoothly, volumeRatio,
+        const {symbolId, change, maxChange, bid, symbol, maxInstantDelta, delta, growingUpSmoothly, volumeRatio,
             askVolumeBTC, bidVolumeBTC, spreadPercent, duration,
             previousClose, open, close, high, maxDrop,
             percentage, prevPercentage, highPercentage, lastQuoteVolume } = m24;
+        const last = this.last[symbolId]
+        const prev = this.prev[symbolId];
 
         if (/\/BTC/.test(symbol))
             if (change > BREAK_CHANGE && isFinite(change)) {//faire aumoins 3% 
@@ -36,14 +38,18 @@ module.exports = class extends M24Base {
                                                 if (growingUpSmoothly)//monté progressive
                                                     if (lastQuoteVolume > 8)//top 100
                                                         if (askVolumeBTC < 1 && bidVolumeBTC < 1)//assez bon volume 24H
-                                                        // if (bidVolumeBTC < 1)//assez bon volume 24H
-                                                        {
-                                                            BREAK_CHANGE > 0 && this.analyseProgress(m24);
-                                                            if (duration > DURATION)
-                                                                if (volumeRatio < 10) {//quantité de bid relativement petite
-                                                                    return true;
-                                                                }
-                                                        }
+                                                            // if (bidVolumeBTC < 1)//assez bon volume 24H
+
+                                                            // BREAK_CHANGE > 0 && this.analyseProgress(m24);
+                                                            // if (duration > DURATION)
+
+                                                            if (volumeRatio < 10)
+                                                                if (last && prev)
+                                                                    if (last.macd > last.macdSignal)
+                                                                    if (last.macdOscillator > prev.macdOscillator) {//quantité de bid relativement petite
+                                                                        return true;
+                                                                    }
+
             }
     }
 
@@ -108,11 +114,11 @@ module.exports = class extends M24Base {
 
     }
     tryReset(asset, newAsset) {
-        const { bid, delta, change, maxChange,minChange, maxInstantDelta, duration, highPercentage, percentage } = asset.m24;
+        const { bid, delta, change, maxChange, minChange, maxInstantDelta, duration, highPercentage, percentage } = asset.m24;
 
         if (change < -1 || maxChange - change > 2 ||
             maxInstantDelta > 1 || duration > 1e3 * 60 * 60 * 6) {
-            this.initAsset(asset, newAsset,{minChange});
+            this.initAsset(asset, newAsset, { minChange });
         }
     }
 
@@ -123,7 +129,7 @@ module.exports = class extends M24Base {
     }
     tick(price) {
         // debugger
-        const symbol=price.symbol;
+        const symbol = price.symbol;
         let pair = this.symbols[symbol];
         if (pair) {
             pair.change = computeChange(pair.close, price.close);

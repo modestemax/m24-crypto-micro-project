@@ -18,11 +18,11 @@ module.exports = class Strategy {
         if (+timeframe === this.options.timeframe && spreadPercentage < 1) {
             const last = signal.candle;
             const prev = signal.candle_1;
-            let assets = await exchange.fetchTickers();
+            let tickers = await exchange.fetchTickers();
             const market = exchange.marketsById[symbolId];
 
-            let bid = await this.canBuy(signal.candle, last, prev, signal, assets[market.baseId]);
-            let ask = await this.canSell(signal.candle, last, prev, signal, assets[market.baseId]);
+            let bid = await this.canBuy(signal.candle, last, prev, signal, tickers[market.symbol]);
+            let ask = await this.canSell(signal.candle, last, prev, signal, tickers[market.symbol]);
 
             Object.assign(this, { symbolId, bid, ask, timeframe });
             if (bid) {

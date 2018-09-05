@@ -1,7 +1,8 @@
 const debug = require('debug')('A:load-signals');
 const _ = require('lodash');
+var schedule = require('node-schedule');
 const { tradingView } = require('common');
-const {  publish } = require('common/redis');
+const { publish } = require('common/redis');
 
 const EXCHANGE = 'binance';
 
@@ -22,35 +23,29 @@ TIMEFRAMES.split(',').forEach((timeframe) => {
             )
         , 10e3);
 
-    // setInterval(throttledGetSignals, 1e3)
-
     throttledGetSignals();
-
-    setTimeout(() => {
-        throttledGetSignals();
-        setInterval(throttledGetSignals, getRate(timeframe))
-    }, getStartTime(timeframe))
-}
-);
+    schedule.scheduleJob(getScheduleRule(timeframe), throttledGetSignals);
+});
 
 
-function getStartTime(timeframe) {
-    return (60e3 - Date.now() % 60e3) - 5e3;
-}
+function getScheduleRule(timeframe) {
 
-function getRate(timeframe) {
     switch (+timeframe) {
         case 1:
-            return 10e3;
+            return '0,58,59 * * * * *'
         case 5:
-            return 60e3;
+            return '0,58,59 0,5,10,15,20,25,30,35,40,45,50,57,58,59 * * * *'
         case 15:
-            return 3 * 60e3;
+            return '0,58,59 0,5,10,14,15,20,25,29,30,35,40,44,45,50,57,58,59 * * * *'
         case 60:
-            return 10 * 60e3;
+            return '0,58,59 0,10,20,30,40,50,57,58,59 * * * *'
+        case 60 * 4:
+            return '0,58,59 0,59 */1 * * *'
         default:
-            return 60 * 60e3;
+        //return '* */10 * * * *'
     }
+    // return rule;
 }
+
 
 
