@@ -15,7 +15,7 @@ module.exports = class extends M24Base {
     }
 
     test(m24, BREAK_CHANGE = 3, DURATION = 1e3 * 60 * 60 * 1) {//1hour
-        const {symbolId, change, maxChange, bid, symbol, maxInstantDelta, delta, growingUpSmoothly, volumeRatio,
+        const { symbolId, change, maxChange, bid, symbol, maxInstantDelta, delta, growingUpSmoothly, volumeRatio,
             askVolumeBTC, bidVolumeBTC, spreadPercent, duration,
             previousClose, open, close, high, maxDrop,
             percentage, prevPercentage, highPercentage, lastQuoteVolume } = m24;
@@ -24,31 +24,34 @@ module.exports = class extends M24Base {
 
         if (/\/BTC/.test(symbol))
             if (change > BREAK_CHANGE && isFinite(change)) {//faire aumoins 3% 
-                if (prevPercentage < percentage) //growing...
-                    if (previousClose < close)
-                        // if (maxDrop < 1)
-                        if (open < close && close < high)
-                            // if (valuePercent(close, high) > 1)
-                            if (maxChange - change < 2)
+                // if (prevPercentage < percentage) //growing...
+                // if (previousClose < close)
+                    // if (maxDrop < 1)
+                    // if (open < close && close < high)
+                    // if (valuePercent(close, high) > 1)
+                    if (maxChange - change < 2)
 
-                                if (percentage > 2) //ne pas toucher a ceux qui sont dejà assez monté
-                                    if (spreadPercent < 1)//bid-ask percentage
-                                        if (delta < .5) //if (delta < .5) //se rassurer des petits pas entre les variations
-                                            if (maxInstantDelta < 1)//pas de hause/chute (pique) brusque
-                                                if (growingUpSmoothly)//monté progressive
-                                                    if (lastQuoteVolume > 8)//top 100
-                                                        if (askVolumeBTC < 1 && bidVolumeBTC < 1)//assez bon volume 24H
-                                                            // if (bidVolumeBTC < 1)//assez bon volume 24H
+                        // if (percentage > 2) //ne pas toucher a ceux qui sont dejà assez monté
+                        if (spreadPercent < 1)//bid-ask percentage
+                            if (delta < .5) //if (delta < .5) //se rassurer des petits pas entre les variations
+                                if (maxInstantDelta < 1)//pas de hause/chute (pique) brusque
+                                    if (growingUpSmoothly)//monté progressive
+                                        if (lastQuoteVolume > 8)//top 100
+                                            if (askVolumeBTC < 1 && bidVolumeBTC < 1)//assez bon volume 24H
+                                                // if (bidVolumeBTC < 1)//assez bon volume 24H
 
-                                                            // BREAK_CHANGE > 0 && this.analyseProgress(m24);
-                                                            // if (duration > DURATION)
+                                                // BREAK_CHANGE > 0 && this.analyseProgress(m24);
+                                                // if (duration > DURATION)
 
-                                                            if (volumeRatio < 10)
-                                                                if (last && prev)
-                                                                    if (last.macd > last.macdSignal)
-                                                                    if (last.macdOscillator > prev.macdOscillator) {//quantité de bid relativement petite
-                                                                        return true;
-                                                                    }
+                                                if (volumeRatio < 10)
+                                                    if (BREAK_CHANGE > 0 && last && prev) {
+                                                        if (last.macd > last.macdSignal)
+                                                            if (last.macdOscillator > prev.macdOscillator) {//quantité de bid relativement petite
+                                                                return true;
+                                                            }
+                                                    } else {
+                                                        return true;
+                                                    }
 
             }
     }
@@ -113,9 +116,9 @@ module.exports = class extends M24Base {
         }
 
     }
-    tryReset(asset, newAsset) {
-      
-    }
+    // tryReset(asset, newAsset) {
+
+    // }
 
     analyseProgress({ symbol, close }) {
         //il est question ici de voir ceux qui en general franchisse la barre des 3% et continue 

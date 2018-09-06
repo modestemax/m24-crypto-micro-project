@@ -33,7 +33,7 @@ function getExchange(auth) {
 }
 
 function overrides(exchange){
-  exchange._fetchTickers = exchange.fetchTickers;
+  // exchange._fetchTickers = exchange.fetchTickers;
 }
 
 const Mutex = new require("await-mutex").default;
@@ -54,22 +54,22 @@ function rateLimit(exchange) {
   // });
 
 
-  exchange.fetchTickers = _.wrap(exchange.fetchTickers, (fetchTickers, ...args) => {
-    return new Promise((resolve) => {
-      // console.log('fetchTickers from redis event')
-      let unsubscribe = subscribe('m24:exchange:tickers', async (tickers) => {
-        // clearTimeout(timeout);
-        // console.log('fetchTickers from redis event OK')
-        unsubscribe();
-        resolve(tickers && Object.keys(tickers).length > 0 ? tickers : (await fetchTickers.apply(exchange)));
-      });
-      // let timeout = setTimeout(async () => {
-      //   unsubscribe();
-      //   resolve((await fetchTickers.apply(exchange)));
-      // }, 1e3)
-      publish('m24:exchange:fetchTickers');
-    })
-  });
+  // exchange.fetchTickers = _.wrap(exchange.fetchTickers, (fetchTickers, ...args) => {
+  //   return new Promise((resolve) => {
+  //     // console.log('fetchTickers from redis event')
+  //     let unsubscribe = subscribe('m24:exchange:tickers', async (tickers) => {
+  //       // clearTimeout(timeout);
+  //       // console.log('fetchTickers from redis event OK')
+  //       unsubscribe();
+  //       resolve(tickers && Object.keys(tickers).length > 0 ? tickers : (await fetchTickers.apply(exchange)));
+  //     });
+  //     // let timeout = setTimeout(async () => {
+  //     //   unsubscribe();
+  //     //   resolve((await fetchTickers.apply(exchange)));
+  //     // }, 1e3)
+  //     publish('m24:exchange:fetchTickers');
+  //   })
+  // });
 
 
   ['fetchBalance', 'fetchTickers', 'fetchOrder', 'fetchOrders', 'createOrder', 'cancelOrder'].forEach(apiName => {
@@ -82,8 +82,10 @@ function rateLimit(exchange) {
           try {
             apiCall.name !== 'wrapper' && console.log("binance api call " + apiName)
             resolve(await apiCall.apply(exchange, args));
+            apiCall.name !== 'wrapper' && console.log("binance api call success " + apiName)
           } catch (error) {
             reject(error);
+            apiCall.name !== 'wrapper' && console.log("binance api fail " + apiName)
             console.error(error);
           } finally {
             unlock && unlock();

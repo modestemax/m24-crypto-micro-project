@@ -23,6 +23,7 @@ module.exports = class extends Template {
 
     }
     async track24H() {
+        const logTop5Throttled=_.throttle(()=> this.logTop5(), process.env.NODE_ENV === 'production' ? 10 * 60e3 : 30e3);
         this.startTime = Date.now();
         this.assets = (await redisGet('assets'));
         fetchTickers((price, assets) => {
@@ -33,9 +34,9 @@ module.exports = class extends Template {
             this.assetChanged(this.assets[price.symbol], price);
             this.tick(price)
             redisSetThrottled({ key: 'assets', data: this.assets, expire: 60 * 20 })//20 min
+            logTop5Throttled()
         })
-        // setInterval(async () => this.logTop5(assets), 5e3)
-        setInterval(async () => this.logTop5(), process.env.NODE_ENV === 'production' ? 10 * 60e3 : 30e3)
+               
     }
     getTop(count = 5, assets) {
         assets = assets || this.assets;
@@ -97,7 +98,9 @@ module.exports = class extends Template {
             m24.prevChange = m24.change;
             m24.change = computeChange(asset.close, newAsset.close);
             m24.maxChange = _.max([m24.change, m24.maxChange]);                                
-
+            
+          //  m24.change >0 && console.log( this.getTop())
+            
             m24.instantDelta = Math.abs(m24.change - m24.prevChange);
             m24.maxInstantDelta = _.max([m24.instantDelta, m24.maxInstantDelta]);
 
@@ -113,7 +116,8 @@ module.exports = class extends Template {
             const { bid, delta, change, duration, highPercentage, percentage } = m24;
             if (this.test(m24)) {//quantité de bid relativement petite
                 {//1heure
-                    m24.openPrice = m24.openPrice || this.getOpenPrice(m24);
+                    // m24.openPrice = m24.openPrice || this.getOpenPrice(m24);
+                    m24.openPrice =  this.getOpenPrice(m24);
                     this.logTop5();
                     console.log(new Date(now), symbol + ' ' + m24.bid + ' [' + m24.openPrice.toFixed(8) + '] ' + change.toFixed(2) + '%', ' since ' + humanizeDuration(duration));
                     this.buy(asset);
@@ -130,12 +134,12 @@ module.exports = class extends Template {
         this.prev[symbolId]=prev;
     }
     tryReset(asset, newAsset) {
-        const { bid, delta, change, maxChange,  maxInstantDelta, duration, highPercentage, percentage } = asset.m24;
+        const { bid, delta, change, maxChange,minChange,  maxInstantDelta, duration, highPercentage, percentage } = asset.m24;
 
         if (change < 0 || maxChange - change > 3/* ||
         maxInstantDelta > 1 || duration > 1e3 * 60 * 60 * 6*/) {
-            let minChange = _.sum([m24.change, m24.minChange]);
-            this.initAsset(asset, newAsset, { minChange });
+            let min = _.sum([change, minChange]);
+            this.initAsset(asset, newAsset, { minChange:min });
         }
     }
     getOpenPrice(m24) {

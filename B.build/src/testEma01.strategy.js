@@ -6,7 +6,7 @@ module.exports = class extends Template {
     // }
 
     async canBuy({  symbolId, timeframe }, last, prev, signal) {
-        const {  symbolId, timeframe } = signal.candle;
+        // const {  symbolId, timeframe } = signal.candle;
         // if (signal.ema10Above20 && signal.plusDiAboveMinusDi /*&& signal.adxAboveRef && signal.adxIsTrendingUp*/) {
         if (symbolId === 'TUSDBTC') {
             let ticker = await this.getTicker({  symbolId });
