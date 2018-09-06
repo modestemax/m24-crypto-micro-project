@@ -41,7 +41,7 @@ module.exports = class extends M24Base {
                                                 // if (bidVolumeBTC < 1)//assez bon volume 24H
 
                                                 // BREAK_CHANGE > 0 && this.analyseProgress(m24);
-                                                // if (duration > DURATION)
+                                                if (duration > DURATION)
 
                                                 if (volumeRatio < 10)
                                                     if (BREAK_CHANGE > 0 && last && prev) {
