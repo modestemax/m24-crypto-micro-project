@@ -96,14 +96,7 @@ module.exports = class extends Template {
             m24.duration = now - m24.time;
             m24.prevChange = m24.change;
             m24.change = computeChange(asset.close, newAsset.close);
-            m24.maxChange = _.max([m24.change, m24.maxChange]);
-            // if(m24.change<1 ){
-            m24.minChange = _.min([m24.change, m24.minChange]);
-            // }else if(!m24.minChange||m24.minChange>-1){
-            //     this.initAsset(asset, newAsset);
-            //     return;
-            // }
-            // m24.maxDrop = _.max([m24.maxChange - m24.change, m24.maxDrop]);
+            m24.maxChange = _.max([m24.change, m24.maxChange]);                                
 
             m24.instantDelta = Math.abs(m24.change - m24.prevChange);
             m24.maxInstantDelta = _.max([m24.instantDelta, m24.maxInstantDelta]);
@@ -137,7 +130,13 @@ module.exports = class extends Template {
         this.prev[symbolId]=prev;
     }
     tryReset(asset, newAsset) {
+        const { bid, delta, change, maxChange,  maxInstantDelta, duration, highPercentage, percentage } = asset.m24;
 
+        if (change < 0 || maxChange - change > 3/* ||
+        maxInstantDelta > 1 || duration > 1e3 * 60 * 60 * 6*/) {
+            let minChange = _.sum([m24.change, m24.minChange]);
+            this.initAsset(asset, newAsset, { minChange });
+        }
     }
     getOpenPrice(m24) {
         const { bid, delta } = m24;

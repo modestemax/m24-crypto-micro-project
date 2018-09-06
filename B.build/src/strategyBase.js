@@ -2,7 +2,7 @@ const debug = require('debug')('B:strategy-base');
 const _ = require('lodash');
 
 const { publish } = require('common/redis');
-const { tradingView, candleUtils, computeChange, exchange, market, fetchTickers,fetchBalance } = require('common');
+const { tradingView, candleUtils, computeChange, exchange, market, fetchTickers, fetchBalance } = require('common');
 const { getAssetBalance } = market;
 const { findSignal } = candleUtils;
 const tickers = {};
@@ -15,7 +15,7 @@ module.exports = class Strategy {
 
     constructor({ name, ...options }) {
         Object.assign(this, { bid: null, name, options });
-        publish('m24:algo:loaded', this)
+        publish('m24:algo:loaded', `#${name} loaded`)
     }
 
     async check(signal) {
@@ -61,15 +61,15 @@ module.exports = class Strategy {
     }
     async notifyBuy() {
         const market = exchange.marketsById[this.symbolId];
-        const balance = await getAssetBalance(market.baseId);
-        const balanceBTC = await getAssetBalance(market.quoteId, 'free');
+        const balance = getAssetBalance(market.baseId);
+        const balanceBTC = getAssetBalance(market.quoteId, 'free');
         if (!balance && balanceBTC > market.limits.cost.min) {
             this.notify('BUY');
         }
     }
     async notifySell() {
         const market = exchange.marketsById[this.symbolId];
-        const balance = await getAssetBalance(market.baseId, 'free');
+        const balance = getAssetBalance(market.baseId, 'free');
         if (balance) {
             this.notify('SELL')
         }

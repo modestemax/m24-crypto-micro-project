@@ -10,7 +10,8 @@ const balanceCallbacks = [];
 
 module.exports = { fetchBalance, fetchTickers, tickers, assets };
 
-fetchTickers(); fetchBalance();
+let initialisation = fetchTickers();
+fetchBalance();
 
 async function fetchTickers(callback) {
   callback = callback || _.noop;
@@ -59,6 +60,7 @@ async function fetchBalance(callback) {
   callback = callback || _.noop;
   balanceCallbacks.push(callback);
   if (balanceCallbacks.length === 1) {
+    await initialisation;
     clearBalances()
     console.log('listen to balance')
     Object.assign(assets, await exchange.fetchBalance());

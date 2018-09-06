@@ -20,15 +20,15 @@ const $this = module.exports = {
     })
     return orders;
   },
-  async getAssetBalance(assetId, part) {
-    let nonNulAssets = await $this.getNonNulAssets();
+   getAssetBalance(assetId, part) {
+    let nonNulAssets =  $this.getNonNulAssets();
     if (nonNulAssets && nonNulAssets[assetId]) {
       return nonNulAssets[assetId][part || 'total'];
     }
     return 0;
   },
 
-  async   getNonNulAssets() {  
+     getNonNulAssets() {  
     return _.reduce(assets, (nonNulAssets, balance, asset) => {
       let symbol = asset + '/BTC';
       let ticker = tickers[symbol];
@@ -47,7 +47,7 @@ const $this = module.exports = {
 
   async   getTrades() {
 
-    let nonNulAssets = await $this.getNonNulAssets();
+    let nonNulAssets =  $this.getNonNulAssets();
 
     return Promise.all(_.map(_.omit(nonNulAssets, ['BTC', 'BNB']), async (balance, asset) => {
       let orders = await exchange.fetchClosedOrders(asset + '/BTC');
@@ -61,8 +61,8 @@ const $this = module.exports = {
       }
     }))
   },
-  async estimatedValue() {    
-    return _.sumBy(_.toArray( await $this.getNonNulAssets()), 'btc')
+   estimatedValue() {    
+    return _.sumBy(_.toArray(  $this.getNonNulAssets()), 'btc').toFixed(8)
   }
 }
 
