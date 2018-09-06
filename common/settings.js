@@ -34,6 +34,11 @@ module.exports = {
             timeInForce: 'GTC',
             isActive: true,
         },
+        "macdH1H4": {
+            timeframe: 4 * 60,
+            timeInForce: 'GTC',
+            isActive: true,
+        },
         "bbemaH1": {
             timeframe: 60,
             timeInForce: 'FOK',
