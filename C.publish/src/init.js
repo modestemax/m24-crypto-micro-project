@@ -1,8 +1,8 @@
-const { market } = require('common');
-const { getOpenOrders, getTrades } = market;
 const _ = require('lodash');
+const { market ,fetchBalance} = require('common');
 const { publish, subscribe } = require('common/redis');
-const { fetchBalance, market } = require("common");
+
+const { getOpenOrders, getTrades } = market;
 const { estimatedValue } = market
 
 subscribe('asset:load', loadAssets)
