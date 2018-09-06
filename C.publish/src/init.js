@@ -1,11 +1,13 @@
-const {  market } = require('common');
-const { getOpenOrders, getTrades  }=market;
+const { market } = require('common');
+const { getOpenOrders, getTrades } = market;
 const _ = require('lodash');
 const { publish, subscribe } = require('common/redis');
+const { fetchBalance, market } = require("common");
+const { estimatedValue } = market
 
 subscribe('asset:load', loadAssets)
 loadAssets();
-
+fetchBalance(() => publish('asset:estimated_balance', { text: estimatedValue() }));
 async function loadAssets() {
   try {
     //-----PENDING ORDERS

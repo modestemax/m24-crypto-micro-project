@@ -66,4 +66,4 @@ const $this = module.exports = {
   }
 }
 
-fetchBalance((balance) => publish('asset:estimated_balance',{text:$this.estimatedValue(balance)}));
+
