@@ -23,7 +23,7 @@ function assetChangeManangement() {
               case "NEW":
                 //new order
                 debug("trying to buy " + order.symbolId);
-                tryToBuy({ orderId, clientOrderId, orderTime });
+                tryToBuy({ orderId,symbolId, clientOrderId, orderTime });
                 publish("asset:buy:order_new", order);
                 break;
               case "FILLED":
