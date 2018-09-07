@@ -82,9 +82,13 @@ module.exports = class Strategy {
 
         this.pairFound({ side, symbolId, price, test: !options.doTrade });
         if (price && options.doTrade) {
-            publish(event, order);
-            this.StrategyLog('Buy event published #' + symbolId)
-            debug(`[strategy:${strategyName}] ${side} ${symbolId} at price: ${price}`)
+            if (symbolId !== 'BNBBTC') {
+                publish(event, order);
+                this.StrategyLog('Buy event published #' + symbolId)
+                debug(`[strategy:${strategyName}] ${side} ${symbolId} at price: ${price}`)
+            }else{
+                this.StrategyLog("Can't trade BNB");
+            }
         }
     }
 
