@@ -78,14 +78,14 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
     const asset = assets[market.baseId];
     const freeQuantity = asset && asset.free;
     const totalQuantity = asset && asset.total;
-    if (freeQuantity) {
+    if (freeQuantity && market.limits.cost.min < freeQuantity*closePrice ) {
       let args = [market.symbol, freeQuantity,]
       let sellFunction = closePrice ? (args.push(closePrice), 'createLimitSellOrder') : 'createMarketSellOrder';
       args.push({
         newClientOrderId: newClientOrderId || `${strategyName}_${symbolId}`,
       })
       exchange[sellFunction].apply(exchange, args);
-    } else if (totalQuantity) {
+    } else if (totalQuantity  && market.limits.cost.min < totalQuantity*closePrice) {
       let lastAsk = await getLastAsk({ clientOrderId: newClientOrderId });
       if (lastAsk) {
         if (+lastAsk.price !== +exchange.priceToPrecision(market.symbol, closePrice)) {

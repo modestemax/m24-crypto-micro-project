@@ -69,10 +69,10 @@ async function fetchTickers(callback) {
 
 async function fetchBalance(callback) {
   callback = callback || _.noop;
+  await initialisation;
   balanceCallbacks.push(callback);
   if (balanceCallbacks.length === 1) {
-    try {
-      await initialisation;
+    try {    
       clearBalances()
       console.log('listen to balance')
       Object.assign(assets, await exchange.fetchBalance());

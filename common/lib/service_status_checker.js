@@ -1,10 +1,16 @@
 const _ = require('lodash');
-var schedule = require('node-schedule');
+const Promise = require('bluebird');
+const schedule = require('node-schedule');
 const { subscribe, publish } = require('./redis');
-
+const {    fetchBalance } = require('./prices');
 const { exchange } = require("./exchange");
 
 const [publishThrottled, subscribeThrottled] = [_.throttle(publish, 30e3), _.throttle(subscribe, 30e3)]
+
+const fetchBalanceAsync=()=>new Promise((resolve,reject)=>{
+  fetchBalance(()=>resolve())
+});
+
 module.exports = {
   wait, start
 };
@@ -25,7 +31,8 @@ async function start(APP, main, { loadMarkets } = {}) {
   console.log('\n\nStarting ' + (process.env.APP_NAME) + ' at ' + new Date() + '\n\n');
   try {
     console.log('loading markets')
-    loadMarkets && await exchange.loadMarkets()
+    loadMarkets && await exchange.loadMarkets();
+    await fetchBalanceAsync();
     console.log('run main')
     await main();
     console.log('set auto start')
@@ -34,7 +41,7 @@ async function start(APP, main, { loadMarkets } = {}) {
   } catch (ex) {
     console.error(ex, ex.stack);
     publish('m24:error', { message: process.env.APP_NAME + ' fail to start\n' + ex.message, stack: ex.stack });
-    // process.exit(1);
+     process.exit(1);
   }
   publish('m24sync:' + APP, 'Starting ' + APP);
   subscribe('m24sync:waiting:' + APP, () => publish('m24sync:' + APP))
