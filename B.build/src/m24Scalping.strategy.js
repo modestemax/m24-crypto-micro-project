@@ -15,29 +15,45 @@ module.exports = class extends M24Base {
             percentage, prevPercentage, highPercentage, lastQuoteVolume } = m24;
 
         if (/\/BTC/.test(symbol))
-            if (change > BREAK_CHANGE && isFinite(change)) {//faire aumoins 3% 
-                // if (prevPercentage <= percentage) //growing...
-                if (percentage > 2)
-                    if (duration < 1e3 * 60 * 5)
-                        // if (asset.percentage < 15) //ne pas toucher a ceux qui sont dejà assez monté
-                        if (spreadPercent < 1)//bid-ask percentage
-                            if (delta < .5) //if (delta < .5) //se rassurer des petits pas entre les variations
-                                if (maxInstantDelta < 1)//pas de hause/chute (pique) brusque
-                                    if (growingUpSmoothly)//monté progressive
-                                        if (lastQuoteVolume > 8)//top 100
-                                            if (askVolumeBTC < 1 && bidVolumeBTC < 1)//assez bon volume 24H
-                                                // if (bidVolumeBTC < 1)//assez bon volume 24H
-                                                if (volumeRatio < 10) {//quantité de bid relativement petite
-                                                    return true;
-                                                }
+            if (change > BREAK_CHANGE && isFinite(change)) { //faire aumoins 3% 
+                // if (prevPercentage < percentage) //growing...
+                // if (previousClose < close)
+                // if (maxDrop < 1)
+                // if (open < close && close < high)
+                // if (valuePercent(close, high) > 1)
+                if (maxChange - change < .25)
+
+                    // if (percentage > 2) //ne pas toucher a ceux qui sont dejà assez monté
+                    if (spreadPercent < 1) //bid-ask percentage
+                        if (delta < .5) //if (delta < .5) //se rassurer des petits pas entre les variations
+                            if (maxInstantDelta < 1) //pas de hause/chute (pique) brusque
+                                if (growingUpSmoothly) //monté progressive
+                                    if (lastQuoteVolume > 8) //top 100
+                                        if (askVolumeBTC < 1 && bidVolumeBTC < 1) //assez bon volume 24H
+                                            // if (bidVolumeBTC < 1)//assez bon volume 24H
+
+                                            // BREAK_CHANGE > 0 && this.analyseProgress(m24);
+                                            if (duration > DURATION)
+
+                                                if (volumeRatio < 10)
+
+                                                    if (last && prev)
+                                                        if (last.macd > last.macdSignal)
+                                                            if (last.macdOscillator > prev.macdOscillator)
+                                                                if (last.plusDi > last.minusDi)
+                                                                    if (last.DiOscillator > prev.DiOscillator)
+                                                                        // if (last.adx > 25)
+                                                                        if (last.adx > prev.adx)
+                                                                            /* if (this.sorted(adx)) */
+                                                                            return true;
             }
 
     }
 
     tryReset(asset, newAsset) {
-        const { bid, delta, change, duration, highPercentage, percentage } = asset.m24;
+        const { bid, delta, upCount, downCount, change, duration, highPercentage, percentage } = asset.m24;
 
-        if (change < 0 || duration>1e3*60*5) {
+        if (change < 0 || downCount > 2 || duration > 1e3 * 60 * 30) {
             this.initAsset(asset, newAsset);
         }
     }

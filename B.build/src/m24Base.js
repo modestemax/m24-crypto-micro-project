@@ -106,8 +106,8 @@ module.exports = class extends Template {
 
             m24.delta = m24.delta ? (m24.delta + m24.instantDelta) / 2 : m24.instantDelta;
 
-            m24.upCount += m24.delta > 0;
-            m24.downCount += m24.delta < 0;
+            m24.upCount += m24.instantDelta > 0;
+            m24.downCount += m24.instantDelta < 0;
             m24.growingUpSmoothly = m24.upCount >= 2 && m24.upCount > m24.downCount;
             m24.askVolumeBTC = newAsset.askVolume * newAsset.ask;
             m24.bidVolumeBTC = newAsset.bidVolume * newAsset.bid;

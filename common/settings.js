@@ -122,17 +122,17 @@ module.exports = {
         },
         "binance24h": {
             isActive: true,
-            doTrade: true,
-            timeInForce: 'GTC',
+            doTrade: false,
+            timeInForce: 'IOK',
             selfStop: true,
             timeframe:15
         },
-        "binance-24h": { isActive: true, virtual: true },
         "m24Scalping": {
-            isActive: false,
-            timeInForce: 'GTC',
+            isActive: true,
+            doTrade: false,
+            timeInForce: 'IOK',
             selfStop: true,
-            cancelBidAfterSecond: 60 * 5,
+            timeframe:1
         }
     }),
 };
@@ -140,6 +140,7 @@ module.exports = {
 function filterActive(objects) {
     const result = {};
     for (key in objects) {
+        objects[key].name=key;
         if (objects[key].isActive) {
             result[key] = Object.assign({}, defaultStrategyOptions, objects[key]);
         }

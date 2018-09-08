@@ -2,22 +2,9 @@ const debug = require('debug')('B:strategy:emah1h4');
 const _ = require('lodash');
 const M24Base = require('./m24Base');
 
-const {
-    subscribe,
-    publish,
-    redisGet,
-    redisSet,
-} = require("common/redis");
-const {
-    candleUtils,
-    saveDatum,
-    exchange,
-    humanizeDuration
-} = require("common");
-const {
-    computeChange,
-    valuePercent
-} = candleUtils;
+const { subscribe, publish, redisGet, redisSet, } = require("common/redis");
+const { candleUtils, saveDatum, exchange, humanizeDuration } = require("common");
+const { computeChange, valuePercent } = candleUtils;
 
 
 module.exports = class extends M24Base {
@@ -28,31 +15,11 @@ module.exports = class extends M24Base {
     }
 
     test(m24, BREAK_CHANGE = 3, DURATION = 1e3 * 60 * 60 * 1) { //1hour
-        const {
-            symbolId,
-            change,
-            maxChange,
-            bid,
-            symbol,
-            maxInstantDelta,
-            delta,
-            growingUpSmoothly,
-            volumeRatio,
-            askVolumeBTC,
-            bidVolumeBTC,
-            spreadPercent,
-            duration,
-            previousClose,
-            open,
-            close,
-            high,
-            adx,
-            maxDrop,
-            percentage,
-            prevPercentage,
-            highPercentage,
-            lastQuoteVolume
-        } = m24;
+        const { symbolId, change, maxChange, bid, symbol, maxInstantDelta, delta, growingUpSmoothly,
+            volumeRatio, askVolumeBTC, bidVolumeBTC, spreadPercent, duration, previousClose,
+            open, close, high, adx, maxDrop, percentage, prevPercentage, highPercentage,
+            lastQuoteVolume } = m24;
+            
         const last = this.last[symbolId]
         const prev = this.prev[symbolId];
 
@@ -97,11 +64,7 @@ module.exports = class extends M24Base {
     }
 
     getOpenPrice(m24) {
-        const {
-            bid,
-            delta,
-            open
-        } = m24;
+        const { bid, delta, open } = m24;
         // let myBid = bid - (delta * bid / 100) / 2
         // if (myBid < open) {
         //     return bid
@@ -112,12 +75,7 @@ module.exports = class extends M24Base {
     }
 
     getSellPriceIfSellable(rawAsset) {
-        const {
-            change,
-            maxChange,
-            openPrice,
-            symbolId
-        } = rawAsset;
+        const { change, maxChange, openPrice, symbolId } = rawAsset;
         // let lossPercentage = maxChange - change;
         let asset = _.find(this.assets, a => a.m24.symbolId === symbolId);
         asset && this.initAsset(asset);
@@ -128,12 +86,7 @@ module.exports = class extends M24Base {
         }
     }
     getSellPriceByRangeIfSellable(rawAsset) {
-        const {
-            change,
-            maxChange,
-            openPrice,
-            symbolId
-        } = rawAsset;
+        const { change, maxChange, openPrice, symbolId } = rawAsset;
 
         if (maxChange < 1) {
             if (change < -3) {
@@ -174,10 +127,7 @@ module.exports = class extends M24Base {
 
     // }
 
-    analyseProgress({
-        symbol,
-        close
-    }) {
+    analyseProgress({ symbol, close }) {
         //il est question ici de voir ceux qui en general franchisse la barre des 3% et continue 
         //et ceux qui ne continue pas
         this.symbols[symbol] = {
