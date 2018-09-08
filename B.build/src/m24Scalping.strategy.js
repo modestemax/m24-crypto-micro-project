@@ -12,7 +12,7 @@ module.exports = class extends M24Base {
     test(m24, BREAK_CHANGE = 1) {
         const { change, bid, symbol, maxInstantDelta, delta, growingUpSmoothly, volumeRatio,
             askVolumeBTC, bidVolumeBTC, spreadPercent, duration,
-            percentage, prevPercentage, highPercentage, lastQuoteVolume } = m24;
+            maxChange, prevPercentage, highPercentage, lastQuoteVolume } = m24;
 
         if (/\/BTC/.test(symbol))
             if (change > BREAK_CHANGE && isFinite(change)) { //faire aumoins 3% 
