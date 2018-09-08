@@ -9,7 +9,7 @@ const { computeChange, valuePercent } = candleUtils;
 
 module.exports = class extends M24Base {
 
-    test(m24, BREAK_CHANGE = 1) {
+    test(m24, BREAK_CHANGE = 1, DURATION =0) { //1hour
         const { change, bid, symbol, maxInstantDelta, delta, growingUpSmoothly, volumeRatio,
             askVolumeBTC, bidVolumeBTC, spreadPercent, duration,
             maxChange, prevPercentage, highPercentage, lastQuoteVolume } = m24;
