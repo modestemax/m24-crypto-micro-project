@@ -20,7 +20,6 @@ module.exports = class extends Template {
                     //24H change must >2
                     /*if (ticker && ticker.percentage > 2)*/ {
                         debug(`${symbolId} Change24h > 2% OK`);
-                      
                         // if (lastH1 && prevH1)
                             if (lastH1.ema10 > lastH1.ema20)
                                 if (prevH1.ema10 < lastH1.ema10) {

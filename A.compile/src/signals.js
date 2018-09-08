@@ -28,7 +28,7 @@ TIMEFRAMES.split(',').forEach((timeframe) => {
             data => process.emit('tv:signals', { markets: data, timeframe }),
             (err) =>
                 publish('m24:error', { message: typeof err === 'string' ? err : err.message, stack: err.stack })
-        );
+        ).then((data)=>console.log('TV data loaded TF:'+timeframe),()=>console.error('TV data load error TF:'+timeframe));
 
     getSignals();
     schedule.scheduleJob(getScheduleRule(timeframe), getSignals);

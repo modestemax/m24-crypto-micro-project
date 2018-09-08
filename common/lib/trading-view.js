@@ -86,6 +86,7 @@ const beautify = (data, timeframe) => {
             adx: d[9],
             minusDi: d[10],
             plusDi: d[11],
+            DiOscillator:d[11]-d[10],
             macd: d[15],
             macdSignal: d[16],
             macdOscillator: d[15]-d[16],

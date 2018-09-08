@@ -98,7 +98,7 @@ module.exports = class extends Template {
             m24.prevChange = m24.change;
             m24.change = computeChange(asset.close, newAsset.close);
             m24.maxChange = _.max([m24.change, m24.maxChange]);                                
-            
+           // m24.adx=[_.last(m24.adx),_.last(_.initial(m24.adx)),this.prev.adx,this.last.adx]
           //  m24.change >0 && console.log( this.getTop())
             
             m24.instantDelta = Math.abs(m24.change - m24.prevChange);
@@ -113,13 +113,13 @@ module.exports = class extends Template {
             m24.bidVolumeBTC = newAsset.bidVolume * newAsset.bid;
             m24.volumeRatio = m24.bidVolumeBTC / newAsset.quoteVolume * 100
             m24.spreadPercent = computeChange(asset.bid, asset.ask);
-            const { bid, delta, change, duration, highPercentage, percentage } = m24;
+            const { bid, delta, change,minChange, duration, highPercentage, percentage } = m24;
             if (this.test(m24)) {//quantité de bid relativement petite
                 {//1heure
                     // m24.openPrice = m24.openPrice || this.getOpenPrice(m24);
                     m24.openPrice =  this.getOpenPrice(m24);
                     // this.logTop5();
-                    console.log(new Date(now), symbol + ' ' + m24.bid + ' [' + m24.openPrice.toFixed(8) + '] ' + change.toFixed(2) + '%', ' since ' + humanizeDuration(duration));
+                    console.log(new Date(now), symbol + ' ' + m24.bid + ' [' + m24.openPrice.toFixed(8) + '] ' + change.toFixed(2) + '%/'+ minChange.toFixed(2) + '%', ' since ' + humanizeDuration(duration));
                     this.buy(asset);
                     //  this.initAsset(asset, newAsset);
                 }

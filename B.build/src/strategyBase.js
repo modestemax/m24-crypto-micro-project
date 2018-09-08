@@ -15,7 +15,8 @@ module.exports = class Strategy {
 
     constructor({ name, ...options }) {
         Object.assign(this, { bid: null, name, options });
-        publish('m24:algo:loaded', `#${name} loaded`)
+        publish('m24:algo:loaded', `#${name} loaded`);
+        this.StrategyLogThrottled = _.throttle(this.StrategyLog.bind(this), 1e3 * 60 * 20)
     }
 
     async check(signal) {
@@ -23,7 +24,8 @@ module.exports = class Strategy {
         if (+timeframe === this.options.timeframe && spreadPercentage < 1) {
             const last = signal.candle;
             const prev = signal.candle_1;
-
+            this.StrategyLogThrottled(`I'm alive, checking ${symbolId} now.
+             sample values: ema10:${last.ema10} ema20:${last.ema20} macd:${last.macd}  `);
             const market = exchange.marketsById[symbolId];
 
             let bid = await this.canBuy(signal.candle, last, prev, signal, tickers[market.symbol]);
@@ -55,10 +57,8 @@ module.exports = class Strategy {
     getSellPriceIfSellable(asset) {
 
     }
-    canBuy({ symbolId, timeframe }, last, prev, signal) {
-    }
-    canSell({ symbolId, timeframe }, last, prev, signal) {
-    }
+    canBuy({ symbolId, timeframe }, last, prev, signal) { }
+    canSell({ symbolId, timeframe }, last, prev, signal) { }
     async notifyBuy() {
         const market = exchange.marketsById[this.symbolId];
         const balance = getAssetBalance(market.baseId);
@@ -86,30 +86,68 @@ module.exports = class Strategy {
                 publish(event, order);
                 this.StrategyLog('Buy event published #' + symbolId)
                 debug(`[strategy:${strategyName}] ${side} ${symbolId} at price: ${price}`)
-            }else{
+            } else {
                 this.StrategyLog("Can't trade BNB");
             }
         }
     }
 
-    pairFound({ side, symbolId, price, test }) {
-        publish(`m24:algo:pair_found`, { side, strategyName: this.name, symbolId, price, test });
+    pairFound({
+        side,
+        symbolId,
+        price,
+        test
+    }) {
+        publish(`m24:algo:pair_found`, {
+            side,
+            strategyName: this.name,
+            symbolId,
+            price,
+            test
+        });
     }
-    async getTicker({ symbolId }) {
-        let tick = await tradingView({ filter: symbolId });
+    async getTicker({
+        symbolId
+    }) {
+        let tick = await tradingView({
+            filter: symbolId
+        });
         return tick[symbolId]
     }
 
     StrategyLog(text, options = {}) {
-        publish(`m24:algo:tracking`, { strategyName: this.name, text, ...options });
+        publish(`m24:algo:tracking`, {
+            strategyName: this.name,
+            text,
+            ...options
+        });
     }
 
-    async findSignal({ symbolId, timeframe, position }) {
-        return findSignal({ symbolId, timeframe, position })
+    async findSignal({
+        symbolId,
+        timeframe,
+        position
+    }) {
+        return findSignal({
+            symbolId,
+            timeframe,
+            position
+        })
     }
 
-    change({ open, close }) {
+    change({
+        open,
+        close
+    }) {
         return computeChange(open, close);
     }
+    sorted(array) {
+        return _.reduce(array, (sorted, val, i) => {
+            let j = i + 1;
+            if (j < array.length) {
+                return sorted && array[i] < array[j];
+            }
+            return sorted;
+        }, true)
+    }
 };
-

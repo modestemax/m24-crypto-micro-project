@@ -27,7 +27,7 @@ function assetChangeManangement() {
                 publish("asset:buy:order_new", order);
                 break;
               case "FILLED":
-                //filled bid    
+                //filled bid
                 debug("buy ok " + order.symbolId);
                 onBuy({ symbolId, clientOrderId, openPrice: price, quantity, stopTick: listenToPriceChange(symbolId) });
                 publish("asset:buy:success", order);
