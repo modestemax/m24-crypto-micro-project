@@ -10,10 +10,13 @@ const { computeChange, valuePercent } = candleUtils;
 module.exports = class extends M24Base {
 
     test(m24, BREAK_CHANGE = 1, DURATION =0) { //1hour
-        const { change, bid, symbol, maxInstantDelta, delta, growingUpSmoothly, volumeRatio,
-            askVolumeBTC, bidVolumeBTC, spreadPercent, duration,
-            maxChange, prevPercentage, highPercentage, lastQuoteVolume } = m24;
-
+        const { symbolId, change, maxChange, bid, symbol, maxInstantDelta, delta, growingUpSmoothly,
+            volumeRatio, askVolumeBTC, bidVolumeBTC, spreadPercent, duration, previousClose,
+            open, close, high, adx, maxDrop, percentage, prevPercentage, highPercentage,
+            lastQuoteVolume } = m24;
+            
+        const last = this.last[symbolId]
+        const prev = this.prev[symbolId];
         if (/\/BTC/.test(symbol))
             if (change > BREAK_CHANGE && isFinite(change)) { //faire aumoins 3% 
                 // if (prevPercentage < percentage) //growing...
