@@ -16,7 +16,7 @@ module.exports = class Strategy {
     constructor({ name, ...options }) {
         Object.assign(this, { bid: null, name, options });
         publish('m24:algo:loaded', `#${name} loaded`);
-        this.StrategyLogThrottled = _.throttle(this.StrategyLog.bind(this), 1e3 * 60 * 20)
+        this.StrategyLogThrottled = _.throttle(this.StrategyLog.bind(this), 1e3 * 60 * 60*6)
     }
 
     async check(signal) {

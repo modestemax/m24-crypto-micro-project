@@ -118,7 +118,7 @@ module.exports = {
         "K3EMA50": {
             timeframe: 15,
             timeInForce: 'GTC',
-            isActive: true,
+            isActive: false,
         },
         "binance24h": {
             isActive: true,
