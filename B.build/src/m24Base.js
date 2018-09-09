@@ -63,7 +63,7 @@ module.exports = class extends Template {
             console.log("top5", this.name)
             top5.map(t => `${t.symbolId} ${t.change} [${t.minChange}]  since ${humanizeDuration(t.duration)}`).map(str => console.log(str))
         } else {
-            this.StrategyLog(assets ? 'Empty' : 'assets is undefined', options)
+            // this.StrategyLog(assets ? 'Empty' : 'assets is undefined', options)
         }
 
     }

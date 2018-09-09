@@ -43,7 +43,7 @@ module.exports = class extends M24Base {
                                                     if (last && prev)
                                                         // if (last.macd > last.macdSignal)
                                                             if (last.macdDistance > prev.macdDistance)
-                                                                if (last.plusDi > last.minusDi)
+                                                                // if (last.plusDi > last.minusDi)
                                                                     if (last.diDistance > prev.diDistance)
                                                                         // if (last.adx > 25)
                                                                         if (last.adx > prev.adx)
