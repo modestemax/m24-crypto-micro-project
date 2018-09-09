@@ -97,16 +97,17 @@ async function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQ
 
 
 
-        const [curr,last, prev,candle_2] = (points || []).concat().reverse();
+        const [candle, candle_1, candle_2, candle_3] = (points || []).concat().reverse();
+        const last = candle_1;
         if (last) {
 
             const specialData = getSpecialData({ symbolId, timeframe });
             if (+timeframe === 60 * 4) {
                 const pointsH1 = await backupLastPoints.getLastPoints({ symbolId, timeframe: 60 });
-                const [,candleH1, candleH1_1] = (pointsH1 || []).concat().reverse();
-                _.extend(specialData, { candleH1, candleH1_1 });
+                const [candleH1, candleH1_1, candleH1_2] = (pointsH1 || []).concat().reverse();
+                _.extend(specialData, { candleH1_1, candleH1_2 });
             }
-            _.extend(specialData, { points, candle: last, candle_1: prev,candle_2 });
+            _.extend(specialData, { candle, candle_1, candle_2, candle_3 });
             // close();
             // ema();
             // rsi();

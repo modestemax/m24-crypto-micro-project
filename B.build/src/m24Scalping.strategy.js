@@ -52,7 +52,9 @@ module.exports = class extends M24Base {
             }
 
     }
-
+    getOpenPrice(m24) {               
+        return m24.ask
+    }
     tryReset(asset, newAsset) {
         const { bid, delta, upCount, downCount, change, duration, highPercentage, percentage } = asset.m24;
 

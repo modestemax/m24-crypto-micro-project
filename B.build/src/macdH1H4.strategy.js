@@ -8,7 +8,7 @@ module.exports = class extends Template {
     // }
 
     async canBuy({  symbolId, timeframe }, last, prev, signalH4, ticker) {
-        const [lastH1, prevH1] = [signalH4.candleH1, signalH4.candleH1_1];
+        const [lastH1, prevH1] = [signalH4.candleH1_1, signalH4.candleH1_2];
         //timeframe H4
         if (last && prev && lastH1 && prevH1)
             if (last.macd > last.macdSignal) {
