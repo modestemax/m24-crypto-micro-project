@@ -33,7 +33,7 @@ function getChangePercentage({ high, low }) {
     return (high - low) / Math.abs(low) * 100;
 }
 
-function backupLastPoints({ limitPointCount = 3, signal, /* timeframes = [5, 15, 60]*/ }) {
+function backupLastPoints({ limitPointCount = 4, signal, /* timeframes = [5, 15, 60]*/ }) {
     const { symbolId, timeframe } = signal;
     init();
     savePoints();
@@ -97,25 +97,25 @@ async function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQ
 
 
 
-        const [last, prev] = (points || []).concat().reverse();
+        const [curr,last, prev,candle_2] = (points || []).concat().reverse();
         if (last) {
 
             const specialData = getSpecialData({ symbolId, timeframe });
             if (+timeframe === 60 * 4) {
                 const pointsH1 = await backupLastPoints.getLastPoints({ symbolId, timeframe: 60 });
-                const [candleH1, candleH1_1] = (pointsH1 || []).concat().reverse();
+                const [,candleH1, candleH1_1] = (pointsH1 || []).concat().reverse();
                 _.extend(specialData, { candleH1, candleH1_1 });
             }
-            _.extend(specialData, { points, candle: last, candle_1: prev });
-            close();
-            ema();
-            rsi();
-            macd();
-            adx();
-            stochastic();
-            stochasticRSI();
-            momentum();
-            bollingerBand();
+            _.extend(specialData, { points, candle: last, candle_1: prev,candle_2 });
+            // close();
+            // ema();
+            // rsi();
+            // macd();
+            // adx();
+            // stochastic();
+            // stochasticRSI();
+            // momentum();
+            // bollingerBand();
             // topGainers();
 
             return specialData;

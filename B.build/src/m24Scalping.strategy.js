@@ -41,10 +41,10 @@ module.exports = class extends M24Base {
                                                 if (volumeRatio < 10)
 
                                                     if (last && prev)
-                                                        if (last.macd > last.macdSignal)
-                                                            if (last.macdOscillator > prev.macdOscillator)
+                                                        // if (last.macd > last.macdSignal)
+                                                            if (last.macdDistance > prev.macdDistance)
                                                                 if (last.plusDi > last.minusDi)
-                                                                    if (last.DiOscillator > prev.DiOscillator)
+                                                                    if (last.diDistance > prev.diDistance)
                                                                         // if (last.adx > 25)
                                                                         if (last.adx > prev.adx)
                                                                             /* if (this.sorted(adx)) */

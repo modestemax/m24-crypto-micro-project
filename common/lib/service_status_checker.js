@@ -68,7 +68,7 @@ process.on('uncaughtException', (err) => {
 });
 
 function autoRestart(APP) {
-  schedule.scheduleJob('* * 0 * * *', () => {
+  schedule.scheduleJob('0 0 0 * * *', () => {
     console.log('restarting ' + APP);
     process.exit(1);
   });

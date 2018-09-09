@@ -25,10 +25,11 @@ TIMEFRAMES.split(',').forEach((timeframe) => {
 
     const getSignals = () => tradingView({ timeframe, filter: SYMBOLS_FILTER, exchangeId: EXCHANGE })
         .then(
-            data => process.emit('tv:signals', { markets: data, timeframe }),
+            data => (process.emit('tv:signals', { markets: data, timeframe }), data),
             (err) =>
                 publish('m24:error', { message: typeof err === 'string' ? err : err.message, stack: err.stack })
-        ).then((data)=>console.log('TV data loaded TF:'+timeframe),()=>console.error('TV data load error TF:'+timeframe));
+        ).then((data) => console.log(`TV data loaded TF:${timeframe} id:${data['ADABTC'].id} time:${data['ADABTC'].time}  at:${data['ADABTC'].now} `),
+            () => console.error('TV data load error TF:' + timeframe));
 
     getSignals();
     schedule.scheduleJob(getScheduleRule(timeframe), getSignals);
@@ -49,7 +50,9 @@ function getScheduleRule(timeframe) {
             //return '0,58,59 0,10,20,30,40,50,57,58,59 * * * *'
             return '56,57,58,59 59 */1 * * *'
         case 60 * 4:
-            return '56,57,58,59 59 3,7,11,15,19,23 * * *'
+            let tz = new Date().getTimezoneOffset() / 60;
+            let hours = [3, 7, 11, 15, 19, 23].map(q => (q - tz + 24) % 24).join();
+            return `56,57,58,59 59 ${hours} * * *`
         default:
         //return '* */10 * * * *'
     }
