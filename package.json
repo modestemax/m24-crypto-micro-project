@@ -4,7 +4,7 @@
   "description": "crypto trading",
   "main": "ecosystem.config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy":"git push --set-upstream origin master && pm2 deploy production"
   },
   "dependencies": {
     "await-mutex": "^1.0.2",
