@@ -63,7 +63,7 @@ module.exports = {
         APP_NAME:'Signal Compiler',
         SYMBOLS_FILTER: 'btc$',
         // SYMBOLS_FILTER: '(eth|xrp|bcc|ltc|eos|ada|xlm|miota|trx|neo|tusd|bcn|xmr|dash|xem|ven|bnb|etc|qtum|ont)btc$',
-        TIMEFRAMES: '15,60,240'
+        TIMEFRAMES: '1,5,15,60,240'
         // TIMEFRAMES: '15,60'
       },
       env_production: {
