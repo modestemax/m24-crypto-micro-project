@@ -1,6 +1,6 @@
 const debug = require('debug')('F:index');
 
-const { bot, tme, M24_LOG_CHAT_ID,M24_FATAL_CHAT_ID, M24_CHAT_ID } = require('./bot');
+const { bot, tme, M24_LOG_CHAT_ID, M24_FATAL_CHAT_ID, M24_CHAT_ID } = require('./bot');
 
 const _ = require('lodash')
 const { redisSet } = require('common/redis');
@@ -11,7 +11,7 @@ module.exports = {
     let text;
     switch (channel) {
       case "m24:fatal":
-        text = ["#JUDE_ACTION",data].join('\n');
+        text = ["#JUDE_ACTION", data].join('\n');
         data = { chat_id: M24_FATAL_CHAT_ID };
       case "m24:error":
         const { message, stack } = data;
@@ -21,7 +21,8 @@ module.exports = {
           redisSet({ key: 'errorstack' + stackId, data: stack, expire: 24 * 60 * 60 }) //24 hour
           stackCmd = `get error stack at /error_stack providing this id: ${stackId}`;
         }
-        text = ["#error", message, stackCmd].join("\n")
+        text = ["#error", message, stackCmd].join("\n");
+        console.error(text, stack);
         break;
       case `m24:algo:pair_found`:
         const { side, strategyName, symbolId, price, test } = data;
