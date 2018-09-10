@@ -10,8 +10,8 @@ const balanceCallbacks = [];
 
 module.exports = { fetchBalance, fetchTickers, tickers, assets };
 
-let initialisation = fetchTickers();
-fetchBalance();
+let tickerPromise = fetchTickers();
+let balancePromise = fetchBalance();
 
 async function fetchTickers(callback) {
   callback = callback || _.noop;
@@ -69,7 +69,7 @@ async function fetchTickers(callback) {
 
 async function fetchBalance(callback) {
   callback = callback || _.noop;
-  await initialisation;
+  await tickerPromise;
   balanceCallbacks.push(callback);
   if (balanceCallbacks.length === 1) {
     try {
@@ -92,6 +92,9 @@ async function fetchBalance(callback) {
       console.error(ex);
       process.exit(1)
     }
+  } else {
+    await balancePromise;
+    callback(assets)
   }
   function dispatchBalance() {
     saveBalances(assets)
