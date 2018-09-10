@@ -26,14 +26,7 @@ module.exports = class extends M24Base {
         const candle = this.candle[symbolId];
         if (/\/BTC/.test(symbol))
             if (change > BREAK_CHANGE && isFinite(change)) { //faire aumoins 3% 
-                // if (prevPercentage < percentage) //growing...
-                // if (previousClose < close)
-                // if (maxDrop < 1)
-                // if (open < close && close < high)
-                // if (valuePercent(close, high) > 1)
                 if (maxChange - change < .25)
-
-                    // if (percentage > 2) //ne pas toucher a ceux qui sont dejà assez monté
                     if (spreadPercent < 1) //bid-ask percentage
                         if (delta < .5) //if (delta < .5) //se rassurer des petits pas entre les variations
                             if (maxInstantDelta < 1) //pas de hause/chute (pique) brusque
@@ -66,7 +59,7 @@ module.exports = class extends M24Base {
         return m24.ask
     }
     tryReset(asset, newAsset) {
-        const { bid, delta, upCount,symbolId, downCount, change, maxChange, duration, highPercentage, percentage } = asset.m24;
+        const { bid, delta, upCount, symbolId, downCount, change, maxChange, duration, highPercentage, percentage } = asset.m24;
 
         if (change < 0 || downCount > 2 || maxChange - change > 1 || duration > 1e3 * 60 * 30) {
             this.initAsset(asset, newAsset);
@@ -99,11 +92,15 @@ module.exports = class extends M24Base {
             if (change > 0) {
                 found.change = _.max([found.change, change]);
             }
-            if ((change < 0 || change >= .3) && found.change) {
-                found.changes = [found.change, ...found.changes.slice(0, 4)];
+            if ((change < 0 || change >= .3)) {
+                let changed;
+                if (found.change) {
+                    found.changes = [found.change, ...found.changes.slice(0, 4)];
+                    changed = true;
+                }
                 found.change = null;
                 found.price0 = null;
-                this.saveFound(found);
+                changed && this.saveFound(found);
                 found.initAsset = true;
             }
         }

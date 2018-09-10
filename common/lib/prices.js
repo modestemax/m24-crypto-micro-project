@@ -72,7 +72,7 @@ async function fetchBalance(callback) {
   await initialisation;
   balanceCallbacks.push(callback);
   if (balanceCallbacks.length === 1) {
-    try {    
+    try {
       clearBalances()
       console.log('listen to balance')
       Object.assign(assets, await exchange.fetchBalance());
