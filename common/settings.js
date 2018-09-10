@@ -115,6 +115,16 @@ module.exports = {
             timeInForce: 'GTC',
             isActive: true,
         },
+        "K3BBEMA70M15": {
+            timeframe: 15,
+            timeInForce: 'GTC',
+            isActive: true,
+        },
+        "K3BBEMA70H1": {
+            timeframe: 60,
+            timeInForce: 'GTC',
+            isActive: true,
+        },
         "K3EMA50": {
             timeframe: 15,
             timeInForce: 'GTC',

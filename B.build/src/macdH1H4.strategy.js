@@ -11,17 +11,10 @@ module.exports = class extends Template {
         const [candleH1, lastH1, prevH1] = [signalH4.candleH1, signalH4.candleH1_1, signalH4.candleH1_2];
         //timeframe H4
         if (last && prev && lastH1 && prevH1 && candleH1)
-            if (last.macd > last.macdSignal) {
-                debug(`${symbolId} EMA H4 OK`);
-                //crossing signal
-                if (prev.macd <= prev.macdSignal) {
-                    debug(`${symbolId} EMA H4 Crossing OK`);
-                    // const asset = await this.getAsset({ symbolId });
-                    //24H change must >2
-                    /*if (ticker && ticker.percentage > 2)*/ {
-                        debug(`${symbolId} Change24h > 2% OK`);
+            if (last.macd > last.macdSignal)
+                if (prev.macd <= prev.macdSignal)
+                    if (last.ema10 < last.ema20) //ema encore en bas
 
-                        // if (lastH1 && prevH1)
                         if (candleH1.ema10 > candleH1.ema20)
                             if (lastH1.ema10 > lastH1.ema20)
                                 if (prevH1.ema10 < lastH1.ema10)
@@ -35,10 +28,6 @@ module.exports = class extends Template {
                                             // return Math.min(ticker.bid, last.open);
                                         }
                                     }
-
-                    }
-                }
-            }
     }
 };
 
