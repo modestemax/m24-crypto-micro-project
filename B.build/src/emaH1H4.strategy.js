@@ -28,7 +28,8 @@ module.exports = class extends Template {
                                     let ticker = await this.getTicker({  symbolId });
                                     if (ticker && ticker.bid) {
                                         debug(`${symbolId} BID AT ${ticker.bid}`);
-                                        return Math.min(ticker.bid, last.open);
+                                        return ticker.bid
+                                        // return Math.min(ticker.bid, last.open);
                                     }
                                 }
 
