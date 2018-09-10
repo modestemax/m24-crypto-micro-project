@@ -95,8 +95,7 @@ module.exports = class extends M24Base {
             if (change > 0) {
                 found.change = _.max([found.change, change]);
             } else if (change < 0 && found.change) {
-                found.changes = _.uniq([found.change,...found.changes]);
-                if (found.changes.length > 5) found.changes=found.changes.slice(0,5);
+                found.changes = [found.change,...found.changes.slice(0,4)];                
                 found.change = null;
                 this.saveFound(found);
             }
