@@ -3,7 +3,7 @@ const defaultStrategyOptions = {
     selfStop: false,
     timeInForce: 'FOK',
     bidMarket: false,
-    takeProfit: 1.2,
+    takeProfit: .25,
     stopLoss: -3,
     trailingStop: 1.5,
     cancelBidAfterSecond: 60 * 20,//20 min,
@@ -133,16 +133,16 @@ module.exports = {
         "binance24h": {
             isActive: true,
             doTrade: false,
-            timeInForce: 'IOK',
+            timeInForce: 'IOC',
             selfStop: true,
-            timeframe:15
+            timeframe: 15
         },
         "m24Scalping": {
             isActive: true,
-            doTrade: false,
-            timeInForce: 'IOK',
+            doTrade: true,
+            timeInForce: 'IOC',
             selfStop: true,
-            timeframe:1
+            timeframe: 1
         }
     }),
 };
@@ -150,7 +150,7 @@ module.exports = {
 function filterActive(objects) {
     const result = {};
     for (key in objects) {
-        objects[key].name=key;
+        objects[key].name = key;
         if (objects[key].isActive) {
             result[key] = Object.assign({}, defaultStrategyOptions, objects[key]);
         }

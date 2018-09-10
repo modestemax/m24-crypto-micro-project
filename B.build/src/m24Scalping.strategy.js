@@ -66,9 +66,14 @@ module.exports = class extends M24Base {
         return m24.ask
     }
     tryReset(asset, newAsset) {
-        const { bid, delta, upCount, downCount, change, maxChange, duration, highPercentage, percentage } = asset.m24;
+        const { bid, delta, upCount,symbolId, downCount, change, maxChange, duration, highPercentage, percentage } = asset.m24;
 
-        if (change < 0 || downCount > 2 || maxChange - change > 3 || duration > 1e3 * 60 * 30) {
+        if (change < 0 || downCount > 2 || maxChange - change > 1 || duration > 1e3 * 60 * 30) {
+            this.initAsset(asset, newAsset);
+        }
+        const found = this.found[symbolId];
+        if (found && found.initAsset) {
+            found.initAsset = false;
             this.initAsset(asset, newAsset);
         }
     }
@@ -79,9 +84,8 @@ module.exports = class extends M24Base {
             let change = computeChange(found.price0, price);
             if (change >= 0 && found.changes.length >= 5 && _.min(found.changes) > .3) {
                 publish(`m24:algo:pair_found`, { side, strategyName: this.name, symbolId, price: `${price.toFixed(8)} [${change.toFixed(2)}%] `, test });
+                console.log(`${this.name} ${symbolId} ${price.toFixed(8)} [${change.toFixed(2)}%] `)
                 return true;
-            } else if (change < 0) {
-                this.found[symbolId].price0 = null;
             }
         }
     }
@@ -94,10 +98,13 @@ module.exports = class extends M24Base {
             let change = computeChange(found.price0, price.close);
             if (change > 0) {
                 found.change = _.max([found.change, change]);
-            } else if (change < 0 && found.change) {
-                found.changes = [found.change,...found.changes.slice(0,4)];                
+            }
+            if ((change < 0 || change >= .3) && found.change) {
+                found.changes = [found.change, ...found.changes.slice(0, 4)];
                 found.change = null;
+                found.price0 = null;
                 this.saveFound(found);
+                found.initAsset = true;
             }
         }
     }
@@ -109,8 +116,11 @@ module.exports = class extends M24Base {
     }
     getSellPriceIfSellable(asset) {
         const { change, maxChange, openPrice } = asset;
-
-        return valuePercent(openPrice, .3);
+        if (change < -1) {
+            return valuePercent(openPrice, -.5)
+        } else {
+            return valuePercent(openPrice, .25);
+        }
 
     }
 };

@@ -79,10 +79,10 @@ module.exports = class extends M24Base {
         // let lossPercentage = maxChange - change;
         let asset = _.find(this.assets, a => a.m24.symbolId === symbolId);
         asset && this.initAsset(asset);
-        if (change < -3) {
-            return valuePercent(openPrice, -2.5)
+        if (change < -1) {
+            return valuePercent(openPrice, -.5)
         } else {
-            return valuePercent(openPrice, 1.2);
+            return valuePercent(openPrice, .25);
         }
     }
     getSellPriceByRangeIfSellable(rawAsset) {
