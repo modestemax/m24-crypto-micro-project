@@ -93,7 +93,7 @@ module.exports = class Strategy {
     }
 
     pairFound({ side, symbolId, price, test }) {
-        publish(`m24:algo:pair_found`, { side, strategyName: this.name, symbolId, price: `${price.toFixed(8)} [${change.toFixed(2)}%] `, test });
+        publish(`m24:algo:pair_found`, { side, strategyName: this.name, symbolId, price: `${price.toFixed(8)} `, test });
         return true;
     }
     async getTicker({ symbolId }) {
