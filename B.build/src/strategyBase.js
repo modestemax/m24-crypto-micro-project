@@ -81,14 +81,14 @@ module.exports = class Strategy {
         const [price, event] = side === 'BUY' ? [openPrice, 'crypto:buy_limit'] : [closePrice, 'crypto:sell_limit'];
 
 
-        if (price && this.pairFound({ side, symbolId, price, test: !options.doTrade }) && options.doTrade) {
-            if (symbolId !== 'BNBBTC') {
+        if (symbolId !== 'BNBBTC') {
+            if (price && this.pairFound({ side, symbolId, price, test: !options.doTrade }) && options.doTrade) {
                 publish(event, order);
                 this.StrategyLog('Buy event published #' + symbolId)
                 debug(`[strategy:${strategyName}] ${side} ${symbolId} at price: ${price}`)
-            } else {
-                this.StrategyLog("Can't trade BNB");
             }
+        } else {
+            // this.StrategyLog("Can't trade BNB");
         }
     }
 

@@ -17,8 +17,6 @@ module.exports = class extends Template {
                                         debug(`${symbolId} BID AT ${ticker.bid}`);
                                         return ticker.bid;
                                     }
-                                    // this.pairFound({ side: 'BUY', symbolId, price: ticker.bid })
-
                                 }
     }
     async   canSell({ symbolId, timeframe }, last, prev, signal) {

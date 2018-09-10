@@ -17,7 +17,6 @@ module.exports = class extends Template {
                                     if (ticker && ticker.ask) {
                                         debug(`${symbolId} BID AT ${ticker.ask}`);
                                         return ticker.ask;
-                                        //    this.pairFound({ side: 'BUY', symbolId, price: ticker.ask })
                                     }
                                 }
                             }
