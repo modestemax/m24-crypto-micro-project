@@ -14,7 +14,7 @@ fetchTickers((price, _tickers) => Object.assign(tickers, _tickers));
 module.exports = class Strategy {
 
     constructor({ name, ...options }) {
-        Object.assign(this, { bid: null, name, options, found: {} });
+        Object.assign(this, { bid: null, name, options });
         publish('m24:algo:loaded', `#${name} loaded`);
         this.StrategyLogThrottled = _.throttle(this.StrategyLog.bind(this), 1e3 * 60 * 60 * 6)
     }
@@ -93,15 +93,8 @@ module.exports = class Strategy {
     }
 
     pairFound({ side, symbolId, price, test }) {
-        this.found[symbolId] = this.found[symbolId] || {};
-        this.found[symbolId].price0 = this.found[symbolId].price0 || price;
-        let change =computeChange(this.found[symbolId].price0, price);
-        if (change >= 0) {
-            publish(`m24:algo:pair_found`, { side, strategyName: this.name, symbolId, price: `${price.toFixed(8)} [${change.toFixed(2)}%] `, test });
-            return true;
-        } else if (change < -1) {
-            this.found[symbolId] = {};
-        }
+        publish(`m24:algo:pair_found`, { side, strategyName: this.name, symbolId, price: `${price.toFixed(8)} [${change.toFixed(2)}%] `, test });
+        return true;
     }
     async getTicker({ symbolId }) {
         let tick = await tradingView({ filter: symbolId });

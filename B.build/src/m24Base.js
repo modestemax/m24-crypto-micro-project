@@ -11,8 +11,9 @@ const redisSetThrottled = _.throttle(redisSet, 60 * 1e3);
 module.exports = class extends Template {
     constructor(options) {
         super(options);
-        this.last=this.last||{};
-        this.prev=this.prev||{};
+        this.last = {};
+        this.prev = {};
+        this.candle = {};
         this.track24H()
         subscribe('m24:algo:get_top5', (...args) => this.logTop5(null, ...args))
     }
@@ -23,7 +24,7 @@ module.exports = class extends Template {
 
     }
     async track24H() {
-        const logTop5Throttled=_.throttle(()=> this.logTop5(), process.env.NODE_ENV === 'production' ? 10 * 60e3 : 30e3);
+        const logTop5Throttled = _.throttle(() => this.logTop5(), process.env.NODE_ENV === 'production' ? 10 * 60e3 : 30e3);
         this.startTime = Date.now();
         this.assets = (await redisGet('assets'));
         fetchTickers((price, assets) => {
@@ -36,7 +37,7 @@ module.exports = class extends Template {
             redisSetThrottled({ key: 'assets', data: this.assets, expire: 60 * 20 })//20 min
             logTop5Throttled()
         })
-               
+
     }
     getTop(count = 5, assets) {
         assets = assets || this.assets;
@@ -97,10 +98,10 @@ module.exports = class extends Template {
             m24.duration = now - m24.time;
             m24.prevChange = m24.change;
             m24.change = computeChange(asset.close, newAsset.close);
-            m24.maxChange = _.max([m24.change, m24.maxChange]);                                
-           // m24.adx=[_.last(m24.adx),_.last(_.initial(m24.adx)),this.prev.adx,this.last.adx]
-          //  m24.change >0 && console.log( this.getTop())
-            
+            m24.maxChange = _.max([m24.change, m24.maxChange]);
+            // m24.adx=[_.last(m24.adx),_.last(_.initial(m24.adx)),this.prev.adx,this.last.adx]
+            //  m24.change >0 && console.log( this.getTop())
+
             m24.instantDelta = Math.abs(m24.change - m24.prevChange);
             m24.maxInstantDelta = _.max([m24.instantDelta, m24.maxInstantDelta]);
 
@@ -113,13 +114,13 @@ module.exports = class extends Template {
             m24.bidVolumeBTC = newAsset.bidVolume * newAsset.bid;
             m24.volumeRatio = m24.bidVolumeBTC / newAsset.quoteVolume * 100
             m24.spreadPercent = computeChange(asset.bid, asset.ask);
-            const { bid, delta, change,minChange, duration, highPercentage, percentage } = m24;
+            const { bid, delta, change, minChange, duration, highPercentage, percentage } = m24;
             if (this.test(m24)) {//quantité de bid relativement petite
                 {//1heure
                     // m24.openPrice = m24.openPrice || this.getOpenPrice(m24);
-                    m24.openPrice =  this.getOpenPrice(m24);
+                    m24.openPrice = this.getOpenPrice(m24);
                     // this.logTop5();
-                    console.log(new Date(now),this.name+' '+ symbol + ' ' + m24.bid + ' [' + m24.openPrice.toFixed(8) + '] ' + change.toFixed(2) + '%/'+ minChange.toFixed(2) + '%', ' since ' + humanizeDuration(duration));
+                    console.log(new Date(now), this.name + ' ' + symbol + ' ' + m24.bid + ' [' + m24.openPrice.toFixed(8) + '] ' + change.toFixed(2) + '%/' + minChange.toFixed(2) + '%', ' since ' + humanizeDuration(duration));
                     this.buy(asset);
                     //  this.initAsset(asset, newAsset);
                 }
@@ -128,18 +129,19 @@ module.exports = class extends Template {
             this.tryReset(asset, newAsset)
         }
     }
-    async canBuy({ symbolId, timeframe }, last, prev, signalH4, asset) { 
-      //  debugger      
-        this.last[symbolId]=last;
-        this.prev[symbolId]=prev;
+    async canBuy({ symbolId, timeframe }, last, prev, signal, asset) {
+        //  debugger      
+        this.last[symbolId] = last;
+        this.prev[symbolId] = prev;
+        this.candle[symbolId] = signal.candle;
     }
     tryReset(asset, newAsset) {
-        const { bid, delta, change, maxChange,minChange,  maxInstantDelta, duration, highPercentage, percentage } = asset.m24;
+        const { bid, delta, change, maxChange, minChange, maxInstantDelta, duration, highPercentage, percentage } = asset.m24;
 
-        if (change < 0 || maxChange - change > 3/* ||
+        if (change < 0 || maxChange - change > 2/* ||
         maxInstantDelta > 1 || duration > 1e3 * 60 * 60 * 6*/) {
             let min = _.sum([change, minChange]);
-            this.initAsset(asset, newAsset, { minChange:min });
+            this.initAsset(asset, newAsset, { minChange: min });
         }
     }
     getOpenPrice(m24) {
