@@ -113,7 +113,7 @@ module.exports = class extends M24Base {
     }
     getSellPriceIfSellable(asset) {
         const { change, maxChange, openPrice } = asset;
-        if (change < -1) {
+        if (change < -3) {
             return valuePercent(openPrice, -.5)
         } else {
             return valuePercent(openPrice, .25);
