@@ -64,14 +64,14 @@ module.exports = class extends M24Base {
     }
 
     getOpenPrice(m24) {
-        const { bid, delta, open } = m24;
+        const { bid,ask, delta, open } = m24;
         // let myBid = bid - (delta * bid / 100) / 2
         // if (myBid < open) {
         //     return bid
         // } else {
         //     return myBid;
         // }
-        return bid;
+        return ask;
     }
 
     getSellPriceIfSellable(rawAsset) {

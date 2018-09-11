@@ -15,7 +15,7 @@ module.exports = class extends M24Base {
         this.found = {}
     }
 
-    test(m24, BREAK_CHANGE = .3, DURATION = 0) { //1hour
+    test(m24, BREAK_CHANGE = .8, DURATION = 0) { //1hour
         const { symbolId, change, maxChange, bid, symbol, maxInstantDelta, delta, growingUpSmoothly,
             volumeRatio, askVolumeBTC, bidVolumeBTC, spreadPercent, duration, previousClose,
             open, close, high, adx, maxDrop, percentage, prevPercentage, highPercentage,
