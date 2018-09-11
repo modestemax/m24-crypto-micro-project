@@ -156,7 +156,7 @@ function filterActive(objects) {
     for (key in objects) {
         objects[key].name = key;
         if (objects[key].isActive) {
-            result[key] = Object.assign({}, defaultStrategyOptions, objects[key]);
+            result[key] = Object.assign({}, Object.assign({}, defaultStrategyOptions), objects[key]);
         }
     }
     return result;
