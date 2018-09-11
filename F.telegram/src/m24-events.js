@@ -26,8 +26,8 @@ module.exports = {
         break;
       case `m24:algo:pair_found`:
         const { side, strategyName, symbolId, price, test } = data;
-        text = [`#pair_found #${strategyName} ${side}`,
-        `${symbolId} at ${price}`,
+        text = [`#pair_found${test?'_test':''}_${strategyName}_${symbolId} `,
+        `${side} #${symbolId} at ${price} for #${strategyName} `,
         test ? "Test (will not bid)" : "Will Bid"].join("\n")
         break;
       case `m24:algo:loaded`:
