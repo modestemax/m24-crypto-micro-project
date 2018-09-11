@@ -38,6 +38,8 @@ module.exports = {
             timeframe: 4 * 60,
             timeInForce: 'GTC',
             isActive: true,
+            doTrade: true,
+            takeProfit: 5,
         },
         "bbemaH1": {
             timeframe: 60,
