@@ -15,7 +15,7 @@ module.exports = class extends M24Base {
         this.found = {}
     }
 
-    test(m24, BREAK_CHANGE = .8, DURATION = 0) { //1hour
+    test(m24, BREAK_CHANGE = 1, DURATION = 0) { //1hour
         const { symbolId, change, maxChange, bid, symbol, maxInstantDelta, delta, growingUpSmoothly,
             volumeRatio, askVolumeBTC, bidVolumeBTC, spreadPercent, duration, previousClose,
             open, close, high, adx, maxDrop, percentage, prevPercentage, highPercentage,
@@ -75,7 +75,7 @@ module.exports = class extends M24Base {
         if (found && found.price0 !== price) {
             found.price0 = found.price0 || price;
             let change = computeChange(found.price0, price);
-            if (change >= 0 && found.changes.length >= 2 && _.min(found.changes) > .3) {
+            if (change >= 0 /* && found.changes.length >= 2 && _.min(found.changes) > .3 */) {
                 publish(`m24:algo:pair_found`, { side, strategyName: this.name, symbolId, price: `${price.toFixed(8)} [${change.toFixed(2)}%] `, test });
                 console.log(`${this.name} ${symbolId} ${price.toFixed(8)} [${change.toFixed(2)}%] `)
                 return true;
