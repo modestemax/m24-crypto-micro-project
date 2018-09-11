@@ -39,7 +39,7 @@ module.exports = {
             timeInForce: 'GTC',
             isActive: true,
             doTrade: true,
-            takeProfit: 5,
+            takeProfit: 1,
         },
         "bbemaH1": {
             timeframe: 60,
