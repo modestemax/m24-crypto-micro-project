@@ -26,8 +26,8 @@ module.exports = {
         break;
       case `m24:algo:pair_found`:
         const { side, strategyName, symbolId, price, test } = data;
-        text = [`#pair_found${test?'_test':''}_${strategyName}_${symbolId} `,
-        `#pair_found${test?'_test':''}_${strategyName} `,
+        text = [`#pair_found${test ? '_test' : ''}_${strategyName}_${symbolId} `,
+        `#pair_found${test ? '_test' : ''}_${strategyName} `,
         `${side} #${symbolId} at ${price} for #${strategyName} `,
         test ? "Test (will not bid)" : "Will Bid"].join("\n")
         break;
@@ -40,7 +40,10 @@ module.exports = {
       case "m24:algo:tracking":
         text = [`#${data.strategyName}`, data.text].join('\n')
         break
-
+      case 'm24:algo:top_result':
+        text = data.top.map(crypto => `#${crypto.symbolId} Gain: ${crypto.change.toFixed(2)}% Loss: ${(crypto.loss).toFixed(2)}% `)
+       text=text.join('\n');
+        break;
     }
     tme.sendMessage({ chat_id: data.chat_id || M24_LOG_CHAT_ID, text });
 

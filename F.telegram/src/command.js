@@ -45,6 +45,23 @@ const commands = {
 	},
 	"top5"(message) {
 		publish('m24:algo:get_top5', { chat_id: message.chat.id })
+	},
+	"top"(message) {
+		message.send("Enter top percent number");
+
+		message.answer(async (message) => {
+			publish('m24:algo:top', { chat_id: message.chat.id, n: +message.text.trim() })
+		});
+
+	},
+	"reset_top"(message) {
+		message.send("Enter asset or all");
+
+		message.answer(async (message) => {
+			publish('m24:algo:reset', { chat_id: message.chat.id, asset: message.text.trim().toUpperCase() })
+			message.send("reset done");
+		});
+
 	}
 }
 

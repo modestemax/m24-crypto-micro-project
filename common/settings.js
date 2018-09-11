@@ -155,6 +155,13 @@ module.exports = {
             // selfStop: true,
             timeframe: 15,
             takeProfit: .7,
+        }, "m24day": {
+            isActive: true,
+            // doTrade: true,
+            timeInForce: 'IOC',
+            // selfStop: true,
+            timeframe: 60 * 24,
+            takeProfit: 5,
         }
     }),
 };
