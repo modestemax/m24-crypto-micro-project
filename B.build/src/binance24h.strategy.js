@@ -14,7 +14,7 @@ module.exports = class extends M24Base {
         this.symbols = {}
     }
 
-    test(m24, BREAK_CHANGE = 3, DURATION = 1e3 * 60 * 60 * 1) { //1hour
+    test(m24, BREAK_CHANGE = 2, DURATION = 1e3 * 60 * 60 * 1) { //1hour
         const { symbolId, change, maxChange, bid, symbol, maxInstantDelta, delta, growingUpSmoothly,
             volumeRatio, askVolumeBTC, bidVolumeBTC, spreadPercent, duration, previousClose,
             open, close, high, adx, maxDrop, percentage, prevPercentage, highPercentage,
@@ -30,7 +30,7 @@ module.exports = class extends M24Base {
                 // if (maxDrop < 1)
                 // if (open < close && close < high)
                 // if (valuePercent(close, high) > 1)
-                if (maxChange - change < 2)
+                if (maxChange - change < 1)
 
                     // if (percentage > 2) //ne pas toucher a ceux qui sont dejà assez monté
                     if (spreadPercent < 1) //bid-ask percentage
@@ -79,7 +79,7 @@ module.exports = class extends M24Base {
         // let lossPercentage = maxChange - change;
         let asset = _.find(this.assets, a => a.m24.symbolId === symbolId);
         asset && this.initAsset(asset);
-        if (change < -1) {
+        if (change < -2) {
             return valuePercent(openPrice, -.5)
         } else {
             return valuePercent(openPrice, .25);
