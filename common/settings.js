@@ -115,7 +115,7 @@ module.exports = {
         "K3EMA100": {
             timeframe: 15,
             timeInForce: 'GTC',
-            isActive: true,
+            isActive: false,
         },
         "K3BBEMA70M15": {
             timeframe: 15,
@@ -142,7 +142,7 @@ module.exports = {
         },
         "m24Scalping": {
             isActive: true,
-            doTrade: false,
+            doTrade: true,
             timeInForce: 'IOC',
             selfStop: true,
             timeframe: 1,
