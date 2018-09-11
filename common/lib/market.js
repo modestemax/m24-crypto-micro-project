@@ -50,8 +50,9 @@ const $this = module.exports = {
     let nonNulAssets =  $this.getNonNulAssets();
 
     return Promise.all(_.map(_.omit(nonNulAssets, ['BTC', 'BNB']), async (balance, asset) => {
-      let orders = await exchange.fetchClosedOrders(asset + '/BTC');
-      let order = _(orders).filter({ side: 'buy', status: 'closed' }).last();
+      let orders = await exchange.fetchOrders(asset + '/BTC');
+      // let order = _(orders).filter({ side: 'buy', status: 'closed' }).last();
+      let order = _(orders).filter({ side: 'buy',  }).last();
       return {
         symbolId: order.info.symbol,
         clientOrderId: order.info.clientOrderId,
