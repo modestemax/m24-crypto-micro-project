@@ -134,7 +134,7 @@ module.exports = {
         },
         "binance24h": {
             isActive: true,
-            doTrade: true,
+            doTrade: false,
             timeInForce: 'IOC',
             selfStop: true,
             timeframe: 15,
@@ -142,7 +142,7 @@ module.exports = {
         },
         "m24Scalping": {
             isActive: true,
-            doTrade: true,
+            doTrade: false,
             timeInForce: 'IOC',
             selfStop: true,
             timeframe: 15,
