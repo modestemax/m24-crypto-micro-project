@@ -147,6 +147,14 @@ module.exports = {
             selfStop: true,
             timeframe: 15,
             takeProfit: .25,
+        },
+        "K3SCALPING": {
+            isActive: true,
+            doTrade: false,
+            timeInForce: 'IOC',
+            selfStop: true,
+            timeframe: 15,
+            takeProfit: .7,
         }
     }),
 };
