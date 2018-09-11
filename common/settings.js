@@ -140,7 +140,7 @@ module.exports = {
         },
         "m24Scalping": {
             isActive: true,
-            doTrade: true,
+            doTrade: false,
             timeInForce: 'IOC',
             selfStop: true,
             timeframe: 1,

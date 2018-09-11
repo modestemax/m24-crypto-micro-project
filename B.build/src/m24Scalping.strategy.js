@@ -75,7 +75,7 @@ module.exports = class extends M24Base {
         if (found && found.price0 !== price) {
             found.price0 = found.price0 || price;
             let change = computeChange(found.price0, price);
-            if (change >= 0 && found.changes.length >= 5 && _.min(found.changes) > .3) {
+            if (change >= 0 && found.changes.length >= 2 && _.min(found.changes) > .3) {
                 publish(`m24:algo:pair_found`, { side, strategyName: this.name, symbolId, price: `${price.toFixed(8)} [${change.toFixed(2)}%] `, test });
                 console.log(`${this.name} ${symbolId} ${price.toFixed(8)} [${change.toFixed(2)}%] `)
                 return true;
