@@ -150,7 +150,7 @@ module.exports = {
         },
         "K3SCALPING": {
             isActive: true,
-            doTrade: true,
+            // doTrade: true,
             timeInForce: 'IOC',
             // selfStop: true,
             timeframe: 15,
