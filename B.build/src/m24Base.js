@@ -32,10 +32,12 @@ module.exports = class extends Template {
                 this.assets = _.cloneDeep(assets);
                 _.forEach(this.assets, (asset) => this.initAsset(asset))
             }
-            this.assetChanged(this.assets[price.symbol], price);
-            this.tick(price)
-            redisSetThrottled({ key: 'assets', data: this.assets, expire: 60 * 20 })//20 min
-            logTop5Throttled()
+            if (this.assets[price.symbol]) {
+                this.assetChanged(this.assets[price.symbol], price);
+                this.tick(price)
+                redisSetThrottled({ key: 'assets', data: this.assets, expire: 60 * 20 })//20 min
+                logTop5Throttled()
+            }
         })
 
     }
