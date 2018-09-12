@@ -27,7 +27,7 @@ module.exports = class Strategy {
             this.StrategyLogThrottled(`I'm alive, checking ${symbolId} now.
              sample values: ema10:${last.ema10} ema20:${last.ema20} macd:${last.macd}  `);
             const market = exchange.marketsById[symbolId];
-
+         if(market){
             let bid = await this.canBuy(signal.candle, last, prev, signal, tickers[market.symbol]);
             let ask = await this.canSell(signal.candle, last, prev, signal, tickers[market.symbol]);
 
@@ -39,6 +39,7 @@ module.exports = class Strategy {
                 debug(`${this.name} Sell OK`);
                 this.notifySell();
             }
+          }
         }
     }
     selfSell(asset) {

@@ -150,12 +150,13 @@ module.exports = {
         },
         "K3SCALPING": {
             isActive: true,
-            // doTrade: true,
+            doTrade: true,
             timeInForce: 'IOC',
             // selfStop: true,
             timeframe: 15,
             takeProfit: .7,
-        }, "m24day": {
+        },
+         "m24day": {
             isActive: true,
             // doTrade: true,
             timeInForce: 'IOC',

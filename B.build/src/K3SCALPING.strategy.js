@@ -9,7 +9,7 @@ module.exports = class extends Template {
         if (last && prev && current) {
             if (prev.ema50 > prev.bbb20) {
                 if (current.ema10 <= current.bbb20)
-                    if ((current.close < current.ema10) && (current.bbu20 / current.close >= 0.7))
+                    if ((current.close < current.ema10) && (current.bbu20 / current.close >= 1))
                         if ((current.ema20 >= current.bbb20) && (current.ema20 <= current.ema30) || (current.ema20 < current.bbb20) && (current.ema20 > current.ema30))
                             if ((current.macd > current.macdSignal) || (current.macd > 0)) {
                                 let ticker = await this.getTicker({ symbolId });
