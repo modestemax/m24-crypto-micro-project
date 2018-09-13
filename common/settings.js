@@ -26,19 +26,19 @@ module.exports = {
             timeframe: 15,
             timeInForce: 'GTC',
             cancelBidAfterSecond: 30,
-            isActive: process.env.NODE_ENV != 'production',
+            // isActive: process.env.NODE_ENV != 'production',
             // isActive: false
         },
         "emaH1H4": {
             timeframe: 4 * 60,
             timeInForce: 'GTC',
-            isActive: true,
+            // isActive: true,
         },
         "macdH1H4": {
             timeframe: 4 * 60,
             timeInForce: 'GTC',
-            isActive: true,
-            doTrade: true,
+            // isActive: true,
+            // doTrade: true,
             takeProfit: 2,
         },
         "bbemaH1": {
@@ -110,7 +110,7 @@ module.exports = {
             timeframe: 15,
             timeInForce: 'GTC',
             doTrade: true,
-            isActive: true,
+            // isActive: true,
         },
         "K3EMA100": {
             timeframe: 15,
@@ -120,12 +120,12 @@ module.exports = {
         "K3BBEMA70M15": {
             timeframe: 15,
             timeInForce: 'GTC',
-            isActive: true,
+            // isActive: true,
         },
         "K3BBEMA70H1": {
             timeframe: 60,
             timeInForce: 'GTC',
-            isActive: true,
+            // isActive: true,
         },
         "K3EMA50": {
             timeframe: 15,
@@ -133,7 +133,7 @@ module.exports = {
             isActive: false,
         },
         "binance24h": {
-            isActive: true,
+            // isActive: true,
             doTrade: false,
             timeInForce: 'IOC',
             selfStop: true,
@@ -141,7 +141,7 @@ module.exports = {
             takeProfit: .5
         },
         "m24Scalping": {
-            isActive: true,
+            // isActive: true,
             doTrade: false,
             timeInForce: 'IOC',
             selfStop: true,
@@ -156,7 +156,15 @@ module.exports = {
             timeframe: 15,
             takeProfit: .7,
         },
-         "m24day": {
+        "m24day": {
+            // isActive: true,
+            // doTrade: true,
+            timeInForce: 'IOC',
+            // selfStop: true,
+            timeframe: 60 * 24,
+            takeProfit: 5,
+        },
+        "m24ohlcv": {
             isActive: true,
             // doTrade: true,
             timeInForce: 'IOC',
