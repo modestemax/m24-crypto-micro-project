@@ -13,8 +13,7 @@ module.exports = class extends M24Base {
 
     constructor(...args) {
         super(...args)
-        this.sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        this.ohlcv = {};
+        this.sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));        
         this.start();
     }
     async start() {
