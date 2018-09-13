@@ -27,19 +27,19 @@ module.exports = class Strategy {
             this.StrategyLogThrottled(`I'm alive, checking ${symbolId} now.
              sample values: ema10:${last.ema10} ema20:${last.ema20} macd:${last.macd}  `);
             const market = exchange.marketsById[symbolId];
-         if(market){
-            let bid = await this.canBuy(signal.candle, last, prev, signal, tickers[market.symbol]);
-            let ask = await this.canSell(signal.candle, last, prev, signal, tickers[market.symbol]);
+            if (market) {
+                let bid = await this.canBuy(signal.candle, last, prev, signal, tickers[market.symbol]);
+                let ask = await this.canSell(signal.candle, last, prev, signal, tickers[market.symbol]);
 
-            Object.assign(this, { symbolId, bid, ask, timeframe });
-            if (bid) {
-                debug(`${this.name} Buy OK`);
-                this.notifyBuy();
-            } else if (ask) {
-                debug(`${this.name} Sell OK`);
-                this.notifySell();
+                Object.assign(this, { symbolId, bid, ask, timeframe });
+                if (bid) {
+                    debug(`${this.name} Buy OK`);
+                    this.notifyBuy();
+                } else if (ask) {
+                    debug(`${this.name} Sell OK`);
+                    this.notifySell();
+                }
             }
-          }
         }
     }
     selfSell(asset) {
@@ -82,7 +82,7 @@ module.exports = class Strategy {
         const [price, event] = side === 'BUY' ? [openPrice, 'crypto:buy_limit'] : [closePrice, 'crypto:sell_limit'];
 
 
-        if (symbolId !== 'BNBBTC') {
+        if (!['TUSDBTC', 'BNBBTC'].includes(symbolId)) {
             if (price && this.pairFound({ side, symbolId, price, test: !options.doTrade }) && options.doTrade) {
                 publish(event, order);
                 this.StrategyLog('Buy event published #' + symbolId)

@@ -164,13 +164,29 @@ module.exports = {
             timeframe: 60 * 24,
             takeProfit: 5,
         },
-        "m24ohlcv": {
+        "m24ohlcv1d": {
             isActive: true,
-            // doTrade: true,
-            timeInForce: 'IOC',
-            // selfStop: true,
             timeframe: 60 * 24,
-            takeProfit: 5,
+            frame: '1d'
+            // takeProfit: 5,
+        },
+        "m24ohlcv4h": {
+            isActive: true,
+            timeframe: 60 * 4,
+            frame: '4h'
+            // takeProfit: 5,
+        },
+        "m24ohlcv1h": {
+            isActive: true,
+            timeframe: 60,
+            frame: '1h'
+            // takeProfit: 5,
+        },
+        "m24ohlcv15m": {
+            isActive: true,
+            timeframe: 15,
+            frame: '15m'
+            // takeProfit: 5,
         }
     }),
 };
