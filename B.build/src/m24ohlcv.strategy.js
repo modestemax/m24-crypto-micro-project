@@ -32,7 +32,7 @@ module.exports = class extends M24Base {
             this.filterSelected(minTarget);
             //-----------------
             this.log();
-            $this.started = true;
+            this.started = true;
         } finally {
             unlock();
         }
