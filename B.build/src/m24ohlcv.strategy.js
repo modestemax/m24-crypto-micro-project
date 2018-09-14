@@ -38,11 +38,11 @@ module.exports = class extends M24Base {
         //  debugger
     }
     log() {
-        console.log(`OHLCV selected symbol for ${this.options.frame} `)
+        console.log(`OHLCV selected symbol timeframe:${this.options.frame} target:${this.options.minTarget}% `)
         console.log(Object.keys(this.selected));
         this.StrategyLog(`Selected symbol for trading ${this.options.frame}\n`
             + _.map(this.selected, s =>
-                `${s.symbolId} enter at ${s.enterPercentage.toFixed(2)}%`).join('\n')
+                `${s.symbolId} bid if change>= ${s.enterPercentage.toFixed(2)}%`).join('\n')
         );
     }
 
