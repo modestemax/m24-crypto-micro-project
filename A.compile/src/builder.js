@@ -6,7 +6,7 @@ const Promise = require('bluebird');
 
 const { redisSet, redisGet } = require('common/redis');
 const { candleUtils } = require('common');
-const { getNewCandleId } = candleUtils;
+const { getNewCandleId,loadPoints } = candleUtils;
 
 process.on('tv:signals', async ({ markets, timeframe }) => {
 
@@ -59,22 +59,13 @@ function backupLastPoints({ limitPointCount = 4, signal, /* timeframes = [5, 15,
         backupLastPoints.tendances[symbolId] = backupLastPoints.tendances[symbolId] || {};
     }
 
-    function getLastPoints({ symbolId, timeframe }) {
+   async function getLastPoints({ symbolId, timeframe }) {
         let points = backupLastPoints.tendances[symbolId][timeframe];
         if (!points) {
-            return redisGet(`points:${symbolId}:${timeframe}`).then(points => {
-                points = points || [];
-                if (!points.push) points = [];
-                return backupLastPoints.tendances[symbolId][timeframe] = points;
-            })
+            return backupLastPoints.tendances[symbolId][timeframe] = await loadPoints({symbolId,timeframe})
         }
         return points
     }
-
-
-
-
-
 
     _.defaults(backupLastPoints, { getLastPoints, /*getPivotPoint */ });
 }

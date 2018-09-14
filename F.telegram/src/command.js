@@ -62,6 +62,11 @@ const commands = {
 			message.send("reset done");
 		});
 
+	},
+	"restart"(message) {
+		message.send("Restarting BOT");
+		publish('m24:restart')
+
 	}
 }
 

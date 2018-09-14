@@ -46,7 +46,7 @@ const $this = module.exports = {
         let key = await $this.keyExistsAtPosition({ exchange, symbolId, timeframe: 240, position: 6 });
         if (key) {
             let signal = await redisGet(key);
-            return  (signal);
+            return (signal);
         }
     },
     async change24H({ exchange, symbolId }) {
@@ -67,6 +67,14 @@ const $this = module.exports = {
         return ((closePrice - openPrice) / openPrice) * 100;
     },
     valuePercent(price, changePercent) {
-        return price * (1 + changePercent/100);
+        return price * (1 + changePercent / 100);
+    },
+    loadPoints({ symbolId, timeframe }) {
+        return redisGet(`points:${symbolId}:${timeframe}`).then(points => {
+            points = points || [];
+            if (!points.push) points = [];
+            return points;
+        })
     }
+
 }
