@@ -94,7 +94,6 @@ module.exports = class extends M24Base {
         if (this.ohlcv) {
             limit = 1
         }
-        limit = 1; debugger;
         console.log(`loading last ${limit} OHLCV for timeframe ${this.options.frame} `)
 
         let markets = Object.entries(exchange.markets).filter(([symbol]) =>
