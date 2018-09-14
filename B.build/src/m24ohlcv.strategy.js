@@ -41,7 +41,7 @@ module.exports = class extends M24Base {
         console.log(`OHLCV selected symbol timeframe:${this.options.frame} target:${this.options.minTarget}% `)
         console.log(Object.keys(this.selected));
         this.StrategyLog(`Selected symbol for timeframe: ${this.options.frame}\n`
-        +`target: ${this.options.minTarget}%`
+            + `target: ${this.options.minTarget}%`
             + _.map(this.selected, s =>
                 `${s.symbolId}   bid if change>= ${s.enterPercentage.toFixed(2)}%`).join('\n')
         );
@@ -106,10 +106,14 @@ module.exports = class extends M24Base {
             let last = arrayToObject(_.last(_.initial(ohlcv)));
             let timeframe = (now.timestamp - last.timestamp) / 1e3;
             let endTimeStamp = now.timestamp + timeframe * 1e3;
+            let prevOHLCV = [];
+            if (this.ohlcv && this.ohlcv[symbolId]) {
+                prevOHLCV = _.tail(this.ohlcv[symbolId].ohlcv);
+            }
             return {
                 symbolId, symbol, timeframe, endTimeStamp,
                 ...now, frame,
-                ohlcv: [_.tail(this.ohlcv)].concat(_.initial(ohlcv).map(arrayToObject))
+                ohlcv: prevOHLCV.concat(_.initial(ohlcv).map(arrayToObject))
             }
         }));
 
@@ -123,7 +127,7 @@ module.exports = class extends M24Base {
             const symbolId = price.info.symbol;
             const selected = this.selected[symbolId];
             if (selected) {
-                selected.change = computeChange(selected.now.open, price.close);
+                selected.change = computeChange(selected.open, price.close);
                 if (!selected.ok)
                     if (selected.change > selected.enterPercentage)
                         if (Date.now < selected.endTimeStamp) {
