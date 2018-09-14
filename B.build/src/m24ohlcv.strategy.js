@@ -121,15 +121,15 @@ module.exports = class extends M24Base {
     tick(price) {
         if (this.started) {
             const symbolId = price.info.symbol;
-            const candle = this.selected[symbolId];
-            if (candle) {
-                candle.change = computeChange(candle.open, price.close);
-                if (!candle.ok)
-                    if (candle.change > candle.enterPercentage)
-                        if (Date.now < candle.endTimeStamp) {
-                            candle.ok = true;
-                            candle.ask = price.close;
-                            this.notifyOk(candle)
+            const selected = this.selected[symbolId];
+            if (selected) {
+                selected.change = computeChange(selected.now.open, price.close);
+                if (!selected.ok)
+                    if (selected.change > selected.enterPercentage)
+                        if (Date.now < selected.endTimeStamp) {
+                            selected.ok = true;
+                            selected.ask = price.close;
+                            this.notifyOk(selected)
                         } else {
                             this.start();
                         }
