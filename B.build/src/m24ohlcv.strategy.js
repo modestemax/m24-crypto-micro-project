@@ -13,12 +13,12 @@ module.exports = class extends M24Base {
 
     constructor(...args) {
         super(...args)
-        this.sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));        
+        this.sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
         this.start();
     }
     async start() {
         let unlock = await mutex.lock();
-        this.StrategyLog({ text: `Loading OHLCV for ${this.options.frame} ` });
+        this.StrategyLog(`Loading OHLCV for ${this.options.frame} `);
         try {
             let { frame, limit, minTarget } = Object.assign({ frame: '1d', limit: 10, minTarget: 5 }, this.options)
             this.started = false;
@@ -40,10 +40,10 @@ module.exports = class extends M24Base {
     log() {
         console.log(`OHLCV selected symbol for ${this.options.frame} `)
         console.log(Object.keys(this.selected));
-        this.StrategyLog({
-            text: `Selected symbol for trading ${this.options.frame}\n` + _.map(this.selected, s =>
+        this.StrategyLog(`Selected symbol for trading ${this.options.frame}\n`
+            + _.map(this.selected, s =>
                 `${s.symbolId} enter at ${s.enterPercentage.toFixed(2)}%`).join('\n')
-        })
+        );
     }
 
     filterSelected(n = 1) {
@@ -94,6 +94,7 @@ module.exports = class extends M24Base {
         if (this.ohlcv) {
             limit = 1
         }
+        limit = 1; debugger;
         console.log(`loading last ${limit} OHLCV for timeframe ${this.options.frame} `)
 
         let markets = Object.entries(exchange.markets).filter(([symbol]) =>

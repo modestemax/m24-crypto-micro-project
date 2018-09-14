@@ -167,25 +167,29 @@ module.exports = {
         "m24ohlcv1d": {
             isActive: true,
             timeframe: 60 * 24,
-            frame: '1d'
+            frame: '1d',
+            minTarget:5
             // takeProfit: 5,
         },
         "m24ohlcv4h": {
             isActive: true,
             timeframe: 60 * 4,
-            frame: '4h'
+            frame: '4h',
+            minTarget:3
             // takeProfit: 5,
         },
         "m24ohlcv1h": {
             isActive: true,
             timeframe: 60,
-            frame: '1h'
+            frame: '1h',
+            minTarget:1
             // takeProfit: 5,
         },
         "m24ohlcv15m": {
             isActive: true,
             timeframe: 15,
-            frame: '15m'
+            frame: '15m',
+            minTarget:.5
             // takeProfit: 5,
         }
     }),

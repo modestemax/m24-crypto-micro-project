@@ -24,8 +24,7 @@ module.exports = class Strategy {
         if (+timeframe === this.options.timeframe && spreadPercentage < 1) {
             const last = signal.candle_1;
             const prev = signal.candle_2;
-            this.StrategyLogThrottled(`I'm alive, checking ${symbolId} now.
-             sample values: ema10:${last.ema10} ema20:${last.ema20} macd:${last.macd}  `);
+            this.StrategyLogThrottled(`I'm alive, checking ${symbolId} now.`);
             const market = exchange.marketsById[symbolId];
             if (market) {
                 let bid = await this.canBuy(signal.candle, last, prev, signal, tickers[market.symbol]);
