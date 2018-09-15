@@ -16,7 +16,7 @@ module.exports = class extends Template {
                 if ((current.close < current.ema10) && (current.bbu20 / current.close >= 1))
                     if ((current.ema20 >= current.bbb20) && (current.ema20 <= current.ema30)
                         || (current.ema20 < current.bbb20) && (current.ema20 > current.ema30) && (current.ema20 >= current.ema10))
-                        if ((current.macd > current.macdSignal) || (current.macd > 0))
+                        if ((current.macd > current.macdSignal) /*|| (current.macd > 0)*/)
                             if ((currentH1.macd > currentH1.macdSignal) || (currentH1.macdDistance > lastH1.macdDistance)) {
                                 let ticker = await this.getTicker({ symbolId });
                                 if (ticker && ticker.ask) {
@@ -45,7 +45,7 @@ module.exports = class extends Template {
             return valuePercent(openPrice, -.5)
         } else if (change < -2.8) {
             return true
-        } else if (duration >  H1 && change >= .3) {
+        } else if (duration > H1 && change >= .3) {
             return closePrice;
         } else if (duration > 2 * H1 && change > .15) {
             return closePrice;

@@ -111,8 +111,8 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
             publish('m24:fatal', "ASK FAILLED " + newClientOrderId + ' at ' + closePrice)
             publish('m24:error', ex)
           }
-
-
+        }else if(1){
+debugger
         }
       }
   } finally {
