@@ -152,7 +152,7 @@ module.exports = {
             isActive: true,
             doTrade: true,
             timeInForce: 'IOC',
-            // selfStop: true,
+            selfStop: true,
             timeframe: 15,
             takeProfit: .7,
         },
