@@ -47,9 +47,9 @@ module.exports = class extends Template {
             return true
         } else if (duration > 1.5 * H1 && change > .3) {
             return closePrice;
-        } else if (duration > 2 * H1) {
+        } else if (duration > 2 * H1 && change > .15) {
             return closePrice;
-        } else if (duration > 2.5 * H1) {
+        } else if (duration > 2.5 * H1 || duration > 2 * H1 && change < .15) {
             return true
         } else {
             return valuePercent(openPrice, .7);
