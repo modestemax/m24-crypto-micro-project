@@ -13,7 +13,7 @@ const defaultStrategyOptions = {
 
 module.exports = {
     MAX_TRADE_COUNT_PER_STRATEGY: 3,
-    MAX_TRADE_COUNT: 5,
+    MAX_TRADE_COUNT: 2,
     defaultStrategyOptions,
     strategies: filterActive({
         pc: {
