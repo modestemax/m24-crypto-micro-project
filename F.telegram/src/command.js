@@ -68,7 +68,7 @@ const commands = {
 		console.log('restart command received from ' + message.from.username)
 		tme.sendMessage({ chat_id: M24_LOG_CHAT_ID, text: 'restart command received from ' + message.from.username });
 		message.send("Restarting BOT");
-		// publish('m24:restart')
+		publish('m24:restart')
 
 	}
 }
