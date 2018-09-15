@@ -61,15 +61,15 @@ module.exports = class Strategy {
     canSell({ symbolId, timeframe }, last, prev, signal) { }
     async notifyBuy() {
         const market = exchange.marketsById[this.symbolId];
-        const balance = getAssetBalance(market.baseId);
-        const balanceBTC = getAssetBalance(market.quoteId, 'free');
+        const balance = getAssetBalance(market.base);
+        const balanceBTC = getAssetBalance(market.quote, 'free');
         if (!balance && balanceBTC > market.limits.cost.min) {
             this.notify('BUY');
         }
     }
     async notifySell() {
         const market = exchange.marketsById[this.symbolId];
-        const balance = getAssetBalance(market.baseId, 'free');
+        const balance = getAssetBalance(market.base, 'free');
         if (balance) {
             this.notify('SELL')
         }

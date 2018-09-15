@@ -38,7 +38,7 @@ async function cryptoBuy({ symbolId, openPrice, strategyName }) {
     if (Object.keys(assets).filter(asset => !/BTC|BNB/.test(asset)).length < MAX_TRADE_COUNT) {
       const market = exchange.marketsById[symbolId];
       const strategy = strategies[strategyName];
-      if (!assets[market.baseId] && strategy) {
+      if (!assets[market.base] && strategy) {
         console.log('get estimated value');
         let btc = await estimatedValue(assets);
         console.log('estimated value is ', btc);
@@ -75,7 +75,7 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
     // unlock = await mutex.lock();
     const market = exchange.marketsById[symbolId];
     const assets = await getNonNulAssets();
-    const asset = assets[market.baseId];
+    const asset = assets[market.base];
     const freeQuantity = asset && asset.free;
     const totalQuantity = asset && asset.total;
     if (freeQuantity) {

@@ -200,8 +200,8 @@ function clearBalances() {
 //   const market = exchange.marketsById[symbolId];
 
 //   return {
-//     quote: _.get(balance[market.quoteId], part, 0),
-//     base: _.get(balance[market.baseId], part, 0)
+//     quote: _.get(balance[market.quote], part, 0),
+//     base: _.get(balance[market.base], part, 0)
 //   };
 // }
 
