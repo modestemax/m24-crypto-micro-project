@@ -25,12 +25,12 @@ redisSubscribe('crypto:*', {
 });
 
 async function cryptoBuy({ symbolId, openPrice, strategyName }) {
-  console.log('about buy', strategyName, symbolId);  
+  console.log('about buy', strategyName, symbolId);
   const newClientOrderId = `${strategyName}_${symbolId}`;
   if (bid_ask[newClientOrderId] === 'bid') return;
   let unlock;
   try {
-    publish(`m24:algo:tracking`, { strategyName, text:"buy process started "+symbolId+' at '+openPrice });
+    publish(`m24:algo:tracking`, { strategyName, text: "buy process started " + symbolId + ' at ' + openPrice });
     // unlock = await mutex.lock();
     console.log('load assets');
     const assets = await getNonNulAssets();
@@ -53,7 +53,7 @@ async function cryptoBuy({ symbolId, openPrice, strategyName }) {
               timeInForce: strategy.timeInForce
             });
             bid_ask[newClientOrderId] = 'bid';
-            publish(`m24:algo:tracking`, { strategyName, text:"buy process done "+symbolId+' at '+openPrice });
+            publish(`m24:algo:tracking`, { strategyName, text: "buy process done " + symbolId + ' at ' + openPrice });
             console.log("order posted " + symbolId);
           } catch (ex) {
             console.log('error buy ', newClientOrderId, ex);
@@ -78,29 +78,32 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
     const asset = assets[market.baseId];
     const freeQuantity = asset && asset.free;
     const totalQuantity = asset && asset.total;
-    if (freeQuantity && market.limits.cost.min < freeQuantity*closePrice ) {
-      let args = [market.symbol, freeQuantity,]
-      let sellFunction = closePrice ? (args.push(closePrice), 'createLimitSellOrder') : 'createMarketSellOrder';
-      args.push({
-        newClientOrderId: newClientOrderId || `${strategyName}_${symbolId}`,
-      })
-      exchange[sellFunction].apply(exchange, args);
-    } else if (totalQuantity  && market.limits.cost.min < totalQuantity*closePrice) {
-      let lastAsk = await getLastAsk({ clientOrderId: newClientOrderId });
-      if (lastAsk) {
-        if (+lastAsk.price !== +exchange.priceToPrecision(market.symbol, closePrice)) {
-          try {
-            await exchange.editLimitSellOrder(lastAsk.orderId, market.symbol, totalQuantity, closePrice, {
-              newClientOrderId: newClientOrderId,
-            });
-            bid_ask[newClientOrderId] = 'ask';
-          } catch (ex) {
-            publish('m24:fatal', "ASK FAILLED " + newClientOrderId + ' at ' + closePrice)
-            publish('m24:error', ex)
+    if (freeQuantity) {
+      if (!closePrice || market.limits.cost.min < freeQuantity * closePrice) {
+        let args = [market.symbol, freeQuantity,]
+        let sellFunction = closePrice ? (args.push(closePrice), 'createLimitSellOrder') : 'createMarketSellOrder';
+        args.push({
+          newClientOrderId: newClientOrderId || `${strategyName}_${symbolId}`,
+        })
+        exchange[sellFunction].apply(exchange, args);
+      }
+    } else if (totalQuantity)
+      if ( market.limits.cost.min < totalQuantity * closePrice) {
+        let lastAsk = await getLastAsk({ clientOrderId: newClientOrderId });
+        if (lastAsk) {
+          if (+lastAsk.price !== +exchange.priceToPrecision(market.symbol, closePrice)) {
+            try {
+              await exchange.editLimitSellOrder(lastAsk.orderId, market.symbol, totalQuantity, closePrice, {
+                newClientOrderId: newClientOrderId,
+              });
+              bid_ask[newClientOrderId] = 'ask';
+            } catch (ex) {
+              publish('m24:fatal', "ASK FAILLED " + newClientOrderId + ' at ' + closePrice)
+              publish('m24:error', ex)
+            }
           }
         }
       }
-    }
   } finally {
     unlock && unlock();
   }
