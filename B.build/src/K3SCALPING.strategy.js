@@ -1,6 +1,6 @@
 const debug = require('debug')('B:strategy:bbema150-15M');
 const { candleUtils } = require('common');
-const { getNewCandleId,loadPoints } = candleUtils;
+const { getNewCandleId, loadPoints, valuePercent, computeChange } = candleUtils;
 
 const Template = require('./strategyBase');
 
@@ -23,6 +23,16 @@ module.exports = class extends Template {
                                     return ticker.ask;
                                 }
                             }
+        }
+    }
+    getSellPriceIfSellable(rawAsset) {
+        const { change, maxChange, openPrice, symbolId } = rawAsset;
+        if (-2.5 < change && change < -2) {
+            return valuePercent(openPrice, -.5)
+        } else if (change < -2.8) {
+            return true
+        } else {
+            return valuePercent(openPrice, .7);
         }
     }
 }
