@@ -100,6 +100,19 @@ const $this = module.exports = new class {
       text: ["#order_expired_canceled", `#${strategyName}, #${symbolId}`].join("\n")
     });
   }
+  tradeForgotten({ clientOrderId, symbolId, timestamp, openPrice, closePrice, quantity }) {
+    clientOrderId = clientOrderId || 'UNKNOWN';
+    let duration = Date.now() - timestamp;
+    let change = computeChange(openPrice, closePrice);
+    const strategyName = clientOrderId.split("_")[0];
+    tme.sendMessage({
+      chat_id: M24_CHAT_ID,
+      text: ["#trade_forgotten",
+        `#${strategyName}, #${symbolId}`,
+        `change: ${change} `,
+        ` since ${humanizeDuration(duration)} `].join("\n")
+    });
+  }
 
   endTrade(trade) {
     let { openPrice, closePrice, symbolId, change, timestamp, clientOrderId } = trade;

@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { market, fetchBalance } = require('common');
+const { market, fetchBalance, getLastAsk } = require('common');
 const { publish, subscribe } = require('common/redis');
 
 const { getOpenOrders, getTrades } = market;
@@ -20,7 +20,9 @@ async function loadAssets() {
 
     //-----RUNNING TRADES
     const trades = await getTrades()
-    _.forEach(trades, trade => {
+    _.forEach(trades, async trade => {
+      let lastAsk = await getLastAsk({ clientOrderId: newClientOrderId });
+      if (!lastAsk) { publish('asset:buy:order_forgotten', trade) }
       publish('asset:track', trade)
     })
 

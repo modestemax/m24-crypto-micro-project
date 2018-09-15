@@ -67,7 +67,7 @@ async function cryptoBuy({ symbolId, openPrice, strategyName }) {
     unlock && unlock();
   }
 }
-async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity, closePrice, strategyName }) {
+async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity, closePrice, strategyName, ...args }) {
   newClientOrderId = newClientOrderId || `${strategyName}_${symbolId}`
   if (bid_ask[newClientOrderId] === 'ask') return;
   let unlock;
@@ -111,8 +111,9 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
             publish('m24:fatal', "ASK FAILLED " + newClientOrderId + ' at ' + closePrice)
             publish('m24:error', ex)
           }
-        }else if(1){
-debugger
+        } else if (1) {
+          //debugger
+          publish('asset:buy:order_forgotten', { clientOrderId: newClientOrderId, symbolId, timestamp:args.timestamp, openPrice:args. openPrice, closePrice, quantity })
         }
       }
   } finally {
