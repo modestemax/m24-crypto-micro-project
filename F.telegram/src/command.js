@@ -70,6 +70,9 @@ const commands = {
 		message.send("Restarting BOT in 5 seconds");
 		setTimeout(() => publish('m24:restart'), 5e3);
 
+	},
+	"sell_*"({search,...message}){
+		debugger
 	}
 }
 
