@@ -8,7 +8,7 @@ const redis = Promise.promisifyAll(redisClient);
 // const humanizeDuration = require('humanize-duration');
 
 const humanizeDuration = _.partial(require('humanize-duration'), _, {
-  units: ['d','h', 'm'],
+  units: ['d', 'h', 'm'],
   round: true
 });
 

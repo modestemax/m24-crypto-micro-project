@@ -88,20 +88,31 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
         exchange[sellFunction].apply(exchange, args);
       }
     } else if (totalQuantity)
-      if ( market.limits.cost.min < totalQuantity * closePrice) {
+      if (!closePrice || market.limits.cost.min < totalQuantity * closePrice) {
         let lastAsk = await getLastAsk({ clientOrderId: newClientOrderId });
         if (lastAsk) {
-          if (+lastAsk.price !== +exchange.priceToPrecision(market.symbol, closePrice)) {
-            try {
-              await exchange.editLimitSellOrder(lastAsk.orderId, market.symbol, totalQuantity, closePrice, {
+          try {
+            if (closePrice) {
+              if (+lastAsk.price !== +exchange.priceToPrecision(market.symbol, closePrice)) {
+                await exchange.editLimitSellOrder(lastAsk.orderId, market.symbol, totalQuantity, closePrice, {
+                  newClientOrderId: newClientOrderId,
+                });
+              }
+            } else {
+              await exchange.cancelOrder(lastAsk.orderId, market.symbol, {
                 newClientOrderId: newClientOrderId,
               });
-              bid_ask[newClientOrderId] = 'ask';
-            } catch (ex) {
-              publish('m24:fatal', "ASK FAILLED " + newClientOrderId + ' at ' + closePrice)
-              publish('m24:error', ex)
+              await exchange.createMarketSellOrder(market.symbol, totalQuantity, {
+                newClientOrderId: newClientOrderId,
+              })
             }
+            bid_ask[newClientOrderId] = 'ask';
+          } catch (ex) {
+            publish('m24:fatal', "ASK FAILLED " + newClientOrderId + ' at ' + closePrice)
+            publish('m24:error', ex)
           }
+
+
         }
       }
   } finally {
