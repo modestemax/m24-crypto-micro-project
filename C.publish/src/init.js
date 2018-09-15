@@ -21,7 +21,7 @@ async function loadAssets() {
     //-----RUNNING TRADES
     const trades = await getTrades()
     _.forEach(trades, async trade => {
-      let lastAsk = await getLastAsk({ clientOrderId: newClientOrderId });
+      let lastAsk = await getLastAsk(trade);
       if (!lastAsk) { publish('asset:buy:order_forgotten', trade) }
       publish('asset:track', trade)
     })
