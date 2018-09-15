@@ -1,11 +1,11 @@
 const debug = require('debug')('F:commands');
-const _=require('lodash');
+const _ = require('lodash');
 const { bot, tme, M24_LOG_CHAT_ID, M24_CHAT_ID } = require('./bot');
 const { publish, subscribe, redisGet } = require('common/redis');
 const { candleUtils } = require('common');
 const { change24H } = candleUtils;
 const { resetMessage } = require("./assets-messages");
-const publishThrottled=_.throttle(publish,1e3*60*10);
+const publishThrottled = _.throttle(publish, 1e3 * 60 * 10);
 serviceStatusHandler();
 
 const commands = {
@@ -65,6 +65,8 @@ const commands = {
 
 	},
 	"restart"(message) {
+		console.log('restart command received from ' + message.from.username)
+		tme.sendMessage({ chat_id: M24_LOG_CHAT_ID, text: 'restart command received from ' + message.from.username });
 		message.send("Restarting BOT");
 		publishThrottled('m24:restart')
 
