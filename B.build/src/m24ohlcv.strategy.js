@@ -40,11 +40,11 @@ module.exports = class extends M24Base {
     log() {
         console.log(`OHLCV selected symbol timeframe:${this.options.frame} target:${this.options.minTarget}% `)
         console.log(Object.keys(this.selected));
-        this.StrategyLog(`Selected symbol for timeframe: ${this.options.frame}\n`
-            + `target: ${this.options.minTarget}%\n`
-            + _.map(this.selected, s =>
-                `${s.symbolId}   bid if change>= ${s.enterPercentage.toFixed(2)}%`).join('\n')
-        );
+        // this.StrategyLog(`Selected symbol for timeframe: ${this.options.frame}\n`
+        //     + `target: ${this.options.minTarget}%\n`
+        //     + _.map(this.selected, s =>
+        //         `${s.symbolId}   bid if change>= ${s.enterPercentage.toFixed(2)}%`).join('\n')
+        // );
     }
 
     filterSelected(n = 1) {
