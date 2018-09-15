@@ -31,7 +31,7 @@ module.exports = class Strategy {
                 let ask = await this.canSell(signal.candle, last, prev, signal, tickers[market.symbol]);
 
                 Object.assign(this, { symbolId, bid, ask, timeframe });
-                if (bid) {xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                if (bid) {
                     debug(`${this.name} Buy OK`);
                     this.notifyBuy();
                 } else if (ask) {
