@@ -79,7 +79,8 @@ const $this = module.exports = new class {
         `max ${maxChange.toFixed(2)}% : min ${minChange.toFixed(2)}%`,
         `stop ${strategy.stopLoss} : profit ${strategy.takeProfit}`,
         `change  ${change.toFixed(2)}% [${targetStatus}]`,
-        `open: ${openPrice.toFixed(8)} close: ${closePrice.toFixed(8)} `,
+        `open : ${openPrice.toFixed(8)}`,
+        `close: ${closePrice.toFixed(8)} `,
         `since ${humanizeDuration(duration)}`,
         `/sell`
       ].join("\n")
