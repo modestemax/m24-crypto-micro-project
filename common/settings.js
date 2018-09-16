@@ -156,6 +156,14 @@ module.exports = {
             timeframe: 15,
             takeProfit: .7,
         },
+        "K3DAILY1H": {
+            isActive: true,
+            doTrade: false,
+            timeInForce: 'IOC',
+            selfStop: true,
+            timeframe: 60,
+            takeProfit: 5,
+        },
         "m24day": {
             // isActive: true,
             // doTrade: true,
@@ -168,28 +176,28 @@ module.exports = {
             // isActive: true,
             timeframe: 60 * 24,
             frame: '1d',
-            minTarget:5
+            minTarget: 5
             // takeProfit: 5,
         },
         "m24ohlcv4h": {
             // isActive: true,
             timeframe: 60 * 4,
             frame: '4h',
-            minTarget:3
+            minTarget: 3
             // takeProfit: 5,
         },
         "m24ohlcv1h": {
             // isActive: true,
             timeframe: 60,
             frame: '1h',
-            minTarget:1
+            minTarget: 1
             // takeProfit: 5,
         },
         "m24ohlcv15m": {
             // isActive: true,
             timeframe: 15,
             frame: '15m',
-            minTarget:.5
+            minTarget: .5
             // takeProfit: 5,
         }
     }),

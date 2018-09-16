@@ -29,6 +29,7 @@
 		"cSpell.words": [
 			"AAGM",
 			"ADABTC",
+			"Aroon",
 			"CQDIRL",
 			"FAILLED",
 			"HDEL",
@@ -42,6 +43,8 @@
 			"RSIK",
 			"STOCHASTICRSI",
 			"SYMBOLID",
+			"Stoch",
+			"VWMA",
 			"algo",
 			"assez",
 			"bbema",
@@ -58,6 +61,7 @@
 			"macd",
 			"moins",
 			"monté",
+			"nempty",
 			"ohlcv",
 			"pmessage",
 			"promisify",
@@ -71,6 +75,7 @@
 			"tendances",
 			"timeframe",
 			"timeframes",
+			"trailling",
 			"voir"
 		]
 	}

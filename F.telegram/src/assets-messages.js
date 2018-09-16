@@ -106,7 +106,8 @@ const $this = module.exports = new class {
     let duration = Date.now() - timestamp;
     let change = computeChange(openPrice, closePrice);
     const strategyName = clientOrderId.split("_")[0];
-    duration && tme.sendMessage({
+    const M1=1e3*60;
+    duration>M1 && tme.sendMessage({
       chat_id: M24_CHAT_ID,
       text: ["#trade_forgotten",
         `#${strategyName}, #${symbolId}`,
