@@ -24,7 +24,7 @@ const $this = module.exports = {
       }
     }
   },
-  async onBuy({ symbolId, clientOrderId, openPrice, quantity, timestamp, stopTick }) {
+  async onBuy({ symbolId, clientOrderId, openPrice, quantity, timestamp,forgotten, stopTick }) {
     let strategyName = clientOrderId.split('_')[0];
     if (strategyName in strategies) {
       let asset = await loadAsset({ clientOrderId });
@@ -32,7 +32,7 @@ const $this = module.exports = {
         delAsset(asset)
       }
       assets[clientOrderId] = Object.assign({}, asset, {
-        symbolId, clientOrderId, strategyName, timestamp,
+        symbolId, clientOrderId, strategyName, timestamp,forgotten,
         strategy: Object.assign({}, strategies[strategyName]),
         openPrice, quantity, stopTick
       })

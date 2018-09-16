@@ -22,7 +22,7 @@ async function loadAssets() {
     const trades = await getTrades()
     _.forEach(trades, async trade => {
       let lastAsk = await getLastAsk(trade);
-      if (!lastAsk) { publish('asset:buy:order_forgotten', trade) }
+      if (!lastAsk || trade.forgotten) { publish('asset:buy:order_forgotten', trade) }
       publish('asset:track', trade)
     })
 

@@ -58,7 +58,8 @@ const $this = module.exports = {
         clientOrderId: order.info.clientOrderId,
         openPrice: order.price,
         quantity: order.filled,
-        timestamp: order.timestamp
+        timestamp: order.timestamp,
+        forgotten:!!asset.free
       }
     }))
   },

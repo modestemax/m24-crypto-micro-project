@@ -60,7 +60,7 @@ const $this = module.exports = new class {
   }
 
   async tradeChanged(trade) {
-    const { symbolId, change, clientOrderId, timestamp, maxChange, minChange } = trade;
+    const { symbolId, change, openPrice, closePrice, clientOrderId, timestamp, maxChange, minChange } = trade;
     let message_id = tradesMessageId[clientOrderId];
     //--
     let strategy = trade.strategy = _.defaults(trade.strategy, { takeProfit: 3, stopLoss: -3, trailling: 2 })
@@ -79,6 +79,7 @@ const $this = module.exports = new class {
         `max ${maxChange.toFixed(2)}% : min ${minChange.toFixed(2)}%`,
         `stop ${strategy.stopLoss} : profit ${strategy.takeProfit}`,
         `change  ${change.toFixed(2)}% [${targetStatus}]`,
+        `open: ${openPrice.toFixed(8)} close: ${closePrice.toFixed(8)} `,
         `since ${humanizeDuration(duration)}`,
         `/sell`
       ].join("\n")
