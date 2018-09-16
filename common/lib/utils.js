@@ -131,9 +131,6 @@ function saveAsk(ask) {
   });
 }
 
-function delTrade({ newClientOrderId }) {
-  return delDatum({ hKey: "trades", id: newClientOrderId });
-}
 //-------------------------STRATEGIES-----------------------------
 
 async function loadOrderStrategy({ newClientOrderId }) {
@@ -218,7 +215,7 @@ function valuePercent(price, changePercent) {
 const exchanges = {};
 
 async function loadMarkets({ exchangeId, auth }) {
-  if (!ccxt[exchangeId]) exchangeId = 'binance';//debug purpuse
+  if (!ccxt[exchangeId]) exchangeId = 'binance';//debug purpose
   exchanges[exchangeId] = exchanges[exchangeId] || new ccxt[exchangeId]({
     apiKey: auth.api_key,
     secret: auth.secret,

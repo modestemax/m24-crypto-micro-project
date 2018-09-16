@@ -74,11 +74,11 @@ const commands = {
 
 	},
 	"sell_*"({search,...message}){
-		debugger
+		// debugger
 	}
 }
 
-for (cmd in commands) {
+for (let cmd in commands) {
 	bot.cmd("/" + cmd, commands[cmd]);
 }
 

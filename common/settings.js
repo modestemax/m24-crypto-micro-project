@@ -197,7 +197,7 @@ module.exports = {
 
 function filterActive(objects) {
     const result = {};
-    for (key in objects) {
+    for (let key in objects) {
         objects[key].name = key;
         if (objects[key].isActive) {
             result[key] = Object.assign({}, Object.assign({}, defaultStrategyOptions), objects[key]);

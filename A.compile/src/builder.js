@@ -315,15 +315,15 @@ async function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQ
                 );
             }
             function bollingerBand() {
-                _.extend(specialData, {
-                    bbl20: last.bbl20,
-                    bbu20: last.bbu20,
-                    bbb20: (last.bbl20 + last.bbu20) / 2,
-                }, prev && {
-                    bbl20_1: prev.bbl20,
-                    bbu20_1: prev.bbu20,
-                    bbb20_1: (prev.bbl20 + prev.bbu20) / 2,
-                });
+                // _.extend(specialData, {
+                //     bbl20: last.bbl20,
+                //     bbu20: last.bbu20,
+                //     bbb20: (last.bbl20 + last.bbu20) / 2,
+                // }, prev && {
+                //     bbl20_1: prev.bbl20,
+                //     bbu20_1: prev.bbu20,
+                //     bbb20_1: (prev.bbl20 + prev.bbu20) / 2,
+                // });
             }
         }
     }

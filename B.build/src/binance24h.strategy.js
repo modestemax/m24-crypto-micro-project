@@ -19,12 +19,12 @@ module.exports = class extends M24Base {
             volumeRatio, askVolumeBTC, bidVolumeBTC, spreadPercent, duration, previousClose,
             open, close, high, adx, maxDrop, percentage, prevPercentage, highPercentage,
             lastQuoteVolume } = m24;
-            
+
         const last = this.last[symbolId]
         const prev = this.prev[symbolId];
 
         if (/\/BTC/.test(symbol))
-            if (change > BREAK_CHANGE && isFinite(change)) { //faire aumoins 3% 
+            if (change > BREAK_CHANGE && isFinite(change)) { //faire au moins 3% 
                 // if (prevPercentage < percentage) //growing...
                 // if (previousClose < close)
                 // if (maxDrop < 1)
@@ -48,23 +48,23 @@ module.exports = class extends M24Base {
 
                                                     if (last && prev)
                                                         // if (last.macd > last.macdSignal)
-                                                            if (last.macdDistance > prev.macdDistance)
-                                                                // if (last.plusDi > last.minusDi)
-                                                                    if (last.diDistance > prev.diDistance)
-                                                                        // if (last.adx > 25)
-                                                                        if (last.adx > prev.adx)
-                                                                            /* if (this.sorted(adx)) */
-                                                                            if (BREAK_CHANGE > 0) { //quantité de bid relativement petite
-                                                                                return true;
-                                                                            } else {
-                                                                                return true;
-                                                                            }
+                                                        if (last.macdDistance > prev.macdDistance)
+                                                            // if (last.plusDi > last.minusDi)
+                                                            if (last.diDistance > prev.diDistance)
+                                                                // if (last.adx > 25)
+                                                                if (last.adx > prev.adx)
+                                                                    /* if (this.sorted(adx)) */
+                                                                    if (BREAK_CHANGE > 0) { //quantité de bid relativement petite
+                                                                        return true;
+                                                                    } else {
+                                                                        return true;
+                                                                    }
 
             }
     }
 
     getOpenPrice(m24) {
-        const { bid,ask, delta, open } = m24;
+        const { bid, ask, delta, open } = m24;
         // let myBid = bid - (delta * bid / 100) / 2
         // if (myBid < open) {
         //     return bid
@@ -87,7 +87,7 @@ module.exports = class extends M24Base {
     }
     getSellPriceByRangeIfSellable(rawAsset) {
         const { change, maxChange, openPrice, symbolId } = rawAsset;
-
+        const lossPercentage = maxChange - change;
         if (maxChange < 1) {
             if (change < -3) {
                 return true;

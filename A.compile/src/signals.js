@@ -13,6 +13,7 @@ publish('m24:timeframe', TIMEFRAMES)
 TIMEFRAMES.split(',').forEach((timeframe) => {
     timeframe = +timeframe;
 
+    const SYMBOLID_SAMPLE = 'ADABTC';
     //get signal max 1 time per second
     // const throttledGetSignals = _.throttle(() =>
     //     tradingView({ timeframe, filter: SYMBOLS_FILTER, exchangeId: EXCHANGE })
@@ -30,7 +31,7 @@ TIMEFRAMES.split(',').forEach((timeframe) => {
                 publish('m24:error', { message: typeof err === 'string' ? err : err.message, stack: err.stack });
                 console.error(err);
             }
-        ).then((data) => data && console.log(`TV data loaded TF:${timeframe} id:${data['ADABTC'].id} time:${data['ADABTC'].time}  at:${data['ADABTC'].now} `),
+        ).then((data) => data && console.log(`TV data loaded TF:${timeframe} id:${data[SYMBOLID_SAMPLE].id} time:${data['ADABTC'].time}  at:${data['ADABTC'].now} `),
             () => console.error('TV data load error TF:' + timeframe));
 
     getSignals();
@@ -51,11 +52,12 @@ function getScheduleRule(timeframe) {
             //return '0,58,59 0,5,10,14,15,20,25,29,30,35,40,44,45,50,57,58,59 * * * *'
             // return '56,57,58,59 14,29,44,59 * * * *'
             // return '56,57,58,59 0,3,6,9,12,14,15,18,21,24,27,29,30,33,36,39,42,44,45,48,51,54,57,59 * * * *'
-            return '30 * * * * *'
+            return '30,58,59 * * * * *'
         case 60:
             //return '0,58,59 0,10,20,30,40,50,57,58,59 * * * *'
             // return '56,57,58,59 59 */1 * * *'
-            return '56,57,58,59 0,10,20,30,40,50,59 * * * *'
+            // return '56,57,58,59 0,10,20,30,40,50,59 * * * *'
+            return '58,59 10,20,30,40,50,59 * * * *'
         case 60 * 4:
             // let tz = new Date().getTimezoneOffset() / 60;
             // let hours = [3, 7, 11, 15, 19, 23].map(q => (q - tz + 24) % 24).join();

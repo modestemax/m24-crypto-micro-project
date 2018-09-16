@@ -1,5 +1,5 @@
 const Bot = require("telega");
-let bot, M24_LOG_CHAT_ID, M24_CHAT_ID;
+let bot, M24_LOG_CHAT_ID, M24_CHAT_ID,M24_FATAL_CHAT_ID;
 
 if (process.env.NODE_ENV == 'production') {
     bot = new Bot("545101798:AAGM1TodXYaS0MreKKimt23KZlXTmmEH_pU"); //m24

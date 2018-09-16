@@ -111,9 +111,9 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
             publish('m24:fatal', "ASK FAILLED " + newClientOrderId + ' at ' + closePrice)
             publish('m24:error', ex)
           }
-        } else if (1) {
+        } else {
           //debugger
-          publish('asset:buy:order_forgotten', { clientOrderId: newClientOrderId, symbolId, timestamp:args.timestamp, openPrice:args. openPrice, closePrice, quantity })
+          publish('asset:buy:order_forgotten', { clientOrderId: newClientOrderId, symbolId, timestamp: args.timestamp, openPrice: args.openPrice, closePrice, quantity })
         }
       }
   } finally {

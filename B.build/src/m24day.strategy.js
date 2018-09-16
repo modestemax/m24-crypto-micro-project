@@ -18,7 +18,7 @@ module.exports = class extends M24Base {
         subscribe('m24:algo:reset', ({ chat_id, asset }) => {
             if (asset && this.cryptos && this.cryptos[asset + 'BTC']) {
                 delete this.cryptos[asset.toUpperCase() + 'BTC'];
-            } else if (asset = 'ALL') {
+            } else if (asset === 'ALL') {
                 this.cryptos = {}
             }
         })
