@@ -23,7 +23,8 @@ module.exports = class Strategy {
     async check(signal) {
         const { symbolId, timeframe, spreadPercentage } = signal.candle;
         if (+timeframe === this.options.timeframe && spreadPercentage < 1) {
-            this.subscribeOnce('m24:algo:check', () => this.StrategyLogThrottled(`I'm alive, checking ${symbolId} now.`));
+            this.subscribeOnce('m24:algo:check', (args) =>
+                this.StrategyLogThrottled(`I'm alive, checking ${symbolId} now.`, args));
             const last = signal.candle_1;
             const prev = signal.candle_2;
             const market = exchange.marketsById[symbolId];
