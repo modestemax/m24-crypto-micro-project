@@ -1,7 +1,7 @@
 const debug = require('debug')('B:strategy-base');
 const _ = require('lodash');
 
-const { publish } = require('common/redis');
+const { publish, subscribe } = require('common/redis');
 const { tradingView, candleUtils, computeChange, exchange, market, fetchTickers, fetchBalance } = require('common');
 const { getAssetBalance } = market;
 const { findSignal } = candleUtils;
@@ -17,14 +17,15 @@ module.exports = class Strategy {
         Object.assign(this, { bid: null, name, options });
         publish('m24:algo:loaded', `#${name} loaded`);
         this.StrategyLogThrottled = _.throttle(this.StrategyLog.bind(this), 1e3 * 60 * 60 * 6)
+        this.subscribeOnce = _.once(subscribe)
     }
 
     async check(signal) {
         const { symbolId, timeframe, spreadPercentage } = signal.candle;
         if (+timeframe === this.options.timeframe && spreadPercentage < 1) {
+            this.subscribeOnce('m24:algo:check', () => this.StrategyLogThrottled(`I'm alive, checking ${symbolId} now.`));
             const last = signal.candle_1;
             const prev = signal.candle_2;
-            this.StrategyLogThrottled(`I'm alive, checking ${symbolId} now.`);
             const market = exchange.marketsById[symbolId];
             if (market) {
                 let bid = await this.canBuy(signal.candle, last, prev, signal, tickers[market.symbol]);
