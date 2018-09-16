@@ -16,15 +16,16 @@ module.exports = class Strategy {
     constructor({ name, ...options }) {
         Object.assign(this, { bid: null, name, options });
         publish('m24:algo:loaded', `#${name} loaded`);
-        this.StrategyLogThrottled = _.throttle(this.StrategyLog.bind(this), 1e3 *5);
+        this.StrategyLogThrottled = _.throttle(this.StrategyLog.bind(this), 0);
         this.subscribeOnce = _.once(subscribe)
     }
 
     async check(signal) {
         const { symbolId, timeframe, spreadPercentage } = signal.candle;
+        this.lastCheck = signal;
         if (+timeframe === this.options.timeframe && spreadPercentage < 1) {
             this.subscribeOnce('m24:algo:check', (args) =>
-                this.StrategyLogThrottled(`I'm alive, checking ${symbolId} now.`, args));
+                this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args));
             const last = signal.candle_1;
             const prev = signal.candle_2;
             const market = exchange.marketsById[symbolId];
