@@ -13,20 +13,19 @@ module.exports = class extends Template {
         if (last && prev && current) {
 
             if ((last.macd > last.macdSignal) && (current.macd > current.macdSignal) && (prev.macd > prev.macdSignal))
-                if ((current.macdDistance >= last.macdDistance) && (current.macd > 0) && (current.macd > 0))
+                if ((current.macdDistance >= last.macdDistance) && (current.macd > 0))
                     if ((last.ema20 > last.bbb20) && (last.ema10 > last.ema20) && (last.ema30 <= current.bbb20))
                         if ((last.ema20 > last.ema30) && (prev.ema20 >= prev.ema30) && (current.ema20 > current.ema30))
                             if ((current.ema10 > current.ema20) && (current.ema20 > current.bbb20) && (current.ema30 <= current.bbb20))
-                                if ((current.ema50 < current.ema30 >= 0) && (last.ema50 <= last.ema20))
-                                    if ((current.plusDI > 20) && (current.minusDI < 20) && (last.plusDI > last.minusDI) && (last.plusDI > 20) && (last.minusDI < 20))
-                                        if (/*(current.ADX > 20) &&*/ (current.ADX > current.minusDI > 0))
-                                            if ((current.close <= current.bbu20)) {
-                                                let ticker = await this.getTicker({ symbolId });
-                                                if (ticker && ticker.ask) {
-                                                    debug(`${symbolId} BID AT ${ticker.ask}`);
-                                                    return ticker.ask;
-                                                }
+                                if ((current.ema50 < current.ema30) && (last.ema50 <= last.ema30))
+                                    if (current.ADX > current.minusDI)
+                                        if ((current.close <= current.bbu20)) {
+                                            let ticker = await this.getTicker({ symbolId });
+                                            if (ticker && ticker.ask) {
+                                                debug(`${symbolId} BID AT ${ticker.ask}`);
+                                                return ticker.ask;
                                             }
+                                        }
         }
     }
     async canSell({ symbolId, timeframe }, last, prev, signal) {
