@@ -90,7 +90,7 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
     } else if (totalQuantity)
       if (!closePrice || market.limits.cost.min < totalQuantity * closePrice) {
         let lastAsk = await getLastAsk({ clientOrderId: newClientOrderId });
-        if (lastAsk) {
+        if (lastAsk && +lastAsk.price) {
           try {
             if (closePrice) {
               if (+lastAsk.price !== +exchange.priceToPrecision(market.symbol, closePrice)) {

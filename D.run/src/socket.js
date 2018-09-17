@@ -54,7 +54,7 @@ function assetChangeManangement() {
                   publish("asset:sell:order_new", order);
                   break;
                 case "FILLED":
-                  //filled bid        
+                  //filled bid
                   debug("sell ok " + order.symbolId);
                   onSell(order);
                   // publish("asset:sell:success", order);
