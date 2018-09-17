@@ -8,6 +8,7 @@ const LOST = "😭"
 const SUCCESS = "👌🏼";
 const WINNING = "👍🏻";
 const LOOSING = "👎🏽";
+
 const tradesMessageId = {};
 
 const $this = module.exports = new class {
@@ -79,10 +80,11 @@ const $this = module.exports = new class {
         `max ${maxChange.toFixed(2)}% : min ${minChange.toFixed(2)}%`,
         `stop ${strategy.stopLoss} : profit ${strategy.takeProfit}`,
         `change  ${change.toFixed(2)}% [${targetStatus}]`,
-        `open : ${openPrice.toFixed(8)}`,
+        `open: ${openPrice.toFixed(8)}`,
         `close: ${closePrice.toFixed(8)} `,
+        `hope: ${valuePercent(openPrice, strategy.takeProfit).toFixed(8)} `,
         `since ${humanizeDuration(duration)}`,
-        `/sell`
+        `/sell_${symbolId} (market price)`
       ].join("\n")
     };
     if (!message_id) {
@@ -107,8 +109,8 @@ const $this = module.exports = new class {
     let duration = Date.now() - timestamp;
     let change = computeChange(openPrice, closePrice);
     const strategyName = clientOrderId.split("_")[0];
-    const M1=1e3*60;
-    duration>M1 && tme.sendMessage({
+    const M1 = 1e3 * 60;
+    duration > M1 && tme.sendMessage({
       chat_id: M24_CHAT_ID,
       text: ["#trade_forgotten",
         `#${strategyName}, #${symbolId}`,
