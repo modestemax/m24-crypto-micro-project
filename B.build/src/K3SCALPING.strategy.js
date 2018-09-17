@@ -20,8 +20,8 @@ module.exports = class extends Template {
                             // if((currentH1.plusDI > currentH1.minusDI))
                             //--------DEBUT MAX------------
                             // if (current.adx > 20)
-                                if (prev.adx < last.adx)
-                                    if (last.adx < current.adx)
+                                // if (prev.adx < last.adx)
+                                    // if (last.adx < current.adx)
                                         //-------FIN MAX-----------------
                                         if ((currentH1.macd > currentH1.macdSignal) || (currentH1.macdDistance >= lastH1.macdDistance)) {
                                             let ticker = await this.getTicker({ symbolId });
