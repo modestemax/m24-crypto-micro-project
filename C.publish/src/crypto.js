@@ -57,7 +57,7 @@ async function cryptoBuy({ symbolId, openPrice, strategyName }) {
             console.log("order posted " + symbolId);
           } catch (ex) {
             console.log('error buy ', newClientOrderId, ex);
-            publish('m24:fatal', "BID FAILLED " + newClientOrderId + ' at ' + openPrice)
+            publish('m24:fatal', "BID FAILLED " + newClientOrderId + ' at ' + (openPrice||'market price'))
             publish('m24:error', ex)
           }
         }
@@ -108,7 +108,7 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
             }
             bid_ask[newClientOrderId] = 'ask';
           } catch (ex) {
-            publish('m24:fatal', "ASK FAILLED " + newClientOrderId + ' at ' + closePrice)
+            publish('m24:fatal', "ASK FAILLED " + newClientOrderId + ' at ' + (closePrice||'market price'))
             publish('m24:error', ex)
           }
         } else {

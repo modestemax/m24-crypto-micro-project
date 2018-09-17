@@ -12,7 +12,8 @@ module.exports = {
     switch (channel) {
       case "m24:fatal":
         text = ["#JUDE_ACTION", data].join('\n');
-        data = { chat_id: data.chat_id || M24_FATAL_CHAT_ID };
+        data = { chat_id: M24_FATAL_CHAT_ID };
+        tme.sendMessage({ chat_id: M24_CHAT_ID, text });
         break;
       case "m24:error":
         {
