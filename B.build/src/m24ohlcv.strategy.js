@@ -49,7 +49,7 @@ module.exports = class extends M24Base {
 
     filterSelected(n = 1) {
         return this.selected = _.reduce(this.ohlcv, (selected, { targetPercentage, symbolId }) => {
-            return targetPercentage > n ? Object.assign(selected, { [symbolId]: this.ohlcv[symbolId] }) : selected;
+            return targetPercentage >= n ? Object.assign(selected, { [symbolId]: this.ohlcv[symbolId] }) : selected;
         }, {})
     }
     findMinMaxGreen() {
@@ -61,9 +61,10 @@ module.exports = class extends M24Base {
                     return change;
                 }
             });
+            const epsi=.5
             let minGreenPercentage = _.min(dayChange);
             let maxGreenPercentage = _.max(dayChange);
-            let enterPercentage = maxRedPercentage + 1;
+            let enterPercentage = maxRedPercentage + epsi;
             return Object.assign(ohlcv, {
                 minGreenPercentage, maxGreenPercentage, enterPercentage,
                 targetPercentage: minGreenPercentage - enterPercentage
@@ -142,6 +143,7 @@ module.exports = class extends M24Base {
     }
 
     notifyOk(candle) {
+        this.StrategyLog(`#ohlcv  ${candle.symbolId} `);
         this.symbolId = candle.symbolId;
         this.timeframe = candle.timeframe;
         this.ask = candle.ask;
