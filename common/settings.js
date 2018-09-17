@@ -173,14 +173,14 @@ module.exports = {
             takeProfit: 5,
         },
         "m24ohlcv1d": {
-            isActive: true,
+            // isActive: true,
             timeframe: 60 * 24,
             frame: '1d',
             minTarget: 5
             // takeProfit: 5,
         },
         "m24ohlcv4h": {
-            isActive: true,
+            // isActive: true,
             timeframe: 60 * 4,
             frame: '4h',
             minTarget: 1.5
