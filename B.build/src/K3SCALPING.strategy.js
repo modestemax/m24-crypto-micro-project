@@ -17,7 +17,7 @@ module.exports = class extends Template {
                     if ((current.ema20 >= current.bbb20) && (current.ema20 <= current.ema30)
                         || (current.ema20 < current.bbb20) && (current.ema20 > current.ema30) /*&& (current.ema20 >= current.ema10)*/)
                         if ((current.macd > current.macdSignal) /*|| (current.macd > 0)*/)
-                            // if((currentH1.plusDI > currentH1.minusDI))
+                            if((currentH1.plusDI > currentH1.minusDI))
                             //--------DEBUT MAX------------
                             // if (current.adx > 20)
                                 // if (prev.adx < last.adx)
