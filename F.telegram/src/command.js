@@ -33,17 +33,7 @@ const commands = {
 			message.send(stack)
 		});
 	},
-	"sell"(message) {
-		message.send("Not Implemented)!");
-		// message.send("Enter sell price or sell percentage (prefixed with 'p')!");
 
-		// message.answer(async (message) => {
-		// 	if(message.text[0]==='p'){
-		// 		publish('user:sell:percent')
-		// 	}
-		// 	message.send(stack)
-		// });
-	},
 	"top5"(message) {
 		publish('m24:algo:get_top5', { chat_id: message.chat.id })
 	},
@@ -73,13 +63,20 @@ const commands = {
 		setTimeout(() => publish('m24:restart'), 5e3);
 
 	},
-	"sell_*"({search,...message}){
-		// debugger
+	"sell": {
+		options: /.*btc$/i,
+		fn({ search, matched, ...message }) {
+			//debugger
+			if (matched.input)
+				publish('crypto:user:sell_market', matched.input.toUpperCase())
+			message.send('Trying to sell ' + search)
+		}
 	}
 }
 
 for (let cmd in commands) {
-	bot.cmd("/" + cmd, commands[cmd]);
+	let [fn, options] = typeof commands[cmd] === 'function' ? [commands[cmd], void 0] : [commands[cmd].fn, commands[cmd].options];
+	bot.cmd("/" + cmd, options, fn);
 }
 
 

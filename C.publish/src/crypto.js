@@ -21,7 +21,24 @@ redisSubscribe('crypto:*', {
   },
   'crypto:sell_market': cryptoSellThrottled,
   'crypto:sell_limit': cryptoSellThrottled,
-  'crypto:buy_limit': cryptoBuyThrottled
+  'crypto:buy_limit': cryptoBuyThrottled,
+  'crypto:user:sell_market': async function (symbolId) {
+    const market = exchange.marketsById[symbolId];
+    const assets = await getNonNulAssets();
+    const asset = assets[market.base];
+    const freeQuantity = asset && asset.free;
+    const totalQuantity = asset && asset.total;
+    if (totalQuantity) {
+      let orders = await exchange.fetchOrders(market.symbol);
+      let sellOrder = _(orders).filter({ side: 'sell', }).last();
+      if (sellOrder) {
+        await exchange.cancelOrder(sellOrder.id, market.symbol);
+      }
+    }
+    await exchange.createMarketSellOrder(market.symbol, +freeQuantity + +totalQuantity, {
+      newClientOrderId: 'user_' + symbolId
+    })
+  }
 });
 
 async function cryptoBuy({ symbolId, openPrice, strategyName }) {
@@ -57,7 +74,7 @@ async function cryptoBuy({ symbolId, openPrice, strategyName }) {
             console.log("order posted " + symbolId);
           } catch (ex) {
             console.log('error buy ', newClientOrderId, ex);
-            publish('m24:fatal', "BID FAILLED " + newClientOrderId + ' at ' + (openPrice||'market price'))
+            publish('m24:fatal', "BID FAILLED " + newClientOrderId + ' at ' + (openPrice || 'market price'))
             publish('m24:error', ex)
           }
         }
@@ -108,7 +125,7 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
             }
             bid_ask[newClientOrderId] = 'ask';
           } catch (ex) {
-            publish('m24:fatal', "ASK FAILLED " + newClientOrderId + ' at ' + (closePrice||'market price'))
+            publish('m24:fatal', "ASK FAILLED " + newClientOrderId + ' at ' + (closePrice || 'market price'))
             publish('m24:error', ex)
           }
         } else {

@@ -84,7 +84,7 @@ const $this = module.exports = new class {
         `close: ${closePrice.toFixed(8)} `,
         `hope: ${valuePercent(openPrice, strategy.takeProfit).toFixed(8)} `,
         `since ${humanizeDuration(duration)}`,
-        `/sell_${symbolId} (market price)`
+        ` type [/sell ${symbolId}] to sell at market price`
       ].join("\n")
     };
     if (!message_id) {
