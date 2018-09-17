@@ -19,7 +19,7 @@ module.exports = class extends Template {
                         if ((current.macd > current.macdSignal) /*|| (current.macd > 0)*/)
                             // if((currentH1.plusDI > currentH1.minusDI))
                             //--------DEBUT MAX------------
-                            if (current.adx > 20)
+                            // if (current.adx > 20)
                                 if (prev.adx < last.adx)
                                     if (last.adx < current.adx)
                                         //-------FIN MAX-----------------
