@@ -27,7 +27,7 @@ module.exports = class extends M24Base {
             //-----------------
             this.findMaxRed();
             this.findMinMaxGreen();
-            this.findMinGain();
+            this.findMinGain(minTarget);
             this.filterSelected(minTarget);
             //-----------------
             this.log();
@@ -61,7 +61,7 @@ module.exports = class extends M24Base {
                     return change;
                 }
             });
-            const epsi=.5
+            const epsi = .5
             let minGreenPercentage = _.min(dayChange);
             let maxGreenPercentage = _.max(dayChange);
             let enterPercentage = maxRedPercentage + epsi;
@@ -71,13 +71,16 @@ module.exports = class extends M24Base {
             })
         })
     }
-    findMinGain() {
+    findMinGain(n = 1) {
+        this.selectedMinGain = {};
         return this.ohlcv = _.mapValues(this.ohlcv, (ohlcv) => {
-            return Object.assign(ohlcv, {
-                minGainPercentage: _.min(ohlcv.ohlcv.map(({ open, close, high }) => {
-                    return computeChange(open, high);
-                }))
-            })
+            let minGainPercentage = _.min(ohlcv.ohlcv.map(({ open, close, high }) => {
+                return computeChange(open, high);
+            }));
+            if (minGainPercentage >= n) {
+                this.selectedMinGain[ohlcv.symbolId] = ohlcv;
+            }
+            return Object.assign(ohlcv, { minGainPercentage })
         })
     }
     findMaxRed() {
@@ -126,22 +129,29 @@ module.exports = class extends M24Base {
     tick(price) {
         if (this.started) {
             const symbolId = price.info.symbol;
-            const selected = this.selected[symbolId];
-            if (selected) {
-                selected.change = computeChange(selected.open, price.close);
-                if (!selected.ok)
-                    if (selected.change > selected.enterPercentage)
-                        if (Date.now < selected.endTimeStamp) {
-                            selected.ok = true;
-                            selected.ask = price.close;
-                            this.notifyOk(selected)
-                        } else {
-                            this.start();
-                        }
+            const candle = this.ohlcv[symbolId];
+            if (candle) {
+                candle.change = computeChange(candle.open, candle.close = price.close);
+                this.checkWhenToBid(candle);
+                this.checkIfMinTargetPerformedIfBidInTheBeginingOfTimeframe(price);
             }
         }
     }
 
+    checkWhenToBid({ symbolId, close }) {
+        const selected = this.selected[symbolId];
+        if (selected) {
+            if (!selected.ok)
+                if (selected.change > selected.enterPercentage)
+                    if (Date.now < selected.endTimeStamp) {
+                        selected.ok = true;
+                        selected.ask = close;
+                        this.notifyOk(selected)
+                    } else {
+                        this.start();
+                    }
+        }
+    }
     notifyOk(candle) {
         this.StrategyLog(`#ohlcv  ${candle.symbolId} `);
         this.symbolId = candle.symbolId;
@@ -149,6 +159,31 @@ module.exports = class extends M24Base {
         this.ask = candle.ask;
         this.notifyBuy();
     }
+    checkIfMinTargetPerformedIfBidInTheBeginingOfTimeframe({ symbolId, close }) {
 
-};
-
+        const selected = this.selectedMinGain[symbolId];
+        if (selected) {
+            if (!selected.ok)
+                if (selected.change > selected.minGainPercentage)
+                    if (Date.now < selected.endTimeStamp) {
+                        selected.ok = true;
+                        selected.ask = close;
+                    } else {
+                        displayResume();
+                        this.start();
+                    }
+        }
+        function displayResume() {
+            let ok = [], nok = [];
+            for (let [symbolId, candle] in this.selectedMinGain) {
+                if (candle.ok) {
+                    ok.push(`si tu avais buy ${symbolId} au debut de la bougie ${candle.frame} tu aurais gagné ${this.options.minTarget} `)
+                } else {
+                    ok.push(`si tu avais buy ${symbolId} au debut de la bougie ${candle.frame} tu aurais perdu} `)
+                }
+            }
+            this.StrategyLog(ok.join('\n'));
+            this.StrategyLog(nok.join('\n'));
+        }
+    }
+}
