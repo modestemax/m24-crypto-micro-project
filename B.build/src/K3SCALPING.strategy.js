@@ -17,15 +17,17 @@ module.exports = class extends Template {
                     if ((current.ema20 >= current.bbb20) && (current.ema20 <= current.ema30)
                         || (current.ema20 < current.bbb20) && (current.ema20 > current.ema30) /*&& (current.ema20 >= current.ema10)*/)
                         if ((current.macd > current.macdSignal) /*|| (current.macd > 0)*/)
-                            if ((currentH1.plusDI >= currentH1.minusDI) || (currentH1.adx >= 20))
+                            if (((currentH1.plusDI >= currentH1.minusDI)))
+                                if (((currentH1.adx >= 20)))
+                                    if ((currentH1.adx >= lastH1.adx))
           /*if ((currentH1.macd > currentH1.macdSignal)
-                                    || (currentH1.macdDistance >= lastH1.macdDistance))*/ {
-                                let ticker = await this.getTicker({ symbolId });
-                                if (ticker && ticker.ask) {
-                                    debug(`${symbolId} BID AT ${ticker.ask}`);
-                                    return ticker.ask;
-                                }
-                            }
+            || (lastH1.macdDistance >= prevH1.macdDistance))*/ {
+                                        let ticker = await this.getTicker({ symbolId });
+                                        if (ticker && ticker.ask) {
+                                            debug(`${symbolId} BID AT ${ticker.ask}`);
+                                            return ticker.ask;
+                                        }
+                                    }
         }
     }
     async canSell({ symbolId, timeframe }, last, prev, signal) {
@@ -43,7 +45,7 @@ module.exports = class extends Template {
         const H1 = 1e3 * 60 * 60;
 
         const duration = Date.now() - timestamp;
-        if (change <1 && maxChange <0) {
+        if (change < 1 && maxChange < 0) {
             return true;
         } else if (change > .3 && maxChange > change) {
             return closePrice;
