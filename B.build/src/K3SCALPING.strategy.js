@@ -43,7 +43,9 @@ module.exports = class extends Template {
         const H1 = 1e3 * 60 * 60;
 
         const duration = Date.now() - timestamp;
-        if (change > .3 && maxChange > change) {
+        if (change <1 && maxChange <0) {
+            return true;
+        } else if (change > .3 && maxChange > change) {
             return closePrice;
         } else if (-2.5 < change && change < -2) {
             return valuePercent(openPrice, -.5)
