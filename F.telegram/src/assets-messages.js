@@ -126,18 +126,18 @@ const $this = module.exports = new class {
       change = computeChange(openPrice, closePrice);
     }
     let duration = Date.now() - timestamp;
-    const result = change > 0.15 ? WIN : change < 0.15 ? LOST : "?";
+    const [result, resultText] = change > 0.15 ? [WIN, 'win'] : change < 0.15 ? [LOST, 'lost'] : ["?", 'unknow'];
 
     tme.sendMessage({
       chat_id: M24_CHAT_ID,
       text: [
-        "🔓 #trade_ended "+result,
+        "🔓 #trade_ended " + result,
         `#${strategyName}, #${symbolId}`,
         `bid : ${openPrice || '?'}`,
         `sell : ${closePrice || '?'}`,
         `change : ${change ? change.toFixed(2) : '?'}`,
         `duration ${humanizeDuration(duration)}`,
-        `${result}`
+        `${result} #${resultText}`
       ].join("\n")
     });
   }
