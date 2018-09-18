@@ -154,7 +154,7 @@ module.exports = {
             timeInForce: 'IOC',
             selfStop: true,
             timeframe: 15,
-            takeProfit: .7,
+            takeProfit: .5,
         },
         "K3DAILY1H": {
             isActive: true,
