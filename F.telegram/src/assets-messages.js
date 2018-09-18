@@ -131,7 +131,7 @@ const $this = module.exports = new class {
     tme.sendMessage({
       chat_id: M24_CHAT_ID,
       text: [
-        "🔓 #trade_ended",
+        "🔓 #trade_ended "+result,
         `#${strategyName}, #${symbolId}`,
         `bid : ${openPrice || '?'}`,
         `sell : ${closePrice || '?'}`,
