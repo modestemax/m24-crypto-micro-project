@@ -104,6 +104,10 @@ module.exports = class Strategy {
         return tick[symbolId]
     }
 
+    async getTickers(filter = 'btc$') {
+        let tick = await tradingView({ filter });
+        return tick
+    }
     StrategyLog(text, options = {}) {
         publish(`m24:algo:tracking`, { strategyName: this.name, text, ...options });
     }
