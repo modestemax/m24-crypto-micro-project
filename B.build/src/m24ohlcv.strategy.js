@@ -32,7 +32,7 @@ module.exports = class extends M24Base {
             // this.filterSelected(minTarget);
             //-----------------
             this.findMinChange(minTarget)
-            this.bid();
+            this.beginBid();
             this.restart();
             //--------------------
             this.log();
@@ -66,7 +66,7 @@ module.exports = class extends M24Base {
             }
         }, 1e3)
     }
-    bid() {
+    beginBid() {
         //only bid if open=high
         this.winners.length && this.StrategyLog(`theses symbols will perform at least: ${this.options.minTarget} in current candle.
          timeframe:${this.options.frame} \n`
