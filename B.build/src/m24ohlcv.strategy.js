@@ -35,7 +35,7 @@ module.exports = class extends M24Base {
             this.beginBid();
             this.restart();
             //--------------------
-            this.log();
+            // this.log();
             this.started = true;
         } finally {
             unlock();
@@ -44,7 +44,7 @@ module.exports = class extends M24Base {
     }
     log() {
         console.log(`OHLCV selected symbol timeframe:${this.options.frame} target:${this.options.minTarget}% `)
-        console.log(Object.keys(this.selected));
+        // console.log(Object.keys(this.selected));
         // this.StrategyLog(`Selected symbol for timeframe: ${this.options.frame}\n`
         //     + `target: ${this.options.minTarget}%\n`
         //     + _.map(this.selected, s =>
