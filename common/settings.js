@@ -177,8 +177,8 @@ module.exports = {
             timeframe: 60 * 24,
             limit: 10,
             frame: '1d',
-            minTarget: 5,
-            takeProfit: 5,
+            minTarget: 2,
+            takeProfit: 2,
         },
         "m24ohlcv4h": {
             isActive: true,

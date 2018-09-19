@@ -24,7 +24,7 @@ module.exports = class extends M24Base {
             let { frame, limit, minTarget } = Object.assign({ frame: '1d', limit: 10, minTarget: 5 }, this.options)
             this.started = false;
             await this.loadOHLCV({ frame, limit });
-            console.log(`OHLCV ${this.options.frame} loaded`)
+            this.StrategyLog(`Loaded OHLCV for ${this.options.frame} `);
             //-----------------
             // this.findMaxRed();
             // this.findMinMaxGreen();
@@ -73,6 +73,7 @@ module.exports = class extends M24Base {
             + _.map(this.winners, s =>
                 `${s.symbolId}`).join('\n')
         );
+        this.winners.length || this.StrategyLog(`no symbols will perform at least: ${this.options.minTarget} in current candle.timeframe:${this.options.frame}`)
     }
 
     findMinChange(target) {
@@ -168,15 +169,15 @@ module.exports = class extends M24Base {
 
     tick(price) {
         this.tickers[price.info.symbol] = price;
-        if (this.started) {
-            const symbolId = price.info.symbol;
-            const candle = this.symbols[symbolId];
-            if (candle) {
-                candle.change = computeChange(candle.open, candle.close = price.close);
-                this.checkWhenToBid(candle);
-                this.checkIfMinTargetPerformedIfBidInTheBeginingOfTimeframe(price);
-            }
-        }
+        // if (this.started) {
+        //     const symbolId = price.info.symbol;
+        //     const candle = this.symbols[symbolId];
+        //     if (candle) {
+        //         candle.change = computeChange(candle.open, candle.close = price.close);
+        //         this.checkWhenToBid(candle);
+        //         this.checkIfMinTargetPerformedIfBidInTheBeginingOfTimeframe(price);
+        //     }
+        // }
     }
 
     checkWhenToBid({ symbolId, close }) {
