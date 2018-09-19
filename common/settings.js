@@ -173,7 +173,7 @@ module.exports = {
             takeProfit: 5,
         },
         "m24ohlcv1d": {
-            isActive: true,
+            // isActive: true,
             timeframe: 60 * 24,
             limit: 10,
             frame: '1d',
@@ -181,7 +181,7 @@ module.exports = {
             takeProfit: 2,
         },
         "m24ohlcv4h": {
-            isActive: true,
+            // isActive: true,
             timeframe: 60 * 4,
             limit: 10,
             frame: '4h',
@@ -189,7 +189,7 @@ module.exports = {
             takeProfit: 1,
         },
         "m24ohlcv1h": {
-            isActive: true,
+            // isActive: true,
             timeframe: 60,
             limit: 10,
             frame: '1h',
