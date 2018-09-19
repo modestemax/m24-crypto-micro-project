@@ -41,9 +41,12 @@ module.exports = class extends Template {
     getSellPriceIfSellable(rawAsset) {
         const { change, maxChange, openPrice, closePrice, symbolId, timestamp } = rawAsset;
         const H1 = 1e3 * 60 * 60;
+        const M1 = 1e3 * 60;
 
         const duration = Date.now() - timestamp;
-        if (change < 1 && maxChange < 0) {
+        if (change < 0 && duration < 10 * M1) {
+            return false;
+        } else if (change < 1 && maxChange < 0) {
             return true;
         } else if (change > .3 && maxChange > change) {
             return closePrice;
