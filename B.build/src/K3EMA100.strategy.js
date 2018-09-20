@@ -8,7 +8,7 @@ module.exports = class extends Template {
         if (last && prev)
             if (prev.ema100 <= prev.bbb20)
                 if (last.ema100 > last.bbb20)
-                    if (last.macd < last.macdSignal)
+                    if (last.macd < last.macd_signal)
                         if (prev.ema10 <= prev.bbb20 && last.ema10 <= last.bbb20)
                             if ((last.ema200 < last.ema100 && last.ema30 >= last.bbb20 && last.ema20 < last.bbb20) || (last.ema200 > last.ema100 && last.ema50 < last.bbb20))
                                 if (last.close <= last.ema10) {

@@ -167,6 +167,15 @@ module.exports = {
             takeProfit: .5,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
+        "K3B2SPIRIT": {
+            isActive: true,
+            doTrade: false,
+            timeInForce: 'GTC',
+            selfStop: true,
+            timeframe: 1,
+            takeProfit: 4,
+            cancelBidAfterSecond: 60 * 10,//5 min,
+        },
         "K3DAILY1H": {
             isActive: true,
             doTrade: false,

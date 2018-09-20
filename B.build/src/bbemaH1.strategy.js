@@ -11,12 +11,12 @@ module.exports = class extends Template {
         if (last && prev) {
             if (prev.ema200 > prev.bbu20) {
                 if (last.ema200 < last.bbu20) {
-                    if (last.macd > last.macdSignal) {
+                    if (last.macd > last.macd_signal) {
                         if (last.macd > 0) {
                             // if (signalH1.rsiBelowHighRef) {
                             const signalH4 = await this.findSignal({  symbolId, timeframe: 4 * 60, position: 0 });
                             const lastH4 = signalH4.candle;
-                            if (lastH4.macd > lastH4.macdSignal) {
+                            if (lastH4.macd > lastH4.macd_signal) {
                                 let ticker = await this.getTicker({  symbolId });
                                 if (ticker && ticker.ask) {
                                     debug(`${symbolId} BID AT ${ticker.ask}`);
@@ -34,7 +34,7 @@ module.exports = class extends Template {
         if (last && prev) {
             if (prev.ema50 <= prev.bbb20) {
                 if (last.ema50 > last.bbb20) {
-                    if (last.macd > last.macdSignal) {
+                    if (last.macd > last.macd_signal) {
                         if (last.ema200 < last.ema50) {
                             let ticker = await this.getTicker({  symbolId });
                             if (ticker && ticker.bid) {

@@ -208,8 +208,8 @@ function clearBalances() {
 function computeChange(openPrice, closePrice) {
   return ((closePrice - openPrice) / openPrice) * 100;
 }
-function valuePercent(price, changePercent) {
-  return price * (1 + changePercent / 100);
+function valuePercent(price, change_percent) {
+  return price * (1 + change_percent / 100);
 }
 
 const exchanges = {};

@@ -12,13 +12,13 @@ module.exports = class extends Template {
         let current = signal.candle;
         if (last && prev && current) {
 
-            if ((last.macd > last.macdSignal) && (current.macd > current.macdSignal) && (prev.macd > prev.macdSignal))
-                if ((current.macdDistance >= last.macdDistance) && (current.macd > 0))
+            if ((last.macd > last.macd_signal) && (current.macd > current.macd_signal) && (prev.macd > prev.macd_signal))
+                if ((current.macd_distance >= last.macd_distance) && (current.macd > 0))
                     if ((last.ema20 > last.bbb20) && (last.ema10 > last.ema20) && (last.ema30 >= last.bbb20))
                         if ((last.ema20 >= last.ema30) && (current.ema20 > current.ema30))
                             if ((current.ema10 > current.ema20) && (current.ema20 > current.bbb20) && (current.ema30 >= current.bbb20))
                                 if ((current.ema50 <= current.ema10) && (last.ema50 <= last.ema10))
-                                    if ((current.plusDI > current.minusDI) && (current.adx > current.minusDI) && (current.adx >= last.adx))
+                                    if ((current.plus_di > current.minus_di) && (current.adx > current.minus_di) && (current.adx >= last.adx))
                                         if ((current.close <= current.bbu20)) {
                                             let ticker = await this.getTicker({ symbolId });
                                             if (ticker && ticker.ask) {

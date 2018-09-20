@@ -11,7 +11,7 @@ module.exports = class extends Template {
                 if (last.ema100 < last.bbu20) {
                     if (last.ema10 >= last.bbb20) {
                         if (last.ema50 <= last.bbb20) {
-                            if (last.macd > last.macdSignal) {
+                            if (last.macd > last.macd_signal) {
                                 if (last.ema100 >= last.close || last.ema50 >= last.close) {
                                     let ticker = await this.getTicker({  symbolId });
                                     if (ticker && ticker.ask) {

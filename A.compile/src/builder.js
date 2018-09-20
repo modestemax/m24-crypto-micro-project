@@ -117,12 +117,12 @@ async function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQ
             //     specialData.changes = changes[symbolId] = changes[symbolId] || {};
             //     if (+timeframe === 5) {
             //         _.extend(changes[symbolId], _.range(1, 13).reduce((change, i) =>
-            //                 (_.extend(change, { [`last${i * 5}mChange`]: _(points).slice(-i).sumBy('changeFromOpen') }))
+            //                 (_.extend(change, { [`last${i * 5}mChange`]: _(points).slice(-i).sumBy('change_from_open') }))
             //             , { symbolId }));
             //     }
             //     if (+timeframe === 1) {
             //         _.extend(changes[symbolId], _.range(1, 5).reduce((change, i) =>
-            //                 (_.extend(change, { [`last${i}mChange`]: _(points).slice(-i).sumBy('changeFromOpen') }))
+            //                 (_.extend(change, { [`last${i}mChange`]: _(points).slice(-i).sumBy('change_from_open') }))
             //             , { symbolId }));
             //     }
             //     buildIndicators.gainers = _.range(1, 13).reduce((gainers, i) => {
@@ -198,15 +198,15 @@ async function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQ
             function macd() {
 
                 _.extend(specialData, {
-                    macdAboveSignal: last.macd > last.macdSignal,
-                    macdBelowSignal: last.macd < last.macdSignal,
+                    macdAboveSignal: last.macd > last.macd_signal,
+                    macdBelowSignal: last.macd < last.macd_signal,
                     macdAboveZero: last.macd > 0,
                     macdBelowZero: last.macd < 0,
-                    macdSignalAboveZero: last.macdSignal > 0,
+                    macd_signalAboveZero: last.macd_signal > 0,
                 },
                     getTrendStatus({ trendingQuote, indicator: 'macd', points }),
-                    getTrendStatus({ trendingQuote, indicator: 'macdSignal', points }),
-                    getCrossingPoint({ indicatorUp: 'macd', indicatorDown: 'macdSignal', points }),
+                    getTrendStatus({ trendingQuote, indicator: 'macd_signal', points }),
+                    getCrossingPoint({ indicatorUp: 'macd', indicatorDown: 'macd_signal', points }),
                 );
 
             }
@@ -215,22 +215,22 @@ async function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQ
                 const ADX_REF = 25;
                 _.defaults(buildIndicators, { ADX_REF });
                 _.extend(specialData, {
-                    plusDiAboveMinusDi: last.plusDi > last.minusDi,
-                    plusDiAboveAdxRef: last.plusDi > ADX_REF,
-                    minusDiBelowAdxRef: last.plusDi < ADX_REF,
-                    plusDiAboveAdx: last.plusDi > last.adx,
-                    diDistance: last.plusDi - last.minusDi,
+                    plus_diAboveminus_di: last.plus_di > last.minus_di,
+                    plus_diAboveAdxRef: last.plus_di > ADX_REF,
+                    minus_diBelowAdxRef: last.plus_di < ADX_REF,
+                    plus_diAboveAdx: last.plus_di > last.adx,
+                    di_distance: last.plus_di - last.minus_di,
                 },
-                    getTrendStatus({ trendingQuote, indicator: 'plusDi', points }),
-                    getTrendStatus({ trendingQuote, indicator: 'minusDi', points }),
-                    getCrossingPoint({ indicatorUp: 'plusDi', indicatorDown: 'minusDi', points }),
+                    getTrendStatus({ trendingQuote, indicator: 'plus_di', points }),
+                    getTrendStatus({ trendingQuote, indicator: 'minus_di', points }),
+                    getCrossingPoint({ indicatorUp: 'plus_di', indicatorDown: 'minus_di', points }),
                 );
 
                 _.extend(specialData, {
                     adxAboveRef: last.adx > ADX_REF,
-                    minusDiBelowAdxRef: last.plusDi < ADX_REF,
-                    plusDiAboveAdx: last.plusDi > last.adx,
-                    diDistance: last.plusDi - last.minusDi,
+                    minus_diBelowAdxRef: last.plus_di < ADX_REF,
+                    plus_diAboveAdx: last.plus_di > last.adx,
+                    di_distance: last.plus_di - last.minus_di,
                 },
                     getTrendStatus({ trendingQuote, indicator: 'adx', points }),
                     getCrossingPoint({ indicatorUp: 'adx', indicatorDown: 'adxRef', points, indicatorDownValue: ADX_REF }),
@@ -242,24 +242,24 @@ async function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQ
                 const STOCHASTIC_HIGH_REF = 80;
                 _.defaults(buildIndicators, { STOCHASTIC_LOW_REF, STOCHASTIC_HIGH_REF });
                 _.extend(specialData, {
-                    stochasticKAboveD: last.stochasticK > last.stochasticD,
-                    stochasticKBelowD: last.stochasticK < last.stochasticD,
-                    stochasticKAboveHighRef: last.stochasticK > STOCHASTIC_HIGH_REF,
-                    stochasticKBelowHighRef: last.stochasticK < STOCHASTIC_HIGH_REF,
-                    stochasticKAboveLowRef: last.stochasticK > STOCHASTIC_LOW_REF,
-                    stochasticKBelowLowRef: last.stochasticK < STOCHASTIC_LOW_REF,
+                    stochastic_kAboveD: last.stochastic_k > last.stochastic_d,
+                    stochastic_kBelowD: last.stochastic_k < last.stochastic_d,
+                    stochastic_kAboveHighRef: last.stochastic_k > STOCHASTIC_HIGH_REF,
+                    stochastic_kBelowHighRef: last.stochastic_k < STOCHASTIC_HIGH_REF,
+                    stochastic_kAboveLowRef: last.stochastic_k > STOCHASTIC_LOW_REF,
+                    stochastic_kBelowLowRef: last.stochastic_k < STOCHASTIC_LOW_REF,
                 },
-                    getTrendStatus({ trendingQuote, indicator: 'stochasticK', points }),
-                    getTrendStatus({ trendingQuote, indicator: 'stochasticD', points }),
-                    getCrossingPoint({ indicatorUp: 'stochasticK', indicatorDown: 'stochasticD', points }),
+                    getTrendStatus({ trendingQuote, indicator: 'stochastic_k', points }),
+                    getTrendStatus({ trendingQuote, indicator: 'stochastic_d', points }),
+                    getCrossingPoint({ indicatorUp: 'stochastic_k', indicatorDown: 'stochastic_d', points }),
                     getCrossingPoint({
-                        indicatorUp: 'stochasticK',
+                        indicatorUp: 'stochastic_k',
                         indicatorDown: 'highRef',
                         points,
                         indicatorDownValue: STOCHASTIC_HIGH_REF
                     }),
                     getCrossingPoint({
-                        indicatorUp: 'stochasticK',
+                        indicatorUp: 'stochastic_k',
                         indicatorDown: 'lowRef',
                         points,
                         indicatorDownValue: STOCHASTIC_LOW_REF
@@ -272,25 +272,25 @@ async function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQ
                 const STOCHASTICRSI_HIGH_REF = 80;
                 _.defaults(buildIndicators, { STOCHASTICRSI_LOW_REF, STOCHASTICRSI_HIGH_REF });
                 _.extend(specialData, {
-                    stochasticRSIKAboveD: last.stochasticRSIK > last.stochasticRSID,
-                    stochasticRSIKBelowD: last.stochasticRSIK < last.stochasticRSID,
-                    stochasticRSIKAboveHighRef: last.stochasticRSIK > STOCHASTICRSI_HIGH_REF,
-                    stochasticRSIKBelowHighRef: last.stochasticRSIK < STOCHASTICRSI_HIGH_REF,
-                    stochasticRSIKAboveLowRef: last.stochasticRSIK > STOCHASTICRSI_LOW_REF,
-                    stochasticRSIKBelowLowRef: last.stochasticRSIK < STOCHASTICRSI_LOW_REF,
+                    stochastic_rsikAboveD: last.stochastic_rsik > last.stochastic_rsid,
+                    stochastic_rsikBelowD: last.stochastic_rsik < last.stochastic_rsid,
+                    stochastic_rsikAboveHighRef: last.stochastic_rsik > STOCHASTICRSI_HIGH_REF,
+                    stochastic_rsikBelowHighRef: last.stochastic_rsik < STOCHASTICRSI_HIGH_REF,
+                    stochastic_rsikAboveLowRef: last.stochastic_rsik > STOCHASTICRSI_LOW_REF,
+                    stochastic_rsikBelowLowRef: last.stochastic_rsik < STOCHASTICRSI_LOW_REF,
 
                 },
-                    getTrendStatus({ trendingQuote, indicator: 'stochasticRSIK', points }),
-                    getTrendStatus({ trendingQuote, indicator: 'stochasticRSID', points }),
-                    getCrossingPoint({ indicatorUp: 'stochasticRSIK', indicatorDown: 'stochasticRSID', points }),
+                    getTrendStatus({ trendingQuote, indicator: 'stochastic_rsik', points }),
+                    getTrendStatus({ trendingQuote, indicator: 'stochastic_rsid', points }),
+                    getCrossingPoint({ indicatorUp: 'stochastic_rsik', indicatorDown: 'stochastic_rsid', points }),
                     getCrossingPoint({
-                        indicatorUp: 'stochasticRSIK',
+                        indicatorUp: 'stochastic_rsik',
                         indicatorDown: 'highRef',
                         points,
                         indicatorDownValue: STOCHASTICRSI_HIGH_REF
                     }),
                     getCrossingPoint({
-                        indicatorUp: 'stochasticRSIK',
+                        indicatorUp: 'stochastic_rsik',
                         indicatorDown: 'lowRef',
                         points,
                         indicatorDownValue: STOCHASTICRSI_LOW_REF

@@ -21,9 +21,9 @@ module.exports = class Strategy {
     }
 
     async check(signal) {
-        const { symbolId, timeframe, spreadPercentage } = signal.candle;
+        const { symbolId, timeframe, spread_percentage } = signal.candle;
         this.lastCheck = signal;
-        if (+timeframe === this.options.timeframe && spreadPercentage < 1) {
+        if (+timeframe === this.options.timeframe && spread_percentage < 1) {
             this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
             this.subscribeOnce('m24:algo:check', (args) =>
                 this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args));

@@ -7,7 +7,7 @@ module.exports = class extends Template {
 
     async canBuy({  symbolId, timeframe }, last, prev, signal) {
         // const {  symbolId, timeframe } = signal.candle;
-        // if (signal.ema10Above20 && signal.plusDiAboveMinusDi /*&& signal.adxAboveRef && signal.adxIsTrendingUp*/) {
+        // if (signal.ema10Above20 && signal.plus_diAboveminus_di /*&& signal.adxAboveRef && signal.adxIsTrendingUp*/) {
         if (symbolId === 'TUSDBTC') {
             let ticker = await this.getTicker({  symbolId });
             return ticker.bid;
@@ -15,7 +15,7 @@ module.exports = class extends Template {
     }
     async canSell({  symbolId, timeframe }, last, prev, signal) {
 
-        // if (signal.ema10Above20 && signal.plusDiAboveMinusDi /*&& signal.adxAboveRef && signal.adxIsTrendingUp*/) {
+        // if (signal.ema10Above20 && signal.plus_diAboveminus_di /*&& signal.adxAboveRef && signal.adxIsTrendingUp*/) {
         if (symbolId === 'TUSDBTC') {
             let ticker = await this.getTicker({  symbolId });
             //return ticker.ask;            
@@ -32,7 +32,7 @@ module.exports = class extends Template {
 //             && m5.ema10Above20 && m5.macdAboveSignal
 //             && m1.candle.rsi > 60
 //             // && m1.rsiBelowHighRef
-//             && (m1.rsiIsTrendingUp || m1.stochasticKIsTrendingUp)
+//             && (m1.rsiIsTrendingUp || m1.stochastic_kIsTrendingUp)
 //     },
 //     testEma01({ symbolId, timeframe, signal, signalFinder }) {
 // return new Template({})
@@ -41,7 +41,7 @@ module.exports = class extends Template {
 //             && 1 <= m5.ema10Ema20CrossingDistance && m5.ema10Ema20CrossingDistance <= 2
 //         // && m1.candle.rsi > 60
 //         // // && m1.rsiBelowHighRef
-//         // && (m1.rsiIsTrendingUp || m1.stochasticKIsTrendingUp)
+//         // && (m1.rsiIsTrendingUp || m1.stochastic_kIsTrendingUp)
 //     },
 //     testGainer({ m1, m5, symbolId }) {
 //         console.log(` ${symbolId} m1.changes.last1mChange ${m1.changes.last1mChange }

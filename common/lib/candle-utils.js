@@ -66,8 +66,8 @@ const $this = module.exports = {
     computeChange(openPrice, closePrice) {
         return ((closePrice - openPrice) / openPrice) * 100;
     },
-    valuePercent(price, changePercent) {
-        return price * (1 + changePercent / 100);
+    valuePercent(price, change_percent) {
+        return price * (1 + change_percent / 100);
     },
     loadPoints({ symbolId, timeframe }) {
         return redisGet(`points:${symbolId}:${timeframe}`).then(points => {

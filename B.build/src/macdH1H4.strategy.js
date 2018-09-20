@@ -11,9 +11,9 @@ module.exports = class extends Template {
         const [currH1, lastH1, prevH1] = [signalH4.candleH1, signalH4.candleH1_1, signalH4.candleH1_2];
         //timeframe H4
         if (last && prev && lastH1 && prevH1 && currH1)
-            if (last.macd > last.macdSignal)
-                if (prev.macd < prev.macdSignal)
-                    if (last.macdDistance > prev.macdDistance)
+            if (last.macd > last.macd_signal)
+                if (prev.macd < prev.macd_signal)
+                    if (last.macd_distance > prev.macd_distance)
 
                         if (last.ema10 > prev.ema10)
 
@@ -22,8 +22,8 @@ module.exports = class extends Template {
                             if (prevH1.ema10 < lastH1.ema10)
                                 if (lastH1.ema10 < currH1.ema10)
 
-                                    if (lastH1.macdDistance > prevH1.macdDistance)
-                                        if (currH1.macdDistance > lastH1.macdDistance) {
+                                    if (lastH1.macd_distance > prevH1.macd_distance)
+                                        if (currH1.macd_distance > lastH1.macd_distance) {
                                             debug(`${symbolId} EMA H1 OK`);
                                             debug(`${symbolId} EMA H1 Trend OK`);
                                             let ticker = await this.getTicker({ symbolId });

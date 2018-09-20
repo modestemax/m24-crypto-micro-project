@@ -8,7 +8,7 @@ module.exports = class extends Template {
         if (last && prev)
             if (prev.ema50 <= prev.bb20)
                 if (last.ema50 > last.bb20)
-                    if (last.macd < last.macdSignal) {
+                    if (last.macd < last.macd_signal) {
                         let ticker = await this.getTicker({  symbolId });
                         if (ticker && ticker.bid) {
                             debug(`${symbolId} BID AT ${ticker.bid}`);
