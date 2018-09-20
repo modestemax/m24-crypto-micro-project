@@ -14,7 +14,7 @@ module.exports = class extends Template {
 
             if ((last.macd > last.macdSignal) && (current.macd > current.macdSignal) && (prev.macd > prev.macdSignal))
                 if ((current.macdDistance >= last.macdDistance) && (current.macd > 0))
-                    if ((last.ema20 > last.bbb20) && (last.ema10 > last.ema20) && (last.ema30 >= current.bbb20))
+                    if ((last.ema20 > last.bbb20) && (last.ema10 > last.ema20) && (last.ema30 >= last.bbb20))
                         if ((last.ema20 >= last.ema30) && (current.ema20 > current.ema30))
                             if ((current.ema10 > current.ema20) && (current.ema20 > current.bbb20) && (current.ema30 >= current.bbb20))
                                 if ((current.ema50 <= current.ema10) && (last.ema50 <= last.ema10))
