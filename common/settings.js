@@ -173,7 +173,7 @@ module.exports = {
             timeInForce: 'IOC',
             selfStop: true,
             timeframe: 60,
-            takeProfit: 5,
+            takeProfit: 4,
         },
         "m24day": {
             // isActive: true,
