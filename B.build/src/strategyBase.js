@@ -24,7 +24,7 @@ module.exports = class Strategy {
         const { symbolId, timeframe, spreadPercentage } = signal.candle;
         this.lastCheck = signal;
         if (+timeframe === this.options.timeframe && spreadPercentage < 1) {
-            this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`));
+            this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
             this.subscribeOnce('m24:algo:check', (args) =>
                 this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args));
             const last = signal.candle_1;
