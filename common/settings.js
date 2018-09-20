@@ -148,13 +148,24 @@ module.exports = {
             timeframe: 15,
             takeProfit: .25,
         },
-        "K3SCALPING": {
+        "K3SCALPINGM15": {
             isActive: true,
             doTrade: true,
-            timeInForce: 'IOC',
+            timeInForce: 'GTC',
             selfStop: true,
             timeframe: 15,
             takeProfit: .5,
+            cancelBidAfterSecond: 60 * 10,//5 min,
+
+        },
+        "K3SCALPINGM5": {
+            isActive: true,
+            doTrade: true,
+            timeInForce: 'GTC',
+            selfStop: true,
+            timeframe: 5,
+            takeProfit: .5,
+            cancelBidAfterSecond: 60 * 10,//5 min,
         },
         "K3DAILY1H": {
             isActive: true,

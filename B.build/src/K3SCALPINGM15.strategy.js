@@ -18,9 +18,9 @@ module.exports = class extends Template {
                         if ((current.macd > current.macdSignal) || ((current.macd > 0) && (current.ema20 > current.ema30)))
                             if ((currentH1.plusDI >= currentH1.minusDI) && (currentH1.adx >= 20)) {
                                 let ticker = await this.getTicker({ symbolId });
-                                if (ticker && ticker.ask) {
-                                    debug(`${symbolId} BID AT ${ticker.ask}`);
-                                    return ticker.ask;
+                                if (ticker && ticker.bid) {
+                                    debug(`${symbolId} BID AT ${ticker.bid}`);
+                                    return ticker.bid;
                                 }
                             }
         }
