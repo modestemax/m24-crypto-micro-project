@@ -16,7 +16,7 @@ module.exports = class Strategy {
     constructor({ name, ...options }) {
         Object.assign(this, { bid: null, name, options });
         publish('m24:algo:loaded', `#${name} loaded`);
-        this.StrategyLogThrottled = _.throttle(this.StrategyLog.bind(this), 0);
+        this.StrategyLogThrottled = _.throttle(this.StrategyLog.bind(this), 1e3*60*5);
         this.subscribeOnce = _.once(subscribe)
     }
 
@@ -24,6 +24,7 @@ module.exports = class Strategy {
         const { symbolId, timeframe, spreadPercentage } = signal.candle;
         this.lastCheck = signal;
         if (+timeframe === this.options.timeframe && spreadPercentage < 1) {
+            this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`));
             this.subscribeOnce('m24:algo:check', (args) =>
                 this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args));
             const last = signal.candle_1;
