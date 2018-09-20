@@ -8,15 +8,15 @@ const Template = require('./strategyBase');
 module.exports = class extends Template {
 
     async canBuy({ symbolId, timeframe }, last, prev, signal) {
-        const [current15M, last15M] = (await loadPoints({ symbolId, timeframe: 15 })).reverse();
+        const [currentM15, lastM15] = (await loadPoints({ symbolId, timeframe: 15 })).reverse();
         let current = signal.candle;
-        if (last && prev && current && current15M && last15M) {
+        if (last && prev && current && currentM15 && lastM15) {
 
             if (current.ema10 <= current.bbb20)
                 if ((current.close < current.ema10) && (current.bbu20 / current.close >= 0.7))
                     if (((current.ema20 >= current.bbb20) && (current.ema20 <= current.ema30)) || ((current.ema20 < current.bbb20) && (current.ema20 > current.ema30)))
-                        if ((current.macd > current.macd_signal) || ((current.macd > 0) && (current.ema20 > current.ema30)))
-                            if ((current15M.plus_di >= current15M.minus_di) && (current15M.adx >= last15M.adx || current15M.adx >= 20)) {
+                        if ((current.macd > current.macd_signal) || ((current.macd > 0) && (current.ema20 > current.ema30) && (last.ema20 > prev.ema20)))
+                            if ((currentM15.plus_di >= currentM15.minus_di) && (currentM15.adx >= lastM15.adx || currentM15.adx >= 20)) {
                                 let ticker = await this.getTicker({ symbolId });
                                 if (ticker && ticker.bid) {
                                     debug(`${symbolId} BID AT ${ticker.bid}`);

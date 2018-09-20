@@ -15,7 +15,7 @@ module.exports = class extends Template {
             if (current.ema10 <= current.bbb20)
                 if ((current.close < current.ema10) && (current.bbu20 / current.close >= 0.7))
                     if (((current.ema20 >= current.bbb20) && (current.ema20 <= current.ema30)) || ((current.ema20 < current.bbb20) && (current.ema20 > current.ema30)))
-                        if ((current.macd > current.macd_signal) || ((current.macd > 0) && (current.ema20 > current.ema30)))
+                        if ((current.macd > current.macd_signal) || ((current.macd > 0) && (current.ema20 > current.ema30) && (last.ema20 > prev.ema20)))
                             if ((currentH1.plus_di >= currentH1.minus_di) && (currentH1.adx >= lastH1.adx || currentH1.adx >= 20)) {
                                 let ticker = await this.getTicker({ symbolId });
                                 if (ticker && ticker.bid) {
