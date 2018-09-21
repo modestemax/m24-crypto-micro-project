@@ -1,25 +1,27 @@
 const debug = require('debug')('B:strategy-base');
 const _ = require('lodash');
 
+
 const { publish, subscribe } = require('common/redis');
 const { tradingView, candleUtils, computeChange, exchange, market, fetchTickers, fetchBalance } = require('common');
 const { getAssetBalance } = market;
 const { findSignal } = candleUtils;
-const tickers = {};
-// const assets = {};
-
-fetchTickers((price, _tickers) => Object.assign(tickers, _tickers));
-// fetchBalance(_bal => Object.assign(assets, _bal));
 
 module.exports = class Strategy {
 
     constructor({ name, ...options }) {
-        Object.assign(this, { bid: null, name, options });
+        Object.assign(this, { bid: null, name, options, tickers: {}, prices: {} });
         publish('m24:algo:loaded', `#${name} loaded`);
-        this.StrategyLogThrottled = _.throttle(this.StrategyLog.bind(this), 1e3*60*5);
+        this.StrategyLogThrottled = _.throttle(this.StrategyLog.bind(this), 1e3 * 60 * 5);
         this.subscribeOnce = _.once(subscribe)
+        fetchTickers(this.onFetchTickers.bind(this));
     }
-
+    onFetchTickers(price, assets) {
+        Object.assign(this.tickers, assets)
+        this.prices[price.info.symbol] = price;
+        this.tick(price);
+    }
+    tick(price) { }
     async check(signal) {
         const { symbolId, timeframe, spread_percentage } = signal.candle;
         this.lastCheck = signal;
@@ -31,8 +33,8 @@ module.exports = class Strategy {
             const prev = signal.candle_2;
             const market = exchange.marketsById[symbolId];
             if (market) {
-                let bid = await this.canBuy(signal.candle, last, prev, signal, tickers[market.symbol]);
-                let ask = await this.canSell(signal.candle, last, prev, signal, tickers[market.symbol]);
+                let bid = await this.canBuy(signal.candle, last, prev, signal, this.tickers[market.symbol]);
+                let ask = await this.canSell(signal.candle, last, prev, signal, this.tickers[market.symbol]);
 
                 Object.assign(this, { symbolId, bid, ask, timeframe });
                 if (bid) {

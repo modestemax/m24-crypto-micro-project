@@ -12,8 +12,7 @@ const mutex = new Mutex();
 module.exports = class extends M24Base {
 
     constructor(...args) {
-        super(...args)
-        this.tickers = {};
+        super(...args)        
         this.sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
         this.start();
     }
@@ -168,7 +167,7 @@ module.exports = class extends M24Base {
     }
 
     tick(price) {
-        this.tickers[price.info.symbol] = price;
+     //   this.tickers[price.info.symbol] = price;
         // if (this.started) {
         //     const symbolId = price.info.symbol;
         //     const candle = this.symbols[symbolId];

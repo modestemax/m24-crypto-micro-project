@@ -19,13 +19,14 @@ module.exports = class extends Template {
                             if ((current.ema10 > current.ema20) && (current.ema20 > current.bbb20) && (current.ema30 >= current.bbb20))
                                 if ((current.ema50 <= current.ema10) && (last.ema50 <= last.ema10))
                                     if ((current.plus_di > current.minus_di) && (current.adx > current.minus_di) && (current.adx >= last.adx))
-                                        if ((current.close <= current.bbu20)) {
-                                            let ticker = await this.getTicker({ symbolId });
-                                            if (ticker && ticker.ask) {
-                                                debug(`${symbolId} BID AT ${ticker.ask}`);
-                                                return ticker.ask;
-                                            }
+                                    // if ((current.close <= current.bbu20))
+                                    {
+                                        let ticker = await this.getTicker({ symbolId });
+                                        if (ticker && ticker.ask) {
+                                            debug(`${symbolId} BID AT ${ticker.ask}`);
+                                            return ticker.ask;
                                         }
+                                    }
         }
     }
     async canSell({ symbolId, timeframe }, last, prev, signal) {

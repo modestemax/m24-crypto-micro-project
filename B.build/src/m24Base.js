@@ -3,7 +3,7 @@ const _ = require('lodash');
 const Template = require('./strategyBase');
 
 const { subscribe, publish, redisGet, redisSet, } = require("common/redis");
-const { candleUtils, exchange, humanizeDuration, fetchTickers } = require("common");
+const { candleUtils, exchange, humanizeDuration } = require("common");
 const { computeChange, valuePercent } = candleUtils;
 
 const redisSetThrottled = _.throttle(redisSet, 60 * 1e3);
@@ -20,26 +20,26 @@ module.exports = class extends Template {
     test(m24, BREAK_CHANGE = 3) {
 
     }
-    tick(price) {
 
-    }
-    async track24H() {
+
+    onFetchTickers(price, assets) {
         const logTop5Throttled = _.throttle(() => this.logTop5(), process.env.NODE_ENV === 'production' ? 10 * 60e3 : 30e3);
+
+        if (!this.assets) {
+            this.assets = _.cloneDeep(assets);
+            _.forEach(this.assets, (asset) => this.initAsset(asset))
+        }
+        if (this.assets[price.symbol]) {
+            this.assetChanged(this.assets[price.symbol], price);
+
+            redisSetThrottled({ key: 'assets', data: this.assets, expire: 60 * 20 })//20 min
+            logTop5Throttled()
+        }
+    }
+
+    async track24H() {
         this.startTime = Date.now();
         this.assets = (await redisGet('assets'));
-        fetchTickers((price, assets) => {
-            if (!this.assets) {
-                this.assets = _.cloneDeep(assets);
-                _.forEach(this.assets, (asset) => this.initAsset(asset))
-            }
-            if (this.assets[price.symbol]) {
-                this.assetChanged(this.assets[price.symbol], price);
-                this.tick(price)
-                redisSetThrottled({ key: 'assets', data: this.assets, expire: 60 * 20 })//20 min
-                logTop5Throttled()
-            }
-        })
-
     }
     getTop(count = 5, assets) {
         assets = assets || this.assets;
