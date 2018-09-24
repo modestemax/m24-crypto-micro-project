@@ -155,6 +155,7 @@ module.exports = {
             selfStop: true,
             timeframe: 15,
             takeProfit: .5,
+            stopLoss: -2,
             cancelBidAfterSecond: 60 * 10,//5 min,
 
         },
@@ -165,6 +166,7 @@ module.exports = {
             selfStop: true,
             timeframe: 5,
             takeProfit: .5,
+            stopLoss: -2,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
         "K3B2SPIRIT": {
