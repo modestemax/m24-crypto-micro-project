@@ -12,11 +12,11 @@ module.exports = class extends Template {
         let current = signal.candle;
         if (last && prev && current && currentH1 && lastH1) {
 
-            if (current.ema10 <= current.bbb20)
-                if ((current.close < current.ema10) && (current.bbu20 / current.close >= 0.7))
-                    if (((current.ema20 >= current.bbb20) && (current.ema20 <= current.ema30)) || ((current.ema20 < current.bbb20) && (current.ema20 > current.ema30)))
-                        if ((current.macd > current.macd_signal) || ((current.macd > 0) && (current.ema20 > current.ema30) && (last.ema20 > prev.ema20) && (current.ema20 > last.ema20)))
-                            if ((currentH1.plus_di > lastH1.minus_di) && (currentH1.plus_di > currentH1.minus_di) && (currentH1.adx >= lastH1.adx || currentH1.adx > 20)) {
+           if (current.ema10 <= current.bbb20)
+    if ((current.close < current.ema10) && (current.bbu20 / current.close >= 0.7))
+      if (((current.ema20 >= current.bbb20) && (current.ema20 <= current.ema30)) || ((current.ema20 < current.bbb20) && (current.ema20 > current.ema30)))
+        if ((current.macd > current.macd_signal) && (last.macd >= last.macd_signal) && (current.ema20 > current.ema30) && (last.macd_distance > prev.macd_distance) && (current.macd_distance > last.macd_distance))
+          if ((lastH1.plus_di > lastH1.minus_di) && (currentH1.plus_di > currentH1.minus_di) && (currentH1.adx >= lastH1.adx)){
                                 let ticker = await this.getTicker({ symbolId });
                                 if (ticker && ticker.bid) {
                                     debug(`${symbolId} BID AT ${ticker.bid}`);
