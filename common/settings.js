@@ -149,7 +149,7 @@ module.exports = {
             takeProfit: .25,
         },
         "K3SCALPINGM15": {
-            isActive: false,
+            isActive: true,
             doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
@@ -159,7 +159,7 @@ module.exports = {
 
         },
         "K3SCALPINGM5": {
-            isActive: false,
+            isActive: true,
             doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
