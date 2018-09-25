@@ -8,7 +8,7 @@ const Template = require('./strategyBase');
 module.exports = class extends Template {
 
     async canBuy({ symbolId, timeframe }, last, prev, signal) {
-        const [currentM5,lastM5] = (await loadPoints({ symbolId, timeframe: 5 })).reverse();
+        const [currentM5, lastM5] = (await loadPoints({ symbolId, timeframe: 5 })).reverse();
         let current = signal.candle;
         if (last && prev && current && currentM5) {
 
@@ -29,13 +29,15 @@ module.exports = class extends Template {
     async canSell({ symbolId, timeframe }, last, prev, signal) {
         let current = signal.candle;
         const [current5M, last5M] = (await loadPoints({ symbolId, timeframe: 5 })).reverse();
-        if ((current5M.adx > current5M.plus_di) && (last5M.adx <= last5M.plus_di)) {
-            let ticker = await this.getTicker({ symbolId });
-            if (ticker && ticker.bid) {
-                debug(`${symbolId} ASK AT ${ticker.bid}`);
-                return ticker.bid;
+
+        if (current5M && last5M)
+            if ((current5M.adx > current5M.plus_di) && (last5M.adx <= last5M.plus_di)) {
+                let ticker = await this.getTicker({ symbolId });
+                if (ticker && ticker.bid) {
+                    debug(`${symbolId} ASK AT ${ticker.bid}`);
+                    return ticker.bid;
+                }
             }
-        }
     }
     getSellPriceIfSellable(rawAsset) {
         const { change, maxChange, openPrice, closePrice, symbolId, timestamp } = rawAsset;
