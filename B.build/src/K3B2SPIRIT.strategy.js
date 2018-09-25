@@ -10,13 +10,13 @@ module.exports = class extends Template {
     async canBuy({ symbolId, timeframe }, last, prev, signal) {
         const [currentM5, lastM5] = (await loadPoints({ symbolId, timeframe: 5 })).reverse();
         let current = signal.candle;
-        if (last && prev && current && currentM5) {
+        if (last && prev && current && currentM5&&lastM5) {
 
             if ((current.bbu20 > last.bbu20) && (last.ema20 > prev.bbu20) && (current.bbl20 < last.bbl20) && (last.bbl20 < prev.bbl20))
                 if ((current.ema10 >= current.ema50) && (current.ema10 >= current.ema20))
                     if ((current.ema20 > current.bbb20) && (current.ema20 >= current.ema30) && (current.ema30 >= current.bbb20))
                         if ((current.macd > current.macd_signal) && (current.macd >= 0))
-                            if ((currentM5.plus_di > 20) && (currentM5.minus_di < 20) && (currentM5.adx >= lastM5.adx))
+                            if (/*(currentM5.plus_di > 20) && (currentM5.minus_di < 20) &&*/ (currentM5.adx >= lastM5.adx))
                                 if ((current.close <= current.bbu20)) {
                                     let ticker = await this.getTicker({ symbolId });
                                     if (ticker && ticker.bid) {
