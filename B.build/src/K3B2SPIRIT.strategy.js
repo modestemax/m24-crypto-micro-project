@@ -12,18 +12,16 @@ module.exports = class extends Template {
         let current = signal.candle;
         if (last && prev && current && currentM5 && lastM5) {
 
-            if ((current.bbu20 > last.bbu20) && (last.bbu20 > prev.bbu20) && (current.bbl20 < last.bbl20) && (last.bbl20 < prev.bbl20))
-                if ((current.ema10 >= current.ema50) && (current.ema10 >= current.ema20))
-                    if ((current.ema20 > current.bbb20) && (current.ema20 >= current.ema30) /*&& (current.ema30 >= current.bbb20)*/)
-                        if ((current.macd > current.macd_signal) && (current.macd >= 0))
-                            if ((currentM5.plus_di > 20) && (currentM5.minus_di < 20) && (currentM5.adx >= lastM5.adx))
-                                if ((current.close > current.bbu20) && (last.high >= last.bbu20)) {
-                                    let ticker = await this.getTicker({ symbolId });
-                                    if (ticker && ticker.bid) {
-                                        console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
-                                        return ticker.bid;
-                                    }
-                                }
+            if (((last.ema100 >= last.bbu20) && (current.ema100 < current.bbu20)) || ((last.ema100 >= last.ema10) && (current.ema100 < current.ema10)) || ((last.ema200 >= last.ema10) && (current.ema200 < current.ema10)) || ((last.ema200 >= last.bbu20) && (current.ema200 < current.bbu20)))
+                if ((current.ema20 > current.ema30) && (current.ema20 >= current.bbb20))
+                    if ((current.plus_di > 20) && (current.minus_di < 20) && (current.plus_di > current.minus_di))
+                        if ((current.close <= current.bbu20)) {
+                            let ticker = await this.getTicker({ symbolId });
+                            if (ticker && ticker.bid) {
+                                console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
+                                return ticker.bid;
+                            }
+                        }
         }
     }
     async canSell({ symbolId, timeframe }, last, prev, signal) {
