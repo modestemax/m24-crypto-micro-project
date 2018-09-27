@@ -8,9 +8,9 @@ const Template = require('./strategyBase');
 module.exports = class extends Template {
 
     async canBuy({ symbolId, timeframe }, last, prev, signal) {
-        const [currentM5, lastM5] = (await loadPoints({ symbolId, timeframe: 5 })).reverse();
+        const [currentX, lastX, prevX] = (await loadPoints({ symbolId, timeframe: this.options.timeframeX })).reverse();
         let current = signal.candle;
-        if (last && prev && current && currentM5 && lastM5) {
+        if (last && prev && current && currentX && lastX) {
 
             if (((last.ema100 >= last.bbu20) && (current.ema100 < current.bbu20)) || ((last.ema100 >= last.ema10) && (current.ema100 < current.ema10)) || ((last.ema200 >= last.ema10) && (current.ema200 < current.ema10)) || ((last.ema200 >= last.bbu20) && (current.ema200 < current.bbu20)))
                 if ((current.ema20 > current.ema30) && (current.ema20 >= current.bbb20))
@@ -26,10 +26,10 @@ module.exports = class extends Template {
     }
     async canSell({ symbolId, timeframe }, last, prev, signal) {
         let current = signal.candle;
-        const [current5M, last5M] = (await loadPoints({ symbolId, timeframe: 5 })).reverse();
+        const [currentX, lastX, prevX] = (await loadPoints({ symbolId, timeframe: this.options.timeframeX })).reverse();
 
-        if (current5M && last5M)
-            if ((current5M.adx > current5M.plus_di) && (last5M.adx <= last5M.plus_di)) {
+        if (currentX && lastX)
+            if ((currentX.adx > currentX.plus_di) && (lastX.adx <= lastX.plus_di)) {
                 let ticker = await this.getTicker({ symbolId });
                 if (ticker && ticker.bid) {
                     debug(`${symbolId} ASK AT ${ticker.bid}`);
