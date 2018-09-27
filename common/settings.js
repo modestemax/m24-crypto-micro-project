@@ -171,6 +171,17 @@ module.exports = {
             stopLoss: -2,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
+        "K3SCALPINGM1": {
+            isActive: true,
+            doTrade: true,
+            timeInForce: 'GTC',
+            selfStop: true,
+            timeframe: 1,
+            timeframeX:5,
+            takeProfit: .5,
+            stopLoss: -2,
+            cancelBidAfterSecond: 60 * 10,//5 min,
+        },
         "K3B2SPIRIT": {
             isActive: true,
             doTrade: false,

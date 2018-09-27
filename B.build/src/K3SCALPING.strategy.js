@@ -8,15 +8,15 @@ const Template = require('./strategyBase');
 module.exports = class extends Template {
 
     async canBuy({ symbolId, timeframe }, last, prev, signal) {
-        const [currentX, lastX] = (await loadPoints({ symbolId, timeframe: this.options.timeframeX })).reverse();
+        const [currentX, lastX, prevX] = (await loadPoints({ symbolId, timeframe: this.options.timeframeX })).reverse();
         let current = signal.candle;
-        if (last && prev && current && currentX && lastX) {
+        if (last && prev && current && currentX && lastX && prevX) {
 
             if (current.ema10 <= current.bbb20)
                 if ((current.close < current.ema10) && (current.bbu20 / current.close >= 0.7))
-                    if (((current.ema20 > current.bbb20) && (current.ema20 <= current.ema30)) || ((current.ema20 < current.bbb20) && (current.ema20 > current.ema30)))
-                        if ((current.macd > current.macd_signal) && (last.macd >= last.macd_signal) && (last.macd_distance > prev.macd_distance) && (current.macd_distance > last.macd_distance))
-                            if ((lastX.plus_di > lastX.minus_di) && (currentX.plus_di > currentX.minus_di) && (currentX.adx >= lastX.adx)) {
+                    if (((current.ema20 > current.bbb20) && (current.ema20 <= current.ema30)) || ((current.ema20 < current.bbb20) && (current.ema20 > current.ema30) && (last.ema20 > prev.ema20)))
+                        if ((last.macd > last.macd_signal) && (prev.macd >= prev.macd_signal) && (last.macd_distance > prev.macd_distance) && (current.macd_distance > last.macd_distance))
+                            if ((lastX.plus_di > lastX.minus_di) && (currentX.plus_di > currentX.minus_di) && (lastX.plus_di >= prevX.plus_di)) {
                                 let ticker = await this.getTicker({ symbolId });
                                 if (ticker && ticker.bid) {
                                     debug(`${symbolId} BID AT ${ticker.bid}`);
