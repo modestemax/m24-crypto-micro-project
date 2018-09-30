@@ -20,7 +20,7 @@ module.exports = class extends M24Base {
         let unlock = await mutex.lock();
         this.StrategyLog(`Loading OHLCV for ${this.options.frame} `);
         try {
-            let { frame, limit, minTarget,maxSpread } = Object.assign({ frame: '1d', limit: 10, minTarget: 5,maxSpread:1 }, this.options)
+            let { frame, limit, minTarget, maxSpread } = Object.assign({ frame: '1d', limit: 10, minTarget: 5, maxSpread: 1 }, this.options)
             // this.started = false;
             await this.loadOHLCV({ frame, limit });
             this.StrategyLog(`Loaded OHLCV for ${this.options.frame} `);
@@ -30,7 +30,7 @@ module.exports = class extends M24Base {
             // this.findMinGain(minTarget);
             // this.filterSelected(minTarget);
             //-----------------
-            this.findMinChange({minTarget,maxSpread})
+            this.findMinChange({ minTarget, maxSpread })
             this.beginBid();
             this.restart();
             //--------------------
@@ -61,22 +61,36 @@ module.exports = class extends M24Base {
         let int = setInterval(() => {
             if (Date.now() >= eth.endTimeStamp) {
                 clearInterval(int);
+                showStatus()
                 this.start();
             }
         }, 1e3)
+        function showStatus() {
+            this.winners.length && this.StrategyLog(
+                `trades results ->: ${this.options.minTarget}%.`
+                + `timeframe:${this.options.frame} \n`
+                + `#ohlcv_ok_` + this.options.frame + '\n'
+                + _(this.winners).filter(s => computeChange(s.open, s.high) > this.options.minTarget)
+                    .map(s => `${s.symbolId}`).value().join('\n')
+                + `#ohlcv_nok_` + this.options.frame + '\n'
+                + _(this.winners).filter(s => computeChange(s.open, s.high) <= this.options.minTarget)
+                    .map(s => `${s.symbolId}`).value().join('\n')
+            );
+        }
     }
     beginBid() {
         //only bid if open=high
-        this.winners.length && this.StrategyLog(`theses symbols will perform at least: ${this.options.minTarget} in current candle.
-         timeframe:${this.options.frame} \n`
-         +`#ohlcv_`+this.options.frame+'\n'
+        this.winners.length && this.StrategyLog(
+            `theses symbols will perform at least: ${this.options.minTarget}% in current candle.`
+            + `timeframe:${this.options.frame} \n`
+            + `#ohlcv_` + this.options.frame + '\n'
             + _.map(this.winners, s =>
                 `${s.symbolId}`).join('\n')
         );
         this.winners.length || this.StrategyLog(`no symbols will perform at least: ${this.options.minTarget} in current candle.timeframe:${this.options.frame}`)
     }
 
-    findMinChange({minTarget,maxSpread}) {
+    findMinChange({ minTarget, maxSpread }) {
 
         let symbols = _.mapValues(this.symbols, (symbolData) => {
             let candlesMaxChanges = symbolData.ohlcv.map(({ open, close, high }) => computeChange(open, high));
@@ -87,12 +101,12 @@ module.exports = class extends M24Base {
                 minPercentage: _.min(candlesMaxChanges),
                 maxPercentage: _.max(candlesMaxChanges),
                 meanPercentage: _.mean(candlesMaxChanges),
-                currentPercentage:computeChange(symbolData.open,symbolData.high),
+                currentPercentage: computeChange(symbolData.open, symbolData.high),
                 lastCandleIsGreen: lastCandle.open < lastCandle.close,
                 spread: ticker && computeChange(ticker.bid, ticker.ask)
             })
         });
-    this.winners = _(symbols).filter(a => a.minPercentage > (minTarget /*+ 2 * a.spread*/) && a.spread < maxSpread).orderBy('minPercentage', 'desc').value()
+        this.winners = _(symbols).filter(a => a.minPercentage > (minTarget /*+ 2 * a.spread*/) && a.spread < maxSpread).orderBy('minPercentage', 'desc').value()
     }
     findMinMaxGreen() {
         return this.symbols = _.mapValues(this.symbols, (symbolData) => {

@@ -14,7 +14,7 @@ module.exports = class extends Template {
 
             if ((current.ema10 < current.bbb20) && (current.ema20 > current.ema30))
                 if ((current.close < current.ema10) && (current.bbu20 / current.close >= 0.7))
-                    if ((current.plus_di > current.minus_di)) {
+                    if ((current.plus_di > current.minus_di) && (current.ema10 >= current.ema50)) {
                         let ticker = await this.getTicker({ symbolId });
                         if (ticker && ticker.bid) {
                             debug(`${symbolId} BID AT ${ticker.bid}`);
