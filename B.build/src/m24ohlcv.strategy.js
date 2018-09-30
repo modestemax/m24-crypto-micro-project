@@ -12,16 +12,16 @@ const mutex = new Mutex();
 module.exports = class extends M24Base {
 
     constructor(...args) {
-        super(...args)        
+        super(...args)
         this.sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        this.start();
+        // this.start();
     }
     async start() {
         let unlock = await mutex.lock();
         this.StrategyLog(`Loading OHLCV for ${this.options.frame} `);
         try {
-            let { frame, limit, minTarget } = Object.assign({ frame: '1d', limit: 10, minTarget: 5 }, this.options)
-            this.started = false;
+            let { frame, limit, minTarget,maxSpread } = Object.assign({ frame: '1d', limit: 10, minTarget: 5,maxSpread:1 }, this.options)
+            // this.started = false;
             await this.loadOHLCV({ frame, limit });
             this.StrategyLog(`Loaded OHLCV for ${this.options.frame} `);
             //-----------------
@@ -30,12 +30,12 @@ module.exports = class extends M24Base {
             // this.findMinGain(minTarget);
             // this.filterSelected(minTarget);
             //-----------------
-            this.findMinChange(minTarget)
+            this.findMinChange({minTarget,maxSpread})
             this.beginBid();
             this.restart();
             //--------------------
             // this.log();
-            this.started = true;
+            // this.started = true;
         } finally {
             unlock();
         }
@@ -69,28 +69,30 @@ module.exports = class extends M24Base {
         //only bid if open=high
         this.winners.length && this.StrategyLog(`theses symbols will perform at least: ${this.options.minTarget} in current candle.
          timeframe:${this.options.frame} \n`
+         +`#ohlcv_`+this.options.frame+'\n'
             + _.map(this.winners, s =>
                 `${s.symbolId}`).join('\n')
         );
         this.winners.length || this.StrategyLog(`no symbols will perform at least: ${this.options.minTarget} in current candle.timeframe:${this.options.frame}`)
     }
 
-    findMinChange(target) {
+    findMinChange({minTarget,maxSpread}) {
 
         let symbols = _.mapValues(this.symbols, (symbolData) => {
             let candlesMaxChanges = symbolData.ohlcv.map(({ open, close, high }) => computeChange(open, high));
-            const epsi = 0//.5            
+            const epsi = 0//.5
             const lastCandle = _.last(symbolData.ohlcv);
-            const ticker = this.tickers[symbolData.symbolId];
+            const ticker = this.tickers[symbolData.symbol];
             return Object.assign(symbolData, {
                 minPercentage: _.min(candlesMaxChanges),
                 maxPercentage: _.max(candlesMaxChanges),
                 meanPercentage: _.mean(candlesMaxChanges),
+                currentPercentage:computeChange(symbolData.open,symbolData.high),
                 lastCandleIsGreen: lastCandle.open < lastCandle.close,
                 spread: ticker && computeChange(ticker.bid, ticker.ask)
             })
         });
-        this.winners = _(symbols).filter(a => a.minPercentage > (target + 2 * a.spread) && a.spread < .1).orderBy('minPercentage', 'desc').value()
+    this.winners = _(symbols).filter(a => a.minPercentage > (minTarget /*+ 2 * a.spread*/) && a.spread < maxSpread).orderBy('minPercentage', 'desc').value()
     }
     findMinMaxGreen() {
         return this.symbols = _.mapValues(this.symbols, (symbolData) => {
@@ -167,7 +169,11 @@ module.exports = class extends M24Base {
     }
 
     tick(price) {
-     //   this.tickers[price.info.symbol] = price;
+        if (!this.started) {
+            this.started = true;
+            this.start();
+        }
+        //   this.tickers[price.info.symbol] = price;
         // if (this.started) {
         //     const symbolId = price.info.symbol;
         //     const candle = this.symbols[symbolId];

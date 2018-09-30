@@ -23,6 +23,7 @@ module.exports = class extends Template {
 
 
     onFetchTickers(price, assets) {
+        super.onFetchTickers(price,assets)
         const logTop5Throttled = _.throttle(() => this.logTop5(), process.env.NODE_ENV === 'production' ? 10 * 60e3 : 30e3);
 
         if (!this.assets) {

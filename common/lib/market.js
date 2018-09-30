@@ -20,24 +20,24 @@ const $this = module.exports = {
     })
     return orders;
   },
-   getAssetBalance(assetId, part) {
+   getAssetBalance(assetName, part) {
     let nonNulAssets =  $this.getNonNulAssets();
-    if (nonNulAssets && nonNulAssets[assetId]) {
-      return nonNulAssets[assetId][part || 'total'];
+    if (nonNulAssets && nonNulAssets[assetName]) {
+      return nonNulAssets[assetName][part || 'total'];
     }
     return 0;
   },
 
      getNonNulAssets() {  
-    return _.reduce(assets, (nonNulAssets, balance, asset) => {
-      let symbol = asset + '/BTC';
+    return _.reduce(assets, (nonNulAssets, balance, assetName) => {
+      let symbol = assetName + '/BTC';
       let ticker = tickers[symbol];
-      if (asset === 'BTC') {
-        return Object.assign(nonNulAssets, { [asset]: Object.assign(balance, { btc: balance.total }) })
+      if (assetName === 'BTC') {
+        return Object.assign(nonNulAssets, { [assetName]: Object.assign(balance, { btc: balance.total }) })
       } else if (ticker) {
         let btc = balance.total * ticker.close;
         if (btc > 0.001) {
-          return Object.assign(nonNulAssets, { [asset]: Object.assign(balance, { btc }) });
+          return Object.assign(nonNulAssets, { [assetName]: Object.assign(balance, { btc }) });
         }
       }
       return nonNulAssets;

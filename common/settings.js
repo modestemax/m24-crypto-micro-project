@@ -219,20 +219,22 @@ module.exports = {
             takeProfit: 5,
         },
         "m24ohlcv1d": {
-            // isActive: true,
+            isActive: true,
             timeframe: 60 * 24,
             limit: 10,
             frame: '1d',
             minTarget: 2,
             takeProfit: 2,
+            maxSpread:1
         },
         "m24ohlcv4h": {
-            // isActive: true,
+            isActive: true,
             timeframe: 60 * 4,
-            limit: 10,
+            limit: 14,
             frame: '4h',
-            minTarget: 1,
-            takeProfit: 1,
+            minTarget: .5,
+            takeProfit: .5,
+            maxSpread:1
         },
         "m24ohlcv1h": {
             // isActive: true,
