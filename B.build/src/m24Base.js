@@ -133,7 +133,7 @@ module.exports = class extends Template {
         }
     }
     async canBuy({ symbolId, timeframe }, last, prev, signal, asset) {
-        //  debugger      
+        //  debugger
         this.last[symbolId] = last;
         this.prev[symbolId] = prev;
         this.candle[symbolId] = signal.candle;

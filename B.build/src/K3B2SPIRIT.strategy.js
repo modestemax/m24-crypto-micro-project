@@ -12,20 +12,19 @@ module.exports = class extends Template {
         let current = signal.candle;
         if (last && prev && current && currentX && lastX) {
 
-            if (((last.ema100 >= last.ema10) && (current.ema100 < current.ema10)) ||
-                ((last.ema200 >= last.ema10) && (current.ema200 < current.ema10)))
-                if ((current.ema20 > current.ema30) && (current.ema20 > current.bbb20) && (current.ema10 > current.ema20))
-                    if ((current.ema10 > current.ema20) && (current.ema10 > current.ema50))
-                        if ((current.plus_di > 20) && (current.minus_di < 20) && (current.adx > 20))
-                            if ((current.close < current.bbu20)) {
-                                let ticker = await this.getTicker({ symbolId });
-                                if (ticker && ticker.bid) {
-                                    console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
-                                    return ticker.bid;
-                                }
+            if ((current.ema50 <= current.ema10) && (current.ema50 >= current.bbb20))
+                if ((current.ema20 >= current.ema30) && (current.ema20 >= current.bbb20))
+                    if ((current.plus_di > current.minus_di) && (current.minus_di < 15)  && (current.plus_di > 20) && (current.adx > 20))
+                        if ((current.close <= current.ema10)) {
+                            let ticker = await this.getTicker({ symbolId });
+                            if (ticker && ticker.bid) {
+                                console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
+                                return ticker.bid;
                             }
+                        }
         }
     }
+
     async canSell({ symbolId, timeframe }, last, prev, signal) {
         let current = signal.candle;
         const [currentX, lastX, prevX] = (await loadPoints({ symbolId, timeframe: this.options.timeframeX })).reverse();
@@ -39,6 +38,7 @@ module.exports = class extends Template {
                 }
             }
     }
+
     getSellPriceIfSellable(rawAsset) {
         const { change, maxChange, openPrice, closePrice, symbolId, timestamp } = rawAsset;
         const H1 = 1e3 * 60 * 60;

@@ -140,6 +140,14 @@ module.exports = {
             timeframe: 15,
             takeProfit: .5
         },
+        "binance24h1d": {
+            isActive: true,
+            doTrade: false,
+            timeInForce: 'IOC',
+            selfStop: true,
+            timeframe: 60*24,
+            takeProfit: 2
+        },
         "m24Scalping": {
             // isActive: true,
             doTrade: false,
@@ -241,7 +249,7 @@ module.exports = {
             takeProfit: 5,
         },
         "m24ohlcv1d": {
-            isActive: true,
+            // isActive: true,
             timeframe: 60 * 24,
             limit: 10,
             frame: '1d',
@@ -250,7 +258,7 @@ module.exports = {
             maxSpread:1
         },
         "m24ohlcv4h": {
-            isActive: true,
+            // isActive: true,
             timeframe: 60 * 4,
             limit: 14,
             frame: '4h',
