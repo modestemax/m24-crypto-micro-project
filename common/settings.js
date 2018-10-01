@@ -141,7 +141,7 @@ module.exports = {
             takeProfit: .5
         },
         "binance24h1d": {
-            isActive: true,
+            // isActive: true,
             doTrade: false,
             timeInForce: 'IOC',
             selfStop: true,
