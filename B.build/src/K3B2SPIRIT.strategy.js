@@ -13,15 +13,16 @@ module.exports = class extends Template {
         if (last && prev && current && currentX && lastX) {
 
             if ((current.ema20 >= current.bbb20) && (current.bbl20 / current.bbu20 >= 5))
-                if ((current.plus_di > current.minus_di) && (current.adx > 30))
+                if ((current.plus_di > current.minus_di) && (current.adx > 20))
                     if ((current.adx > last.adx) && (current.plus_di > last.plus_di))
-                        if ((current.ema10 > last.ema10)) {
-                            let ticker = await this.getTicker({ symbolId });
-                            if (ticker && ticker.bid) {
-                                console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
-                                return ticker.bid;
+                        if ((current.ema10 > last.ema10))
+                            if (current.close <= current.bbu20) {
+                                let ticker = await this.getTicker({ symbolId });
+                                if (ticker && ticker.bid) {
+                                    console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
+                                    return ticker.bid;
+                                }
                             }
-                        }
         }
     }
 
