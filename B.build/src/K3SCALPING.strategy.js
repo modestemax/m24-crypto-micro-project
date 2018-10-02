@@ -13,11 +13,12 @@ module.exports = class extends Template {
         if (last && prev && current && currentX && lastX && prevX) {
 
             if (current.ema10 <= current.bbb20)
-                if ((current.close < current.ema10) && (current.bbu20 / current.close >= 0.7))
-                    if (((current.ema20 > current.bbb20) && (current.ema20 <= current.ema30)) || ((current.ema20 < current.bbb20) && (current.ema20 > current.ema30) && (last.ema20 > prev.ema20)))
-                        if ((last.macd > last.macd_signal) && (prev.macd >= prev.macd_signal) && (last.macd_distance > prev.macd_distance) && (current.macd_distance > last.macd_distance))
-                            if (current.plus_di > current.minus_di)
-                                if ((lastX.plus_di > lastX.minus_di) && (currentX.plus_di > currentX.minus_di) && (currentX.adx > 20) && (currentX.open < currentX.close)) {
+                if ((current.close < current.ema10) && (current.bbu20 / current.close >= 0.5))
+                    if (((current.ema20 > current.bbb20) && (current.ema20 <= current.ema30)) || ((current.ema20 < current.bbb20) && (current.ema20 > current.ema30)))
+                        //if((last.macd_distance > prev.macd_distance) &&(current.macd_distance > last.macd_distance))
+                        if ((last.ema20 > prev.ema20) && (current.macd_distance > last.macd_distance))
+                            if ((current.plus_di > current.minus_di) && (currentX.adx > last.adx))
+                                if ((lastX.plus_di > lastX.minus_di) && (currentX.plus_di > currentX.minus_di)/* && (currentX.adx > 20)*/ && (currentX.open < currentX.close)) {
                                     let ticker = await this.getTicker({ symbolId });
                                     if (ticker && ticker.bid) {
                                         debug(`${symbolId} BID AT ${ticker.bid}`);
