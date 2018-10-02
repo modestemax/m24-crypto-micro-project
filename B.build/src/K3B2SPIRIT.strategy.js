@@ -12,10 +12,10 @@ module.exports = class extends Template {
         let current = signal.candle;
         if (last && prev && current && currentX && lastX) {
 
-            if ((current.ema50 <= current.ema10) && (current.ema50 >= current.bbb20))
-                if ((current.ema20 >= current.ema30) && (current.ema20 >= current.bbb20))
-                    if ((current.plus_di > current.minus_di) && (current.minus_di < 15)  && (current.plus_di > 20) && (current.adx > 20))
-                        if ((current.close <= current.ema10)) {
+            if ((current.ema20 >= current.bbb20) && (current.bbl20 / current.bbl20 >= 5))
+                if ((current.plus_di > current.minus_di) && (current.adx > 30))
+                    if ((current.adx > last.adx) && (current.plus_di > last.plus_di))
+                        if ((current.ema10 > last.ema10)) {
                             let ticker = await this.getTicker({ symbolId });
                             if (ticker && ticker.bid) {
                                 console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
@@ -29,14 +29,14 @@ module.exports = class extends Template {
         let current = signal.candle;
         const [currentX, lastX, prevX] = (await loadPoints({ symbolId, timeframe: this.options.timeframeX })).reverse();
 
-        if (currentX && lastX)
-            if ((currentX.adx > currentX.plus_di) && (lastX.adx <= lastX.plus_di)) {
-                let ticker = await this.getTicker({ symbolId });
-                if (ticker && ticker.bid) {
-                    debug(`${symbolId} ASK AT ${ticker.bid}`);
-                    return ticker.bid;
-                }
+        // if (currentX && lastX)
+        if ((current.ema20 <= current.bbb20) && (last.ema20 > last.bbb20)) {
+            let ticker = await this.getTicker({ symbolId });
+            if (ticker && ticker.bid) {
+                debug(`${symbolId} ASK AT ${ticker.bid}`);
+                return ticker.bid;
             }
+        }
     }
 
     getSellPriceIfSellable(rawAsset) {
