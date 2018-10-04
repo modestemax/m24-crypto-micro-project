@@ -16,7 +16,7 @@ module.exports = class extends Template {
                 if ((current.bbl20 < prev.bbl20) && (current.bbu20 > prev.bbu20))
                     if (current.plus_di > current.minus_di)
                         if (current.ema10 > last.ema10)
-                            if (current.macd_distance > last.macd_distance)
+                            if ((current.macd_distance > last.macd_distance) && (last.macd_distance > prev.macd_distance))
                                 if (current.close <= current.bbu20) {
                                     let ticker = await this.getTicker({ symbolId });
                                     if (ticker && ticker.bid) {
