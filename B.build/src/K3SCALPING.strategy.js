@@ -46,17 +46,24 @@ module.exports = class extends Template {
         const price = this.prices[symbolId];
         const duration = Date.now() - timestamp;
 
+        if (maxChange > 0) {
+            if (change == maxChange) {
+                return false;
+            }
+        }
         if (price) {
+
             if (valuePercent(openPrice, price.bid) >= .45) {
                 return true
             }
-            if (change < this.options.stopLoss) {
-                return true;
-            }
-            if (duration > 3*H1) {
-                return true
-            }
         }
+        if (change < this.options.stopLoss) {
+            return true;
+        }
+        if (duration > 3 * H1) {
+            return true
+        }
+
         return valuePercent(openPrice, this.options.takeProfit);
 
         //-----ci dessous a revoir 
