@@ -53,33 +53,33 @@ module.exports = class extends Template {
             if (change < this.options.stopLoss) {
                 return true;
             }
-            if (duration > H1) {
+            if (duration > 3*H1) {
                 return true
             }
-            return valuePercent(openPrice, this.options.takeProfit);
-
-            //-----ci dessous a revoir 
-
-            // if (-1 < change && change < 0 && duration < 10 * M1) {
-            //     return false;
-            // } else if (change < -2.8) {
-            //     return true
-            // } /*else if (change < 1 && maxChange < 0) {
-            //     return true;
-            // } */else if (change > .3 && maxChange > change) {
-            //     return true;
-            // } else if (-2.5 < change && change < -2) {
-            //     // return valuePercent(openPrice, -.5)
-            //     true
-            // } else if (duration > H1 && change >= .3) {
-            //     return true;
-            // } else if (duration > 2 * H1 && change > .15) {
-            //     return true;
-            // } else if (duration > 2.5 * H1 || duration > 2 * H1 && change < .15) {
-            //     return true
-            // } else {
-            //     //return valuePercent(openPrice, .7);
-            // }
         }
+        return valuePercent(openPrice, this.options.takeProfit);
+
+        //-----ci dessous a revoir 
+
+        // if (-1 < change && change < 0 && duration < 10 * M1) {
+        //     return false;
+        // } else if (change < -2.8) {
+        //     return true
+        // } /*else if (change < 1 && maxChange < 0) {
+        //     return true;
+        // } */else if (change > .3 && maxChange > change) {
+        //     return true;
+        // } else if (-2.5 < change && change < -2) {
+        //     // return valuePercent(openPrice, -.5)
+        //     true
+        // } else if (duration > H1 && change >= .3) {
+        //     return true;
+        // } else if (duration > 2 * H1 && change > .15) {
+        //     return true;
+        // } else if (duration > 2.5 * H1 || duration > 2 * H1 && change < .15) {
+        //     return true
+        // } else {
+        //     //return valuePercent(openPrice, .7);
+        // }
     }
 }
