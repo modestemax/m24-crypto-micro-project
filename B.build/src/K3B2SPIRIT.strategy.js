@@ -41,6 +41,8 @@ module.exports = class extends Template {
         //         return ticker.bid;
         //     }
         // }
+
+        
     }
 
     getSellPriceIfSellable(rawAsset) {
