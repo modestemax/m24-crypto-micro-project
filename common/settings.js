@@ -220,7 +220,7 @@ module.exports = {
             timeframe: 60,
             timeframeX:60*4,
             takeProfit: .5,
-            stopLoss: -1,
+            stopLoss: -2,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
         "K3B2SPIRITM5": {
@@ -231,7 +231,7 @@ module.exports = {
             timeframe: 5,
             timeframeX:15,
             takeProfit: .5,
-            stopLoss: -1,
+            stopLoss: -2,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
         "K3B2SPIRITM15": {
@@ -242,7 +242,7 @@ module.exports = {
             timeframe: 15,
             timeframeX:60,
             takeProfit: .5,
-            stopLoss: -1,
+            stopLoss: -2,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
         "K3DAILY1H": {
