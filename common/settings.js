@@ -145,7 +145,7 @@ module.exports = {
             doTrade: false,
             timeInForce: 'IOC',
             selfStop: true,
-            timeframe: 60*24,
+            timeframe: 60 * 24,
             takeProfit: 2
         },
         "m24Scalping": {
@@ -162,7 +162,7 @@ module.exports = {
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 15,
-            timeframeX:60,
+            timeframeX: 60,
             takeProfit: .5,
             stopLoss: -1,
             cancelBidAfterSecond: 60 * 10,//5 min,
@@ -174,7 +174,7 @@ module.exports = {
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 5,
-            timeframeX:15,
+            timeframeX: 15,
             takeProfit: .5,
             stopLoss: -1,
             cancelBidAfterSecond: 60 * 10,//5 min,
@@ -185,12 +185,12 @@ module.exports = {
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 1,
-            timeframeX:5,
+            timeframeX: 5,
             takeProfit: .5,
             stopLoss: -1,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
-          "K3SCALPINGUPM15": {
+        "K3SCALPINGUPM15": {
             // isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
@@ -201,8 +201,8 @@ module.exports = {
             stopLoss: -1,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
-       "K3SCALPINGBBM5": {
-            // isActive: true,
+        "K3SCALPINGBBM5": {
+            isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
@@ -212,13 +212,35 @@ module.exports = {
             stopLoss: -.5,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
-           "K3B2SPIRITH1": {
+        "K3SCALPINGBBM15": {
+            isActive: true,
+            // doTrade: true,
+            timeInForce: 'GTC',
+            selfStop: true,
+            timeframe: 15,
+            // timeframeX:5,
+            takeProfit: .5,
+            stopLoss: -.5,
+            cancelBidAfterSecond: 60 * 10,//5 min,
+        },
+        "K3SCALPINGBBMH1": {
+            isActive: true,
+            // doTrade: true,
+            timeInForce: 'GTC',
+            selfStop: true,
+            timeframe: 60,
+            // timeframeX:5,
+            takeProfit: .5,
+            stopLoss: -.5,
+            cancelBidAfterSecond: 60 * 10,//5 min,
+        },
+        "K3B2SPIRITH1": {
             isActive: true,
             doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 60,
-            timeframeX:60*4,
+            timeframeX: 60 * 4,
             takeProfit: .5,
             stopLoss: -2,
             cancelBidAfterSecond: 60 * 10,//5 min,
@@ -229,7 +251,7 @@ module.exports = {
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 5,
-            timeframeX:15,
+            timeframeX: 15,
             takeProfit: .5,
             stopLoss: -2,
             cancelBidAfterSecond: 60 * 10,//5 min,
@@ -240,7 +262,7 @@ module.exports = {
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 15,
-            timeframeX:60,
+            timeframeX: 60,
             takeProfit: .5,
             stopLoss: -2,
             cancelBidAfterSecond: 60 * 10,//5 min,
@@ -268,7 +290,7 @@ module.exports = {
             frame: '1d',
             minTarget: 2,
             takeProfit: 2,
-            maxSpread:1
+            maxSpread: 1
         },
         "m24ohlcv4h": {
             // isActive: true,
@@ -277,7 +299,7 @@ module.exports = {
             frame: '4h',
             minTarget: .5,
             takeProfit: .5,
-            maxSpread:1
+            maxSpread: 1
         },
         "m24ohlcv1h": {
             // isActive: true,

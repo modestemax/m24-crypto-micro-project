@@ -12,16 +12,17 @@ module.exports = class extends Template {
         let current = signal.candle;
         if (last && prev && current) {
 
-            if (current.close < current.bbl20)
-                if (current.bbu20 / current.close >= 0.7)
-                    if (((current.plus_di < current.minus_di)) || ((current.plus_di < 15) && (current.minus_di > 25)))
-                        if ((current.adx > current.minus_di) || (current.adx > 30)) {
-                            let ticker = await this.getTicker({ symbolId });
-                            if (ticker && ticker.bid) {
-                                debug(`${symbolId} BID AT ${ticker.bid}`);
-                                return ticker.bid;
+            if ((current.ema20 >= current.ema30) && (current.ema10 >= current.bbb20))
+                if (current.bbu20 / current.bbl20 >= 1.012)
+                    if ((current.bbu20 > last.bbu20) && (current.bbl20 < last.bbl20))
+                        if ((last.low < last.bbl20) || (prev.low < prev.bbl20))
+                            if (current.close < current.ema10) {
+                                let ticker = await this.getTicker({ symbolId });
+                                if (ticker && ticker.bid) {
+                                    debug(`${symbolId} BID AT ${ticker.bid}`);
+                                    return ticker.bid;
+                                }
                             }
-                        }
         }
     }
 
