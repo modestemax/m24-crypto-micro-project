@@ -61,7 +61,13 @@ const $this = module.exports = new class {
   }
 
   async tradeChanged(trade) {
-    const { symbolId, change, openPrice, closePrice, clientOrderId, timestamp, maxChange, minChange } = trade;
+    let { symbolId, change, openPrice, closePrice, clientOrderId, timestamp, maxChange, minChange } = trade;
+    openPrice = openPrice || 0;
+    closePrice = closePrice || 0;
+    change = change || 0;
+    maxChange = maxChange || 0;
+    minChange = minChange || 0;
+
     let message_id = tradesMessageId[clientOrderId];
     //--
     let strategy = trade.strategy = _.defaults(trade.strategy, { takeProfit: 3, stopLoss: -3, trailling: 2 })
