@@ -223,7 +223,7 @@ module.exports = {
             stopLoss: -.5,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
-        "K3SCALPINGBBMH1": {
+        "K3SCALPINGBBH1": {
             isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
