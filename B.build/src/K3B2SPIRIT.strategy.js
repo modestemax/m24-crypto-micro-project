@@ -14,10 +14,10 @@ module.exports = class extends Template {
         if (last && prev && current && currentX && lastX && candle_3) {
 
             if((last.ema20 >= last.bbb20) && (last.ema10 >= last.ema20))
-            if((current.ema100 >= current.bbb20) && (current.ema200 >= current.bbb20))
+            if((current.ema100 >= current.bbb20) && (current.ema200 >= current.ema20))
               if((current.ema20 > current.ema30) && (last.ema20 >= last.ema30))
-                if((current.ema50 >= current.ema30) && (current.ema100 <= current.bbu20))
-                  if((current.ema200 > current.ema10))
+                if((last.ema100 <= last.bbu20) && (current.ema100 <= current.bbu20))
+                  if((current.ema200 > current.ema10) && (last.ema200 > last.ema10))
                     if((current.bbu20 / current.bbl20 >= 1.01) && (current.bbu20 / current.bbl20 <= 1.05))
                       if((last.bbl20 < prev.bbl20) && (prev.bbl20 < candle_3.bbl20))
                         if((last.bbu20 > prev.bbu20) && (prev.bbu20 > candle_3.bbu20))
@@ -25,12 +25,12 @@ module.exports = class extends Template {
                             if((current.ema10 > last.ema10) && (current.ema10 >= current.ema20))
                               if((current.macd_distance >= last.macd_distance) && (last.macd_distance > prev.macd_distance) && (prev.macd_distance >= candle_3.macd_distance))
                                 if ((current.close <= current.bbu20) /*&& (currentX.close > currentX.open)*/) {
-                                                    let ticker = await this.getTicker({ symbolId });
-                                                    if (ticker && ticker.bid) {
-                                                        console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
-                                                        return ticker.bid;
-                                                    }
-                                                }
+                                                            let ticker = await this.getTicker({ symbolId });
+                                                            if (ticker && ticker.bid) {
+                                                                console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
+                                                                return ticker.bid;
+                                                            }
+                                                        }
         }
     }
 
