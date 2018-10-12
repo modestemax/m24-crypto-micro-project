@@ -269,7 +269,7 @@ module.exports = {
         },
         "K3B2SPIRITV2H1": {
             isActive: true,
-            doTrade: false,
+            doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 60,
@@ -280,7 +280,7 @@ module.exports = {
         },
         "K3B2SPIRITV2M5": {
             isActive: true,
-            doTrade: false,
+            doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 5,
@@ -291,7 +291,7 @@ module.exports = {
         },
         "K3B2SPIRITV2M15": {
             isActive: true,
-            doTrade: false,
+            doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 15,
