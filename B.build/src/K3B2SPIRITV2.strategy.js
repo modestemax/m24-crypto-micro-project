@@ -34,15 +34,15 @@ module.exports = class extends Template {
         let current = signal.candle;
         const [currentX, lastX, prevX] = (await loadPoints({ symbolId, timeframe: this.options.timeframeX })).reverse();
 
-        if (current && last)
-            if ((current.ema20 < current.bbb20) && (last.ema20 >= last.bbb20))
-                if ((current.macd_distance < last.macd_distance)) {
-                    let ticker = await this.getTicker({ symbolId });
-                    if (ticker && ticker.bid) {
-                        debug(`${symbolId} ASK AT ${ticker.bid}`);
-                        return ticker.bid;
-                    }
-                }
+        // if (current && last)
+        //     if ((current.ema20 < current.bbb20) && (last.ema20 >= last.bbb20))
+        //         if ((current.macd_distance < last.macd_distance)) {
+        //             let ticker = await this.getTicker({ symbolId });
+        //             if (ticker && ticker.bid) {
+        //                 debug(`${symbolId} ASK AT ${ticker.bid}`);
+        //                 return ticker.bid;
+        //             }
+        //         }
 
 
     }
@@ -54,24 +54,24 @@ module.exports = class extends Template {
         const price = this.prices[symbolId];
         const duration = Date.now() - timestamp;
 
-        if (maxChange > 0) {
-            if (change == maxChange) {
-                return false;
-            }
-        }
-        if (price) {
+        // if (maxChange > 0) {
+        //     if (change == maxChange) {
+        //         return false;
+        //     }
+        // }
+        // if (price) {
 
-            if (valuePercent(openPrice, price.bid) >= .45) {
-                return true
-            }
-        }
-        if (change < this.options.stopLoss) {
-            return true;
-        }
-        if (duration > 3 * H1) {
-            return true
-        }
+        //     if (valuePercent(openPrice, price.bid) >= .45) {
+        //         return true
+        //     }
+        // }
+        // if (change < this.options.stopLoss) {
+        //     return true;
+        // }
+        // if (duration > 3 * H1) {
+        //     return true
+        // }
 
-        return valuePercent(openPrice, this.options.takeProfit);
+        // return valuePercent(openPrice, this.options.takeProfit);
     }
 }
