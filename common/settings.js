@@ -109,7 +109,7 @@ module.exports = {
         "BBEMA110": {
             timeframe: 15,
             timeInForce: 'GTC',
-            doTrade: true,
+            // doTrade: true,
             // isActive: true,
         },
         "K3EMA100": {
@@ -158,7 +158,7 @@ module.exports = {
         },
         "K3SCALPINGM15": {
             isActive: true,
-            doTrade: true,
+            // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 15,
@@ -170,7 +170,7 @@ module.exports = {
         },
         "K3SCALPINGM5": {
             isActive: true,
-            doTrade: true,
+            // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 5,
@@ -181,7 +181,7 @@ module.exports = {
         },
         "K3SCALPINGM1": {
             isActive: true,
-            doTrade: true,
+            // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 1,
@@ -236,7 +236,7 @@ module.exports = {
         },
         "K3B2SPIRITH1": {
             isActive: true,
-            doTrade: true,
+            // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 60,
@@ -247,7 +247,7 @@ module.exports = {
         },
         "K3B2SPIRITM5": {
             isActive: true,
-            doTrade: true,
+            // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 5,
@@ -258,7 +258,7 @@ module.exports = {
         },
         "K3B2SPIRITM15": {
             isActive: true,
-            doTrade: true,
+            // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 15,
