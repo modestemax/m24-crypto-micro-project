@@ -18,7 +18,7 @@ module.exports = class extends M24Base {
             const change = computeChange(current.open, current.close);
             const changeMax = computeChange(current.open, current.high);
 
-            if (change >this.options.enterThreshold && change <this.options.enterThreshold+1 && changeMax - change < 1) {
+            if (change >this.options.enterThreshold && changeMax - change < 1) {
                 let ticker = await this.getTicker({ symbolId });
                 if (ticker && ticker.bid) {
                     console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
