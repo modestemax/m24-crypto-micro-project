@@ -12,16 +12,26 @@ module.exports = class extends M24Base {
         super(...args)
 
     }
+    async   rememberTrackings() {
+        if (this._stopTrackings) {
+            return this._stopTrackings;
+        } else {
+            this._stopTrackings = await redisGet('m24trackings') || {}
+        }
+    }
     async canBuy({ symbolId, timeframe }, last, prev, signal) {
         let current = signal.candle;
-        if (current) {
+        await this.rememberTrackings();
+        if (current && this._stopTrackings[symbolId] !== current.id) {
             const change = computeChange(current.open, current.close);
             const changeMax = computeChange(current.open, current.high);
 
-            if (change >this.options.enterThreshold && changeMax - change < 1) {
+            if (change > this.options.enterThreshold && changeMax - change < 1) {
                 let ticker = await this.getTicker({ symbolId });
                 if (ticker && ticker.bid) {
                     console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
+                    this._stopTrackings[symbolId] = current.id;
+                    redisSet({ key: 'm24trackings', data: this._stopTrackings });
                     return ticker.bid;
                 }
             }
