@@ -25,19 +25,21 @@ module.exports = class extends M24Base {
         if (current && last)
             if (current && current.rating > 0)
                 if (this._stopTrackings[symbolId] !== current.id) {
-                    const change = computeChange(current.open, current.close);
-                    const changeMax = computeChange(current.open, current.high);
+                    // const change = computeChange(current.open, current.close);
+                    // const changeMax = computeChange(current.open, current.high);
+
                     //if (change > this.options.enterThreshold && changeMax - change < 1)
                     if (current.close > last.high)
-                        if (true) {
-                            let ticker = await this.getTicker({ symbolId });
-                            if (ticker && ticker.bid) {
-                                console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
-                                this._stopTrackings[symbolId] = current.id;
-                                redisSet({ key: 'm24trackings', data: this._stopTrackings });
-                                return ticker.bid;
+                        if (current.change_from_open > 2)
+                            if (true) {
+                                let ticker = await this.getTicker({ symbolId });
+                                if (ticker && ticker.bid) {
+                                    console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
+                                    this._stopTrackings[symbolId] = current.id;
+                                    redisSet({ key: 'm24trackings', data: this._stopTrackings });
+                                    return ticker.bid;
+                                }
                             }
-                        }
                 }
     }
 
