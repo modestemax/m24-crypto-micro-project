@@ -14,7 +14,7 @@ module.exports = class extends M24Base {
     constructor(...args) {
         super(...args)
         this.sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-        // this.start();
+         this.start();
     }
     async start() {
         let unlock = await mutex.lock();

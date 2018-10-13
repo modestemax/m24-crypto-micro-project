@@ -30,7 +30,7 @@ module.exports = class Strategy {
         const change24 = computeChange(current24.open, current24.close);
         const change24Max = computeChange(current24.open, current24.high);
 
-        if (change24 > 2)
+        // if (change24 > 2)
             if (+timeframe === this.options.timeframe && spread_percentage < .5) {
                 this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
                 this.subscribeOnce('m24:algo:check', (args) =>
