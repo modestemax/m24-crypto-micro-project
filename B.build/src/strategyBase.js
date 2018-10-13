@@ -5,7 +5,7 @@ const _ = require('lodash');
 const { publish, subscribe } = require('common/redis');
 const { tradingView, candleUtils, computeChange, exchange, market, fetchTickers, fetchBalance } = require('common');
 const { getAssetBalance } = market;
-const { findSignal } = candleUtils;
+const { findSignal, loadPoints } = candleUtils;
 
 module.exports = class Strategy {
 
@@ -24,28 +24,34 @@ module.exports = class Strategy {
     tick(price) { }
     async check(signal) {
         const { symbolId, timeframe, spread_percentage } = signal.candle;
-        this.lastCheck = signal;
-        if (+timeframe === this.options.timeframe && spread_percentage < .5) {
-            this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
-            this.subscribeOnce('m24:algo:check', (args) =>
-                this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args));
-            const last = signal.candle_1;
-            const prev = signal.candle_2;
-            const market = exchange.marketsById[symbolId];
-            if (market) {
-                let bid = await this.canBuy(signal.candle, last, prev, signal, this.tickers[market.symbol]);
-                let ask = await this.canSell(signal.candle, last, prev, signal, this.tickers[market.symbol]);
+        const [current24] = (await loadPoints({ symbolId, timeframe: 60 * 24 })).reverse();
 
-                Object.assign(this, { symbolId, bid, ask, timeframe });
-                if (bid) {
-                    debug(`${this.name} Buy OK`);
-                    this.notifyBuy();
-                } else if (ask) {
-                    debug(`${this.name} Sell OK`);
-                    this.notifySell();
+        this.lastCheck = signal;
+        const change24 = computeChange(current24.open, current24.close);
+        const change24Max = computeChange(current24.open, current24.high);
+
+        if (change24 > 2)
+            if (+timeframe === this.options.timeframe && spread_percentage < .5) {
+                this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
+                this.subscribeOnce('m24:algo:check', (args) =>
+                    this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args));
+                const last = signal.candle_1;
+                const prev = signal.candle_2;
+                const market = exchange.marketsById[symbolId];
+                if (market) {
+                    let bid = await this.canBuy(signal.candle, last, prev, signal, this.tickers[market.symbol]);
+                    let ask = await this.canSell(signal.candle, last, prev, signal, this.tickers[market.symbol]);
+
+                    Object.assign(this, { symbolId, bid, ask, timeframe });
+                    if (bid) {
+                        debug(`${this.name} Buy OK`);
+                        this.notifyBuy();
+                    } else if (ask) {
+                        debug(`${this.name} Sell OK`);
+                        this.notifySell();
+                    }
                 }
             }
-        }
     }
     selfSell(asset) {
         let ask = this.getSellPriceIfSellable(asset)
