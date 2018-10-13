@@ -90,7 +90,7 @@ async function buildIndicators({ signal, /*timeframes = [5, 15, 60],*/ trendingQ
 
         const [candle, candle_1, candle_2, candle_3] = (points || []).concat().reverse();
         const last = candle_1;
-        if (last) {
+        if (true) {
 
             const specialData = getSpecialData({ symbolId, timeframe });
             if (+timeframe === 60 * 4) {

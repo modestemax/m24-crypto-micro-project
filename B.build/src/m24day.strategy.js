@@ -14,9 +14,11 @@ module.exports = class extends M24Base {
     }
     async canBuy({ symbolId, timeframe }, last, prev, signal) {
         let current = signal.candle;
-        if (last && prev && current) {
+        if (current) {
+            const change = computeChange(current.open, current.close);
+            const changeMax = computeChange(current.open, current.high);
 
-            if (0) {
+            if (change >this.options.enterThreshold && change <this.options.enterThreshold+1 && changeMax - change < 1) {
                 let ticker = await this.getTicker({ symbolId });
                 if (ticker && ticker.bid) {
                     console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
@@ -26,5 +28,25 @@ module.exports = class extends M24Base {
         }
     }
 
+    async canSell({ symbolId, timeframe }, last, prev, signal) {
+
+
+
+    }
+
+    getSellPriceIfSellable(rawAsset) {
+        const { change, maxChange, openPrice, closePrice, symbolId, timestamp } = rawAsset;
+        const H1 = 1e3 * 60 * 60;
+        const M1 = 1e3 * 60;
+        const price = this.prices[symbolId];
+        const duration = Date.now() - timestamp;
+
+        if (maxChange - change > this.options.lossThreshold) {
+            return true
+        }
+        if (change < this.options.stopLoss) {
+            return true;
+        }
+    }
 };
 

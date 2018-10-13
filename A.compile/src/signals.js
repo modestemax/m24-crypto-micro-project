@@ -69,7 +69,7 @@ function getScheduleRule(timeframe) {
             // let hours = [3, 7, 11, 15, 19, 23].map(q => (q - tz + 24) % 24).join();
             // return `56,57,58,59 59 ${hours} * * *`
             // return '56,57,58,59 59 */1 * * *'  
-            return '0 * * * * *'
+            return '* */1 * * * *'
         default:
         //return '* */10 * * * *'
     }
