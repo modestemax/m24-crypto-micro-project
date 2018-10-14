@@ -23,7 +23,7 @@ module.exports = class extends M24Base {
         let current = signal.candle;
         await this.rememberTrackings();
         if (current && last)
-            if (current && current.rating > 0)
+            if (current.rating > 0)
                 if (this._stopTrackings[symbolId] !== current.id) {
                     // const change = computeChange(current.open, current.close);
                     // const changeMax = computeChange(current.open, current.high);
