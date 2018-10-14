@@ -40,7 +40,10 @@ TIMEFRAMES.split(',').forEach((timeframe) => {
 
 
 function getScheduleRule(timeframe) {
-
+    // var parser = require('cron-parser');
+    // var interval = parser.parseExpression('*/2 * * * *');
+    // interval.next().toString()
+    // interval.prev().toString()
     switch (+timeframe) {
         case 1:
             return '56,57,58,59,10,20,30,40,50 * * * * *'
@@ -69,7 +72,7 @@ function getScheduleRule(timeframe) {
             // let hours = [3, 7, 11, 15, 19, 23].map(q => (q - tz + 24) % 24).join();
             // return `56,57,58,59 59 ${hours} * * *`
             // return '56,57,58,59 59 */1 * * *'  
-            return '* */1 * * * *'
+            return '0 */1 * * * *'
         default:
         //return '* */10 * * * *'
     }
