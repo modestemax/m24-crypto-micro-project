@@ -31,7 +31,8 @@ module.exports = class extends M24Base {
 
                         //if (change > this.options.enterThreshold && changeMax - change < 1)
                         // if (current.close > last.high)
-                        if (current.close > (_.max([last.open, last.close]) + last.high) / 2)
+                        // if (current.close > (_.max([last.open, last.close]) + last.high) / 2)
+                        if (current.close > (last.close + last.high) / 2)
                             if (current.change_from_open > this.options.change_from_open_min)
                                 if (true) {
                                     let ticker = await this.getTicker({ symbolId });
