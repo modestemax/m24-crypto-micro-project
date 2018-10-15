@@ -27,8 +27,8 @@ module.exports = class Strategy {
         const [current24] = (await loadPoints({ symbolId, timeframe: 60 * 24 })).reverse();
 
         this.lastCheck = signal;
-        const change24 = computeChange(current24.open, current24.close);
-        const change24Max = computeChange(current24.open, current24.high);
+        // const change24 = computeChange(current24.open, current24.close);
+        // const change24Max = computeChange(current24.open, current24.high);
 
         // if (change24 > 2)
             if (+timeframe === this.options.timeframe && spread_percentage < .5) {
