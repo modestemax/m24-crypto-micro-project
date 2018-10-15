@@ -31,16 +31,24 @@ module.exports = class Strategy {
         // const change24Max = computeChange(current24.open, current24.high);
 
         // if (change24 > 2)
-            if (+timeframe === this.options.timeframe && spread_percentage < .5) {
-                this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
-                this.subscribeOnce('m24:algo:check', (args) =>
-                    this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args));
-                const last = signal.candle_1;
-                const prev = signal.candle_2;
-                const market = exchange.marketsById[symbolId];
-                if (market) {
-                    let bid = await this.canBuy(signal.candle, last, prev, signal, this.tickers[market.symbol]);
-                    let ask = await this.canSell(signal.candle, last, prev, signal, this.tickers[market.symbol]);
+        if (+timeframe === this.options.timeframe && spread_percentage < .5) {
+            this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
+            this.subscribeOnce('m24:algo:check', (args) =>
+                this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args));
+            const last = signal.candle_1;
+            const prev = signal.candle_2;
+            const market = exchange.marketsById[symbolId];
+            if (market) {
+                let canBuy = await this.canBuy(signal.candle, last, prev, signal, this.tickers[market.symbol]);
+                let canSell = await this.canSell(signal.candle, last, prev, signal, this.tickers[market.symbol]);
+
+                if (canBuy || canSell) {
+                    let ticker = await this.getTicker({ symbolId });
+                    let bid = _.get(ticker, this.options.buyMode === 'limit' ? 'bid' : 'ask')
+                    let ask = _.get(ticker, this.options.sellMode === 'limit' ? 'ask' : 'bid')
+                    let now = _.get(ticker, 'now')
+                    bid && console.log(`${this.name} ${symbolId} BID AT ${bid} ${now} `);
+                    ask && console.log(`${this.name} ${symbolId} ASK AT ${ask} ${now} `);
 
                     Object.assign(this, { symbolId, bid, ask, timeframe });
                     if (bid) {
@@ -52,6 +60,7 @@ module.exports = class Strategy {
                     }
                 }
             }
+        }
     }
     selfSell(asset) {
         let ask = this.getSellPriceIfSellable(asset)

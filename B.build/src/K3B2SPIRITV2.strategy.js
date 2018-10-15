@@ -21,11 +21,7 @@ module.exports = class extends Template {
                                 if ((current.bbu20 / current.bbl20 > last.bbu20 / last.bbl20) && (last.bbu20 / last.bbl20 >= prev.bbu20 / prev.bbl20))
                                     if ((current.plus_di > 20) && (current.minus_di < 20) && (current.adx > last.adx))
                                         if (current.close < current.bbu20) {
-                                            let ticker = await this.getTicker({ symbolId });
-                                            if (ticker && ticker.bid) {
-                                                console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
-                                                return ticker.bid;
-                                            }
+                                            return true;
                                         }
         }
     }

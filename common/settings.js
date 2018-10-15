@@ -9,6 +9,8 @@ const defaultStrategyOptions = {
     cancelBidAfterSecond: 60 * 20,//20 min,
     ownerTelegramChatId: "475514014",//"@modestemax";
     doTrade: false,
+    buyMode: 'limit',
+    sellMode: 'limit',
 };
 
 module.exports = {

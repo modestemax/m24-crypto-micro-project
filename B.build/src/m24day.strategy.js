@@ -10,22 +10,33 @@ module.exports = class extends M24Base {
 
     constructor(...args) {
         super(...args)
-        this.trackKey = 'm24trackings_' + this.name;
+
     }
-    async   rememberTrackings() {
+    setTracking({ id, open, symbolId, ...args }) {
+        this._stopTrackings = this._stopTrackings || {};
+        this._stopTrackings[id] = this._stopTrackings[id];
+        this._stopTrackings[id][symbolId] = { open }
+    }
+    hasTracking({ id, open, symbolId, ...args }) {
+        return _.get(this._stopTrackings, id, symbolId)
+    }
+    async   getTrackings(id) {
         if (this._stopTrackings) {
             return this._stopTrackings;
         } else {
-            this._stopTrackings = await redisGet(this.trackKey) || {}
+            this._stopTrackings = await redisGet(this.getTrackKey(id)) || {}
         }
+    }
+    getTrackKey(id) {
+        return `m24trackings_${this.name}_${id}`;
     }
     async canBuy({ symbolId, timeframe }, last, prev, signal) {
         let current = signal.candle;
-        await this.rememberTrackings();
+        await this.getTrackings(current.id);
         if (current && last)
             if (current.rating > 0)
                 if ((new Date(current.now) - new Date(current.time)) / (1e3 * 60) < this.options.timeframe / 2)
-                    if (this._stopTrackings[symbolId] !== current.id) {
+                    if (!this.hasTracking(current)) {
                         // const change = computeChange(current.open, current.close);
                         // const changeMax = computeChange(current.open, current.high);
 
@@ -33,16 +44,12 @@ module.exports = class extends M24Base {
                         // if (current.close > last.high)
                         // if (current.close > (_.max([last.open, last.close]) + last.high) / 2)
                         if (current.close > (last.close + last.high) / 2)
-                            if (current.change_from_open > this.options.change_from_open_min)
-                                if (true) {
-                                    let ticker = await this.getTicker({ symbolId });
-                                    if (ticker && ticker.bid) {
-                                        console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
-                                        this._stopTrackings[symbolId] = current.id;
-                                        redisSet({ key: this.trackKey, data: this._stopTrackings });
-                                        return ticker.bid;
-                                    }
-                                }
+                            if (current.change_from_open > this.options.change_from_open_min) {
+                                this.setTracking(current);
+                                redisSet({ key: this.getTrackKey(current.id), data: await this.getTrackings(current.id) });
+                                return true;
+
+                            }
                     }
     }
 

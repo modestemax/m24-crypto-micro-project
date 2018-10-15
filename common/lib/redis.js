@@ -26,7 +26,7 @@ async function redisGet(key) {
   }
 }
 async function redisSet({ key, data, expire }) {
-  const strData = JSON.stringify(data);
+  const strData = JSON.stringify(data,null,2);
   let res = await redis.setAsync(key, strData);
   expire && await redis.expireAsync(key, expire);
   return res;

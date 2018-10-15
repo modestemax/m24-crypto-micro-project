@@ -18,11 +18,7 @@ module.exports = class extends Template {
                     if ((current.macd_distance >= last.macd_distance) && (last.macd_distance >= prev.macd_distance))
                         if (current.bbu20 / current.bbl20 >= 1.013)
                             if (current.close < current.ema10) {
-                                let ticker = await this.getTicker({ symbolId });
-                                if (ticker && ticker.bid) {
-                                    console.log(`${symbolId} BID AT ${ticker.bid} ${ticker.now} `);
-                                    return ticker.bid;
-                                }
+                                return true;
                             }
         }
     }
