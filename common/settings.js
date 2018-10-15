@@ -140,7 +140,8 @@ module.exports = {
             timeInForce: 'IOC',
             selfStop: true,
             timeframe: 15,
-            takeProfit: .5
+            takeProfit: .5,
+            stopLoss: -1,
         },
         "binance24h1d": {
             // isActive: true,
