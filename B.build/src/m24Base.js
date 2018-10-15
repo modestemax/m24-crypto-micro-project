@@ -148,8 +148,9 @@ module.exports = class extends Template {
         }
     }
     getOpenPrice(m24) {
-        const { bid, delta } = m24;
-        return bid - (delta * bid / 100) / 2
+        const { bid, delta,ask } = m24;
+        //return bid - (delta * bid / 100) / 2
+        return ask;
     }
     buy(asset) {
         let { symbolId, openPrice } = asset.m24;

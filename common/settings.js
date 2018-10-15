@@ -148,7 +148,7 @@ module.exports = {
             doTrade: true,
             timeInForce: 'IOC',
             selfStop: true,
-            timeframe: 15,
+            timeframe: 60*24,
             takeProfit: .5,
             stopLoss: -1,
         },
