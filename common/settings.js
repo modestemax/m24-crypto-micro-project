@@ -135,6 +135,15 @@ module.exports = {
             isActive: false,
         },
         "binance24h": {
+            isActive: false,
+            doTrade: false,
+            timeInForce: 'IOC',
+            selfStop: true,
+            timeframe: 15,
+            takeProfit: .5,
+            stopLoss: -1,
+        },
+        "bin24h": {
             isActive: true,
             doTrade: true,
             timeInForce: 'IOC',

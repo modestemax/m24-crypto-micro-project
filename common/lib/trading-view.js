@@ -86,10 +86,10 @@ const beautify = (data, timeframe) => {
             adx: d[9],
             minus_di: d[10],
             plus_di: d[11],
-            di_distance:d[11]-d[10],
+            di_distance: d[11] - d[10],
             macd: d[15],
             macd_signal: d[16],
-            macd_distance: d[15]-d[16],
+            macd_distance: d[15] - d[16],
             rsi: d[12],
             volatility: d[22],
             stochastic_k: d[23],
@@ -156,7 +156,7 @@ function getSignals({ options = params(), rate = 1e3 } = {}) {
                     if (jsonData.data && !jsonData.error) {
                         let beautifyData = beautify(jsonData.data, timeframe);
                         timeframe && debug(`signals ${timeframe} ${_.keys(beautifyData).length} symbols loaded`);
-
+                        beautifyData = _.mapKeys(_.orderBy(beautifyData, 'change_from_open', 'desc').map((a, i) => ({ position: ++i, ...a })), a => a.symbolId)
                         resolve(beautifyData);
                     }
                     err = jsonData.error;
