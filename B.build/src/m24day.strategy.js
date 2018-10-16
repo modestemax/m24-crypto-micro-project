@@ -73,6 +73,9 @@ module.exports = class extends M24Base {
         if ((maxChange - change) / maxChange > .5) {
             return true
         }
+        if (change < maxChange && change > .3 && change < .5) {
+            return true
+        }
         if (change < this.options.stopLoss) {
             return true;
         }
