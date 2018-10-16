@@ -24,7 +24,7 @@ module.exports = class Strategy {
     tick(price) { }
     async check(signal) {
         const { symbolId, timeframe, spread_percentage } = signal.candle;
-        const [current24] = (await loadPoints({ symbolId, timeframe: 60 * 24 })).reverse();
+       // const [current24] = (await loadPoints({ symbolId, timeframe: 60 * 24 })).reverse();
 
         this.lastCheck = signal;
         // const change24 = computeChange(current24.open, current24.close);
