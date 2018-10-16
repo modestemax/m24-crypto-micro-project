@@ -14,17 +14,17 @@ module.exports = class extends M24Base {
     }
     setTracking({ id, open, symbolId, ...args }) {
         this._stopTrackings = this._stopTrackings || {};
-        this._stopTrackings[id] = this._stopTrackings[id];
+        this._stopTrackings[id] = this._stopTrackings[id] || {};
         this._stopTrackings[id][symbolId] = { open }
     }
     hasTracking({ id, open, symbolId, ...args }) {
-        return _.get(this._stopTrackings, id, symbolId)
+        return _.get(this._stopTrackings[id], symbolId)
     }
     async   getTrackings(id) {
         if (this._stopTrackings) {
             return this._stopTrackings;
         } else {
-            this._stopTrackings = await redisGet(this.getTrackKey(id)) || {}
+            this._stopTrackings = await redisGet(this.getTrackKey(id)) || { [id]: {} }
         }
     }
     getTrackKey(id) {
@@ -46,7 +46,11 @@ module.exports = class extends M24Base {
                         if (current.close > (last.close + last.high) / 2)
                             if (current.change_from_open > this.options.change_from_open_min) {
                                 this.setTracking(current);
-                                redisSet({ key: this.getTrackKey(current.id), data: await this.getTrackings(current.id) });
+                                redisSet({
+                                    key: this.getTrackKey(current.id),
+                                    data: await this.getTrackings(current.id),
+                                    expire: 60 * 60 * 24 * 7
+                                });
                                 return true;
 
                             }
