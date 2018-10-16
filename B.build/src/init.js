@@ -7,9 +7,12 @@ const { subscribe: redisSubscribe, publish } = require('common/redis');
 redisSubscribe('newData:*', {
     'newData:.*': function (signal, channel) {
         debug('data received', channel);
-        for (let strategy in strategies) {
+        for (let [name, strategy] of Object.entries(strategies)) {
             debug('checkin strategy', strategy, signal.symbolId, signal.timeframe);
-            strategies[strategy].check(signal);
+            if (+signal.timeframe === +strategy.options.timeframe) {
+                strategy.signal[signal.symbolId] = signal;
+                strategies[name].check(signal);
+            }
         }
     }
 });

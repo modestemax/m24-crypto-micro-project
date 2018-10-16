@@ -17,13 +17,13 @@ module.exports = class extends binance24h {
             open, close, high, adx, maxDrop, percentage, prevPercentage, highPercentage,
             lastQuoteVolume } = m24;
 
-        const last = this.last[symbolId]
-        const prev = this.prev[symbolId];
-        const current = this.candle[symbolId];
+        // const last = this.last[symbolId]
+        // const prev = this.prev[symbolId];
+        const current = this.signal[symbolId] && this.signal[symbolId].candle;
 
         if (/\/BTC/.test(symbol) && current)
             if (change > BREAK_CHANGE && isFinite(change)) { //faire au moins 3% 
-                if (current.position < 11 && current.change_from_open > 0)
+                if (current.position < 11 && current.change_from_open > 2)
                     // if (percentage > 2) //ne pas toucher a ceux qui sont dejà assez monté
                     if (spreadPercent < 1) //bid-ask percentage
                         if (delta < .5) //if (delta < .5) //se rassurer des petits pas entre les variations

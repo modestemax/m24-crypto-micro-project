@@ -20,8 +20,8 @@ module.exports = class extends M24Base {
             open, close, high, adx, maxDrop, percentage, prevPercentage, highPercentage,
             lastQuoteVolume } = m24;
 
-        const last = this.last[symbolId]
-        const prev = this.prev[symbolId];
+        const last = this.signal[symbolId] && this.signal[symbolId].candle_1
+        const prev = this.signal[symbolId] && this.signal[symbolId].candle_2;
 
         if (/\/BTC/.test(symbol))
             if (change > BREAK_CHANGE && isFinite(change)) { //faire au moins 3% 

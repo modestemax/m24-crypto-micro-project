@@ -11,9 +11,9 @@ const redisSetThrottled = _.throttle(redisSet, 60 * 1e3);
 module.exports = class extends Template {
     constructor(options) {
         super(options);
-        this.last = {};
-        this.prev = {};
-        this.candle = {};
+        // this.last = {};
+        // this.prev = {};
+        // this.candle = {};
         this.track24H()
         subscribe('m24:algo:get_top5', (...args) => this.logTop5(null, ...args))
     }
@@ -134,9 +134,9 @@ module.exports = class extends Template {
     }
     async canBuy({ symbolId, timeframe }, last, prev, signal, asset) {
         // debugger
-        this.last[symbolId] = last;
-        this.prev[symbolId] = prev;
-        this.candle[symbolId] = signal.candle;
+        // this.last[symbolId] = last;
+        // this.prev[symbolId] = prev;
+        // this.candle[symbolId] = signal.candle;
     }
     tryReset(asset, newAsset) {
         const { bid, delta, change, maxChange, minChange, maxInstantDelta, duration, highPercentage, percentage } = asset.m24;
