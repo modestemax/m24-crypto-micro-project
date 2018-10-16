@@ -70,7 +70,10 @@ module.exports = class extends M24Base {
         const price = this.prices[symbolId];
         const duration = Date.now() - timestamp;
 
-        if ((maxChange - change) / maxChange > .5) {
+        // if ((maxChange - change) / maxChange > .5) {
+        //     return true
+        // }
+        if ((maxChange - change)>3) {
             return true
         }
         if (change < maxChange && change > .3 && change < .5) {
