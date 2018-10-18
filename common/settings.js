@@ -366,7 +366,7 @@ module.exports = {
             stopLoss: -3,
         },
         "m24dayH4": {
-            isActive: true,
+            // isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
             buyMode: 'market',
