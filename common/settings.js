@@ -363,7 +363,7 @@ module.exports = {
             takeProfit: 10,
             enterThreshold: 5,
             lossThreshold: 2,
-            stopLoss: -2,
+            stopLoss: -3,
         },
         "m24dayH4": {
             isActive: true,
