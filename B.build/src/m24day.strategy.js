@@ -64,7 +64,7 @@ module.exports = class extends M24Base {
     }
 
     getSellPriceIfSellable(rawAsset) {
-        const { change, maxChange, openPrice, closePrice, symbolId, timestamp } = rawAsset;
+        const { change, maxChange, minChange, openPrice, closePrice, symbolId, timestamp } = rawAsset;
         const H1 = 1e3 * 60 * 60;
         const M1 = 1e3 * 60;
         const price = this.prices[symbolId];
@@ -73,10 +73,10 @@ module.exports = class extends M24Base {
         // if ((maxChange - change) / maxChange > .5) {
         //     return true
         // }
-        if ((maxChange - change)>3) {
+        if ((maxChange - change) > 3) {
             return true
         }
-        if (change < maxChange && change > .3 && change < .5) {
+        if (change < maxChange && minChange < 2 && change > .5 && change < 1) {
             return true
         }
         if (change < this.options.stopLoss) {
