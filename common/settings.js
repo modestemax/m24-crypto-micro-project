@@ -364,6 +364,7 @@ module.exports = {
             enterThreshold: 5,
             lossThreshold: 2,
             stopLoss: -10,
+            buyMode: 'market',
         },
         "m24dayH4": {
             // isActive: true,
