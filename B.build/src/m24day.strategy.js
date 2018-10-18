@@ -44,16 +44,17 @@ module.exports = class extends M24Base {
                         // if (current.close > last.high)
                         // if (current.close > (_.max([last.open, last.close]) + last.high) / 2)
                         if (current.close > (last.close + last.high) / 2)
-                            if (current.change_from_open > this.options.change_from_open_min) {
-                                this.setTracking(current);
-                                redisSet({
-                                    key: this.getTrackKey(current.id),
-                                    data: await this.getTrackings(current.id),
-                                    expire: 60 * 60 * 24 * 7
-                                });
-                                return true;
+                            if (current.position < 11)
+                                if (current.change_from_open > this.options.change_from_open_min) {
+                                    this.setTracking(current);
+                                    redisSet({
+                                        key: this.getTrackKey(current.id),
+                                        data: await this.getTrackings(current.id),
+                                        expire: 60 * 60 * 24 * 7
+                                    });
+                                    return true;
 
-                            }
+                                }
                     }
     }
 

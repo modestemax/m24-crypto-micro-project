@@ -378,6 +378,7 @@ module.exports = {
             enterThreshold: 5,
             lossThreshold: -1,
             stopLoss: -1,
+            // stopLossRange:{1:2,},
         },
         "m24ohlcv1d": {
             // isActive: true,
