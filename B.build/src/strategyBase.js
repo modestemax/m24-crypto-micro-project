@@ -1,6 +1,7 @@
 const debug = require('debug')('B:strategy-base');
 const _ = require('lodash');
 
+const [SELL, BUY] = ['SELL', 'BUY'];
 
 const { publish, subscribe } = require('common/redis');
 const { tradingView, candleUtils, computeChange, exchange, market, fetchTickers, fetchBalance } = require('common');
@@ -24,7 +25,7 @@ module.exports = class Strategy {
     tick(price) { }
     async check(signal) {
         const { symbolId, timeframe, spread_percentage } = signal.candle;
-       // const [current24] = (await loadPoints({ symbolId, timeframe: 60 * 24 })).reverse();
+        // const [current24] = (await loadPoints({ symbolId, timeframe: 60 * 24 })).reverse();
 
         this.lastCheck = signal;
         // const change24 = computeChange(current24.open, current24.close);
@@ -84,28 +85,34 @@ module.exports = class Strategy {
         const market = exchange.marketsById[this.symbolId];
         const balance = getAssetBalance(market.base);
         const balanceBTC = getAssetBalance(market.quote, 'free');
+
+        const { name: strategyName, options, bid: openPrice, symbolId, timeframe } = this;
+        this.pairFound({ side: BUY, symbolId, price: bid, test: !options.doTrade });
+
         if (!balance && balanceBTC > market.limits.cost.min) {
-            this.notify('BUY');
+            this.notify(BUY);
+        } else {
+            this.StrategyLog(`Buy event not published, balance insufisante #${symbolId} #no_balance_${symbolId}`)
         }
     }
     async notifySell() {
         const market = exchange.marketsById[this.symbolId];
         const balance = getAssetBalance(market.base, 'free');
         if (balance) {
-            this.notify('SELL')
+            this.notify(SELL)
         }
     }
     notify(side) {
         const { name: strategyName, options, ask: closePrice, bid: openPrice, symbolId, timeframe } = this;
         let order = ({ strategyName, openPrice, closePrice, symbolId, timeframe });
 
-        const [price, event] = side === 'BUY' ? [openPrice, 'crypto:buy_limit'] : [closePrice, 'crypto:sell_limit'];
+        const [price, event] = side === BUY ? [openPrice, 'crypto:buy_limit'] : [closePrice, 'crypto:sell_limit'];
 
 
         if (!['TUSDBTC', 'BNBBTC'].includes(symbolId)) {
-            if (price && this.pairFound({ side, symbolId, price, test: !options.doTrade }) && options.doTrade) {
+            if (price && (side === SELL || options.doTrade)) {
                 publish(event, order);
-                this.StrategyLog('Buy event published #' + symbolId)
+                this.StrategyLog(`${side} event published #${symbolId}`)
                 debug(`[strategy:${strategyName}] ${side} ${symbolId} at price: ${price}`)
             }
         } else {

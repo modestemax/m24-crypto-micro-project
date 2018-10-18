@@ -12,10 +12,10 @@ module.exports = class extends M24Base {
         super(...args)
 
     }
-    setTracking({ id, open, symbolId, ...args }) {
+    setTracking({ id, open, symbolId, now, position, ...args }) {
         this._stopTrackings = this._stopTrackings || {};
         this._stopTrackings[id] = this._stopTrackings[id] || {};
-        this._stopTrackings[id][symbolId] = { open }
+        this._stopTrackings[id][symbolId] = { open, now, position }
     }
     hasTracking({ id, open, symbolId, ...args }) {
         return _.get(this._stopTrackings[id], symbolId)
@@ -79,7 +79,7 @@ module.exports = class extends M24Base {
         if (change < maxChange && minChange < 2 && change > .5 && change < 1) {
             return true
         }
-        if (change < this.options.stopLoss) {
+        if (change < this.options.stopLoss || (change <= -2 && maxChange <= 0)) {
             return true;
         }
         return valuePercent(openPrice, this.options.takeProfit);
