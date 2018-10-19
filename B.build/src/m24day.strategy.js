@@ -68,10 +68,14 @@ module.exports = class extends M24Base {
 		//     return true
 		// }
 		if (current && current.position > 5) {
-			if (change > 0.5) {
+			if (change > 0.3) {
 				return valuePercent(openPrice, change);
 			} else {
-				return valuePercent(openPrice, 0.5);
+				if (maxChange > 0.5 && change >= 0) {
+					return valuePercent(openPrice, 0.3);
+				} else {
+					return true;
+				}
 			}
 		}
 		if (maxChange - change > 3) {
