@@ -35,27 +35,27 @@ module.exports = class extends M24Base {
 			if (+current.rating >= 0)
 				if (current.position <= this.options.min_position)
 					if (current.change_from_open > this.options.change_from_open_min)
-						if (current.close > (last.close + last.high) / 2)
-							// if (
-							// 	(new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
-							// 	this.options.timeframe / 2
-							// )
-							// if (!this.hasTracking(current))
-							// const change = computeChange(current.open, current.close);
-							// const changeMax = computeChange(current.open, current.high);
+						// if (current.close > (last.close + last.high) / 2)
+						// if (
+						// 	(new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
+						// 	this.options.timeframe / 2
+						// )
+						// if (!this.hasTracking(current))
+						// const change = computeChange(current.open, current.close);
+						// const changeMax = computeChange(current.open, current.high);
 
-							//if (change > this.options.enterThreshold && changeMax - change < 1)
-							// if (current.close > last.high)
-							// if (current.close > (_.max([last.open, last.close]) + last.high) / 2)
-							if (true) {
-								this.setTracking(current);
-								redisSet({
-									key: this.getTrackKey(current.id),
-									data: await this.getTrackings(current.id),
-									expire: 60 * 60 * 24 * 7
-								});
-								return true;
-							}
+						//if (change > this.options.enterThreshold && changeMax - change < 1)
+						// if (current.close > last.high)
+						// if (current.close > (_.max([last.open, last.close]) + last.high) / 2)
+						if (true) {
+							this.setTracking(current);
+							redisSet({
+								key: this.getTrackKey(current.id),
+								data: await this.getTrackings(current.id),
+								expire: 60 * 60 * 24 * 7
+							});
+							return true;
+						}
 	}
 
 	async canSell({ symbolId, timeframe }, last, prev, signal) { }
