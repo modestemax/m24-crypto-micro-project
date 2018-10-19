@@ -12,10 +12,10 @@ module.exports = class extends M24Base {
 	constructor(...args) {
 		super(...args);
 	}
-	async	setTracking({ id, open, symbolId, now, position, change_from_open, ...args }) {
+	async	setTracking({ id, open, symbolId, now, position, change_from_open, last_sell_change, ...args }) {
 		this._stopTrackings = this._stopTrackings || {};
 		this._stopTrackings[id] = this._stopTrackings[id] || {};
-		this._stopTrackings[id][symbolId] = { open, now, position, change_from_open };
+		this._stopTrackings[id][symbolId] = { symbolId, open, now, position, change_from_open, last_sell_change };
 		redisSetThrottle({
 			key: this.getTrackKey(id),
 			data: await this.getTrackings(id),
@@ -26,7 +26,6 @@ module.exports = class extends M24Base {
 		return _.get(this._stopTrackings[id], symbolId);
 	}
 	getTracking({ id, symbolId }) {
-
 		return _.get(this._stopTrackings, `${id}[${symbolId}]`);
 	}
 
@@ -49,10 +48,21 @@ module.exports = class extends M24Base {
 				if (current.position <= this.options.min_position)
 					if (current.change_from_open > this.options.change_from_open_min) {
 						if (tracking) {
-							if (!tracking.max_change_from_open) { return false }
-							if (current.change_from_open < tracking.max_change_from_open) {
+
+
+							if (!tracking.last_sell_change) {
+								tracking.last_sell_change = current.change_from_open + 1;
+								redisSet({
+									key: this.getTrackKey(current.id),
+									data: await this.getTrackings(current.id),
+									expire: 60 * 60 * 24 * 7
+								});
+								return false
+							}
+							if (current.change_from_open < tracking.last_sell_change) {
 								return false;
 							}
+
 						}
 						// if (current.close > (last.close + last.high) / 2)
 						// if (
@@ -87,7 +97,7 @@ module.exports = class extends M24Base {
 		// }
 
 		if (current) {
-			this.setTracking({ ...current, max_change_from_open: computeChange(current.open, current.high) });
+			this.setTracking({ ...current, last_sell_change: current.change_from_open });
 			if (current.position > this.options.min_position) {
 				this.logStrategy(`#position_lost_${symbolId}\n${symbolId} has lost his position`);
 				if (change > 0.3) {
