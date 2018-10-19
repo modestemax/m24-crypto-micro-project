@@ -48,8 +48,6 @@ module.exports = class extends M24Base {
 				if (current.position <= this.options.min_position)
 					if (current.change_from_open > this.options.change_from_open_min) {
 						if (tracking) {
-
-
 							if (!tracking.last_sell_change) {
 								tracking.last_sell_change = current.change_from_open + 1;
 								redisSet({
@@ -100,7 +98,10 @@ module.exports = class extends M24Base {
 			this.setTracking({ ...current, last_sell_change: current.change_from_open });
 			if (current.position > this.options.min_position) {
 				this.logStrategy(`#position_lost_${symbolId}\n${symbolId} has lost his position`);
-				if (change > 0.3) {
+
+				if (price && valuePercent(openPrice, price.ask) > .3) {
+					return true
+				} else if (change > 0.3) {
 					this.logStrategy(`${symbolId} trying to get ${change.toFixed(2)}% `);
 					return valuePercent(openPrice, change);
 				} else {

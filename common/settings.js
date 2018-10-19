@@ -361,10 +361,11 @@ module.exports = {
             timeframe: 60 * 24,
             change_from_open_min: 2,
             min_position: MAX_TRADE_COUNT,
-            takeProfit: 10,
+            // takeProfit: 10,
+            takeProfit: 2,
             enterThreshold: 5,
             lossThreshold: 2,
-            stopLoss: -10,
+            stopLoss: -3,
             buyMode: 'market',
         },
         "m24dayH4": {
