@@ -6,7 +6,7 @@ const { subscribe: redisSubscribe, publish } = require('common/redis');
 
 redisSubscribe('newData:*', {
     'newData:.*': function (signal, channel) {
-        console.log('signal received '+signal.timeframe+'  '+signal.symbolId)
+        // console.log('signal received '+signal.timeframe+'  '+signal.symbolId)
         debug('data received', channel);
         for (let [name, strategy] of Object.entries(strategies)) {
             debug('checkin strategy', strategy, signal.symbolId, signal.timeframe);

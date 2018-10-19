@@ -12,10 +12,10 @@ const defaultStrategyOptions = {
     buyMode: 'limit',
     sellMode: 'limit',
 };
-
+const MAX_TRADE_COUNT = 4;
 module.exports = {
     MAX_TRADE_COUNT_PER_STRATEGY: 3,
-    MAX_TRADE_COUNT: 4,
+    MAX_TRADE_COUNT,
     defaultStrategyOptions,
     strategies: filterActive({
         pc: {
@@ -148,7 +148,7 @@ module.exports = {
             // doTrade: true,
             timeInForce: 'IOC',
             selfStop: true,
-            timeframe: 60*24,
+            timeframe: 60 * 24,
             takeProfit: .5,
             stopLoss: -1,
         },
@@ -360,6 +360,7 @@ module.exports = {
             selfStop: true,
             timeframe: 60 * 24,
             change_from_open_min: 2,
+            min_position: MAX_TRADE_COUNT,
             takeProfit: 10,
             enterThreshold: 5,
             lossThreshold: 2,

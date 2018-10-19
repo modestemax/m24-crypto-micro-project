@@ -32,30 +32,33 @@ module.exports = class extends M24Base {
 		let current = signal.candle;
 		await this.getTrackings(current.id);
 		if (current && last)
-			if (current.rating > 0)
-				if ((new Date(current.now) - new Date(current.time)) / (1e3 * 60) < this.options.timeframe / 2)
-					if (!this.hasTracking(current)) {
-						// const change = computeChange(current.open, current.close);
-						// const changeMax = computeChange(current.open, current.high);
-
-						//if (change > this.options.enterThreshold && changeMax - change < 1)
-						// if (current.close > last.high)
-						// if (current.close > (_.max([last.open, last.close]) + last.high) / 2)
+			if (+current.rating >= 0)
+				if (current.position <= this.options.min_position)
+					if (current.change_from_open > this.options.change_from_open_min)
 						if (current.close > (last.close + last.high) / 2)
-							if (current.position <= 5)
-								if (current.change_from_open > this.options.change_from_open_min) {
-									this.setTracking(current);
-									redisSet({
-										key: this.getTrackKey(current.id),
-										data: await this.getTrackings(current.id),
-										expire: 60 * 60 * 24 * 7
-									});
-									return true;
-								}
-					}
+							// if (
+							// 	(new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
+							// 	this.options.timeframe / 2
+							// )
+							// if (!this.hasTracking(current))
+							// const change = computeChange(current.open, current.close);
+							// const changeMax = computeChange(current.open, current.high);
+
+							//if (change > this.options.enterThreshold && changeMax - change < 1)
+							// if (current.close > last.high)
+							// if (current.close > (_.max([last.open, last.close]) + last.high) / 2)
+							if (true) {
+								this.setTracking(current);
+								redisSet({
+									key: this.getTrackKey(current.id),
+									data: await this.getTrackings(current.id),
+									expire: 60 * 60 * 24 * 7
+								});
+								return true;
+							}
 	}
 
-	async canSell({ symbolId, timeframe }, last, prev, signal) {}
+	async canSell({ symbolId, timeframe }, last, prev, signal) { }
 
 	getSellPriceIfSellable(rawAsset) {
 		const { change, maxChange, minChange, openPrice, closePrice, symbolId, timestamp } = rawAsset;
@@ -67,19 +70,23 @@ module.exports = class extends M24Base {
 		// if ((maxChange - change) / maxChange > .5) {
 		//     return true
 		// }
-		if (current && current.position > 5) {
-			this.StrategyLog(`#position_lost_${symbolId}\n${symbolId} has lost his position`);
-			if (change > 0.3) {
-				this.StrategyLog(`${symbolId} trying to get ${change.toFixed(2)}% `);
-				return valuePercent(openPrice, change);
-			} else {
-				if (maxChange > 0.5 && change >= 0) {
-					this.StrategyLog(`${symbolId} trying to get 0.3% `);
-					return valuePercent(openPrice, 0.3);
+		if (current) {
+			if (current.position > this.options.min_position) {
+				this.StrategyLog(`#position_lost_${symbolId}\n${symbolId} has lost his position`);
+				if (change > 0.3) {
+					this.StrategyLog(`${symbolId} trying to get ${change.toFixed(2)}% `);
+					return valuePercent(openPrice, change);
 				} else {
-					this.StrategyLog(`${symbolId} bad trade ask at market price `);
-					return true;
+					if (maxChange > 0.5 && change >= 0) {
+						this.StrategyLog(`${symbolId} trying to get 0.3% `);
+						return valuePercent(openPrice, 0.3);
+					} else {
+						this.StrategyLog(`${symbolId} bad trade ask at market price `);
+						return true;
+					}
 				}
+			} else {
+
 			}
 		}
 		if (maxChange - change > 3) {
