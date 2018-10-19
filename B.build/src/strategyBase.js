@@ -86,7 +86,7 @@ module.exports = class Strategy {
         const balance = getAssetBalance(market.base);
         const balanceBTC = getAssetBalance(market.quote, 'free');
 
-        const { name: strategyName, options, bid: openPrice, symbolId, timeframe } = this;
+        const { name: strategyName, options, bid, symbolId, timeframe } = this;
         this.pairFound({ side: BUY, symbolId, price: bid, test: !options.doTrade });
 
         if (!balance && balanceBTC > market.limits.cost.min) {
