@@ -54,7 +54,7 @@ module.exports = class extends M24Base {
 								data: await this.getTrackings(current.id),
 								expire: 60 * 60 * 24 * 7
 							});
-							return true;
+							// return true;
 						}
 	}
 
