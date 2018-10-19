@@ -6,7 +6,7 @@ const redisClient = redisLib.createClient({ host: process.env.REDIS_HOST });
 
 const redis = Promise.promisifyAll(redisClient);
 // const humanizeDuration = require('humanize-duration');
-
+const { publish } = require('./redis')
 const humanizeDuration = _.partial(require('humanize-duration'), _, {
   units: ['d', 'h', 'm'],
   round: true
@@ -14,7 +14,7 @@ const humanizeDuration = _.partial(require('humanize-duration'), _, {
 
 
 module.exports = {
-  getLastAsk, saveAsk,
+  getLastAsk, saveAsk, trackTrade,
   loadAsset, delAsset, saveAsset,
   loadOrders, saveTrade, loadTrades, loadTrade, delTrade, saveOder, saveSellOder, delOder /*delExpiredOrders,*/,
   loadOrder, loadSellOrders, loadSellOrder, /*getFreeBalance,*/ loadMarkets, computeChange,
@@ -116,6 +116,19 @@ function saveTrade(trade) {
 function delTrade({ newClientOrderId }) {
   return delDatum({ hKey: "trades", id: newClientOrderId });
 }
+
+
+async function trackTrade(trade) {
+  let lastAsk = await getLastAsk(trade);
+  if (!lastAsk || trade.forgotten) {
+    publish('asset:buy:order_forgotten', trade)
+    if (!lastAsk && !trade.forgotten) {
+      saveAsk(trade.sellOrder.info)
+    }
+  }
+  publish('asset:track', trade)
+}
+
 //-------------------------ASK-----------------------------
 
 

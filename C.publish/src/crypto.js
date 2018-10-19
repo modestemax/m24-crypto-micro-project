@@ -5,8 +5,9 @@ const mutex = new Mutex();
 const _ = require('lodash');
 
 const { subscribe: redisSubscribe, publish } = require('common/redis');
-const { exchange, getLastAsk, market } = require("common");
+const { exchange, getLastAsk, trackTrade, market } = require("common");
 const { MAX_TRADE_COUNT, strategies } = require("common/settings");
+const { getOpenOrders, getTrades } = market;
 
 const { getNonNulAssets, estimatedValue } = market
 
@@ -88,6 +89,7 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
   newClientOrderId = newClientOrderId || `${strategyName}_${symbolId}`
   if (bid_ask[newClientOrderId] === 'ask') return;
   let unlock;
+
   try {
     // unlock = await mutex.lock();
     const market = exchange.marketsById[symbolId];
@@ -130,7 +132,12 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
           }
         } else {
           //debugger
-          publish('asset:buy:order_forgotten', { clientOrderId: newClientOrderId, symbolId, timestamp: args.timestamp, openPrice: args.openPrice, closePrice, quantity })
+
+          const trades = await getTrades();
+          trade = _.find(trades, { symbolId });
+          trade ?
+            trackTrade(trade)
+            : publish('asset:buy:order_forgotten', { clientOrderId: newClientOrderId, symbolId, timestamp: args.timestamp, openPrice: args.openPrice, closePrice, quantity })
         }
       }
   } finally {
