@@ -138,6 +138,7 @@ module.exports = class Strategy {
 	}
 	StrategyLog(text, options = {}) {
 		publish(`m24:algo:tracking`, { strategyName: this.name, text, ...options });
+		console.log(text);
 	}
 
 	async findSignal({ symbolId, timeframe, position }) {
