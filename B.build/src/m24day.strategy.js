@@ -72,16 +72,16 @@ module.exports = class extends M24Base {
 		// }
 		if (current) {
 			if (current.position > this.options.min_position) {
-				this.StrategyLog(`#position_lost_${symbolId}\n${symbolId} has lost his position`);
+				this.logStrategy(`#position_lost_${symbolId}\n${symbolId} has lost his position`);
 				if (change > 0.3) {
-					this.StrategyLog(`${symbolId} trying to get ${change.toFixed(2)}% `);
+					this.logStrategy(`${symbolId} trying to get ${change.toFixed(2)}% `);
 					return valuePercent(openPrice, change);
 				} else {
 					if (maxChange > 0.5 && change >= 0) {
-						this.StrategyLog(`${symbolId} trying to get 0.3% `);
+						this.logStrategy(`${symbolId} trying to get 0.3% `);
 						return valuePercent(openPrice, 0.3);
 					} else {
-						this.StrategyLog(`${symbolId} bad trade ask at market price `);
+						this.logStrategy(`${symbolId} bad trade ask at market price `);
 						return true;
 					}
 				}

@@ -62,7 +62,7 @@ module.exports = class extends Template {
         let top5 = this.getTop(5, assets);
 
         if (top5.length) {
-            this.StrategyLog(top5.map(t => `#${t.symbolId} ${t.change} [min: ${t.minChange}] [ since ${humanizeDuration(t.duration)} ]`).join('\n'),
+            this.logStrategy(top5.map(t => `#${t.symbolId} ${t.change} [min: ${t.minChange}] [ since ${humanizeDuration(t.duration)} ]`).join('\n'),
                 options);
             console.log("top5", this.name)
             top5.map(t => `${t.symbolId} ${t.change} [${t.minChange}]  since ${humanizeDuration(t.duration)}`).map(str => console.log(str))

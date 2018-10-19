@@ -1,7 +1,7 @@
 const debug = require('debug')('B:strategy-base');
 const _ = require('lodash');
 
-const [ SELL, BUY ] = [ 'SELL', 'BUY' ];
+const [SELL, BUY] = ['SELL', 'BUY'];
 
 const { publish, subscribe } = require('common/redis');
 const { tradingView, candleUtils, computeChange, exchange, market, fetchTickers, fetchBalance } = require('common');
@@ -12,7 +12,7 @@ module.exports = class Strategy {
 	constructor({ name, ...options }) {
 		Object.assign(this, { bid: null, name, options, tickers: {}, prices: {}, signal: {} });
 		publish('m24:algo:loaded', `#${name} loaded`);
-		this.StrategyLogThrottled = _.throttle(this.StrategyLog.bind(this), 1e3 * 60 * 5);
+		this.StrategyLogThrottled = _.throttle(this.logStrategy.bind(this), 1e3 * 60 * 5);
 		this.subscribeOnce = _.once(subscribe);
 		fetchTickers(this.onFetchTickers.bind(this));
 	}
@@ -21,7 +21,7 @@ module.exports = class Strategy {
 		this.prices[price.info.symbol] = price;
 		this.tick(price);
 	}
-	tick(price) {}
+	tick(price) { }
 	async check(signal) {
 		const { symbolId, timeframe, spread_percentage } = signal.candle;
 		// const [current24] = (await loadPoints({ symbolId, timeframe: 60 * 24 })).reverse();
@@ -76,21 +76,21 @@ module.exports = class Strategy {
 		}
 	}
 
-	getSellPriceIfSellable(asset) {}
-	canBuy({ symbolId, timeframe }, last, prev, signal) {}
-	canSell({ symbolId, timeframe }, last, prev, signal) {}
+	getSellPriceIfSellable(asset) { }
+	canBuy({ symbolId, timeframe }, last, prev, signal) { }
+	canSell({ symbolId, timeframe }, last, prev, signal) { }
 	async notifyBuy() {
 		const market = exchange.marketsById[this.symbolId];
 		const balance = getAssetBalance(market.base);
 		const balanceBTC = getAssetBalance(market.quote, 'free');
 
 		const { name: strategyName, options, bid, symbolId, timeframe } = this;
-		this.pairFound({ side: BUY, symbolId, price: bid, test: !options.doTrade });
+		!balance && this.logPairFound({ side: BUY, symbolId, price: bid, test: !options.doTrade });
 
 		if (!balance && balanceBTC > market.limits.cost.min) {
 			this.notify(BUY);
 		} else {
-			this.StrategyLog(`Buy event not published, balance insufisante #${symbolId} #no_balance_${symbolId}`);
+			this.logStrategy(`Buy event not published, balance insufisante #${symbolId} #no_balance_${symbolId}`);
 		}
 	}
 	async notifySell() {
@@ -104,12 +104,12 @@ module.exports = class Strategy {
 		const { name: strategyName, options, ask: closePrice, bid: openPrice, symbolId, timeframe } = this;
 		let order = { strategyName, openPrice, closePrice, symbolId, timeframe };
 
-		const [ price, event ] = side === BUY ? [ openPrice, 'crypto:buy_limit' ] : [ closePrice, 'crypto:sell_limit' ];
+		const [price, event] = side === BUY ? [openPrice, 'crypto:buy_limit'] : [closePrice, 'crypto:sell_limit'];
 
-		if (![ 'TUSDBTC', 'BNBBTC' ].includes(symbolId)) {
+		if (!['TUSDBTC', 'BNBBTC'].includes(symbolId)) {
 			if (price && (side === SELL || options.doTrade)) {
 				publish(event, order);
-				this.StrategyLog(`${side} event published #${symbolId}`);
+				this.logStrategy(`${side} event published #${symbolId}`);
 				debug(`[strategy:${strategyName}] ${side} ${symbolId} at price: ${price}`);
 			}
 		} else {
@@ -117,7 +117,7 @@ module.exports = class Strategy {
 		}
 	}
 
-	pairFound({ side, symbolId, price, test }) {
+	logPairFound({ side, symbolId, price, test }) {
 		publish(`m24:algo:pair_found`, {
 			side,
 			strategyName: this.name,
@@ -136,7 +136,7 @@ module.exports = class Strategy {
 		let tick = await tradingView({ filter });
 		return tick;
 	}
-	StrategyLog(text, options = {}) {
+	logStrategy(text, options = {}) {
 		publish(`m24:algo:tracking`, { strategyName: this.name, text, ...options });
 		console.log(text);
 	}

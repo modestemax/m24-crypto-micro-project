@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const { strategies } = require('common/settings');
 
-const { candleUtils, loadAsset, delAsset, saveAsset, saveBalances,exchange, redis } = require("common");
+const { candleUtils, loadAsset, delAsset, saveAsset, saveBalances, exchange, redis } = require("common");
 const { valuePercent, computeChange } = candleUtils;
 const { publish } = redis;
 const assets = {};
@@ -80,11 +80,11 @@ const $this = module.exports = {
   },
   tryToStopTick(asset) {
     const ONE_MINUTE = 1e3 * 60;
-    const lastCheckDurationInMinute=(Date.now() - asset.tradeExist)/ONE_MINUTE
+    const lastCheckDurationInMinute = (Date.now() - asset.tradeExist) / ONE_MINUTE
     if (asset.stopTick) {
       if (!asset.tradeExist) {
         asset.tradeExist = Date.now();
-      } else if (lastCheckDurationInMinute >  (10 + 10 * Math.random())) {
+      } else if (lastCheckDurationInMinute > (10 + 10 * Math.random())) {
         asset.tradeExist = Date.now();
         exchange.fetchBalance().then(balances => {
           const market = exchange.marketsById[asset.symbolId];
