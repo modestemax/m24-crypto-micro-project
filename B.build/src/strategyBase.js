@@ -8,13 +8,20 @@ const { tradingView, candleUtils, computeChange, exchange, market, fetchTickers,
 const { getAssetBalance } = market;
 const { findSignal, loadPoints } = candleUtils;
 
+const signals = {}
 module.exports = class Strategy {
 	constructor({ name, ...options }) {
-		Object.assign(this, { bid: null, name, options, tickers: {}, prices: {}, signal: {} });
+		Object.assign(this, { bid: null, name, options, tickers: {}, prices: {}, });
 		publish('m24:algo:loaded', `#${name} loaded`);
 		this.logStrategyThrottled = _.throttle(this.logStrategy.bind(this), 1e3 * 60 * 5);
 		this.subscribeOnce = _.once(subscribe);
 		fetchTickers(this.onFetchTickers.bind(this));
+	}
+	get signals() {
+		return signals
+	}
+	get signal() {
+		return signals[+this.options.timeframe] || {};
 	}
 	onFetchTickers(price, assets) {
 		Object.assign(this.tickers, assets);
@@ -124,7 +131,7 @@ module.exports = class Strategy {
 			symbolId,
 			price: `${price.toFixed(8)} `,
 			test
-		});	
+		});
 	}
 	async getTicker({ symbolId }) {
 		let tick = await tradingView({ filter: symbolId });

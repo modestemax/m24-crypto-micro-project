@@ -47,21 +47,43 @@ module.exports = class extends M24Base {
 			if (+current.rating >= 0)
 				if (current.position <= this.options.min_position)
 					if (current.change_from_open > this.options.change_from_open_min) {
+						let canBuy;
 						if (tracking) {
-							if (!tracking.last_sell_change) {
-								tracking.last_sell_change = current.change_from_open + 1;
-								redisSet({
-									key: this.getTrackKey(current.id),
-									data: await this.getTrackings(current.id),
-									expire: 60 * 60 * 24 * 7
-								});
-								return false
+							const currentH4 = this.signals[60 * 4] && this.signals[60 * 4][symbolId].candle;
+							const currentH1 = this.signals[60 * 1] && this.signals[60 * 1][symbolId].candle;
+							const currentM15 = this.signals[15] && this.signals[15][symbolId].candle;
+							const currentM5 = this.signals[5] && this.signals[5][symbolId].candle;
+							const currentM1 = this.signals[1] && this.signals[1][symbolId].candle;
+							if (currentM1 && currentM5 && currentM15 && currentH1 && currentH4) {
+								if (+currentM1.rating >= 0 && +currentM5.rating >= 0 && +currentM15.rating >= 0
+									&& +currentH1.rating >= 0 && +currentH4.rating >= 0) {
+									if (currentM1.change_from_open > 0 && currentM5.change_from_open > 0 && currentM15.change_from_open > 0
+										&& currentH1.change_from_open > 0 && currentH4.change_from_open > 0) {
+										canBuy = true
+									}
+								}
 							}
-							if (current.change_from_open < tracking.last_sell_change) {
+							if (!canBuy) {
 								return false;
 							}
-
 						}
+						//-----------------------
+						// if (tracking) {
+						// 	if (!tracking.last_sell_change) {
+						// 		tracking.last_sell_change = current.change_from_open + 1;
+						// 		redisSet({
+						// 			key: this.getTrackKey(current.id),
+						// 			data: await this.getTrackings(current.id),
+						// 			expire: 60 * 60 * 24 * 7
+						// 		});
+						// 		return false
+						// 	}
+						// 	if (current.change_from_open < tracking.last_sell_change) {
+						// 		return false;
+						// 	}
+
+						// }
+						//---------------------------
 						// if (current.close > (last.close + last.high) / 2)
 						// if (
 						// 	(new Date(current.now) - new Date(current.time)) / (1e3 * 60) <

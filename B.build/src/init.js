@@ -10,18 +10,19 @@ redisSubscribe('newData:*', {
         debug('data received', channel);
         for (let [name, strategy] of Object.entries(strategies)) {
             debug('checkin strategy', strategy, signal.symbolId, signal.timeframe);
+            strategy.signals[+signal.timeframe] = strategy.signals[+signal.timeframe] || {};
+            strategy.signals[+signal.timeframe][signal.symbolId] = signal;
             if (+signal.timeframe === +strategy.options.timeframe) {
-                strategy.signal[signal.symbolId] = signal;
                 strategy.check(signal);
             }
         }
     }
 });
 redisSubscribe('crypto:self_stop', (asset) => {
-    for (let strategy in strategies) {
+    for (let [name, strategy] of Object.entries(strategies)) {
         debug('checkin if asset is sellable', asset.symbolId);
-        if (asset.strategyName === strategy) {
-            strategies[strategy].selfSell(asset);
+        if (asset.strategyName === name) {
+            strategy.selfSell(asset);
         }
     }
 });
