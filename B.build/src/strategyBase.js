@@ -12,7 +12,7 @@ module.exports = class Strategy {
 	constructor({ name, ...options }) {
 		Object.assign(this, { bid: null, name, options, tickers: {}, prices: {}, signal: {} });
 		publish('m24:algo:loaded', `#${name} loaded`);
-		this.StrategyLogThrottled = _.throttle(this.logStrategy.bind(this), 1e3 * 60 * 5);
+		this.logStrategyThrottled = _.throttle(this.logStrategy.bind(this), 1e3 * 60 * 5);
 		this.subscribeOnce = _.once(subscribe);
 		fetchTickers(this.onFetchTickers.bind(this));
 	}
@@ -32,9 +32,9 @@ module.exports = class Strategy {
 
 		// if (change24 > 2)
 		if (+timeframe === this.options.timeframe && spread_percentage < 1) {
-			this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
+			this.logStrategyThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
 			this.subscribeOnce('m24:algo:check', (args) =>
-				this.StrategyLogThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args)
+				this.logStrategyThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args)
 			);
 			const last = signal.candle_1;
 			const prev = signal.candle_2;
@@ -124,8 +124,7 @@ module.exports = class Strategy {
 			symbolId,
 			price: `${price.toFixed(8)} `,
 			test
-		});
-		return true;
+		});	
 	}
 	async getTicker({ symbolId }) {
 		let tick = await tradingView({ filter: symbolId });

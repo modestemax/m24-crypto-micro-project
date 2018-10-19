@@ -8,6 +8,7 @@ const LOST = "😭"
 const SUCCESS = "👌🏼";
 const WINNING = "👍🏻";
 const LOOSING = "👎🏽";
+const ONE_MINUTE = 1e3 * 60;
 
 const tradesMessageId = {};
 
@@ -20,6 +21,7 @@ const $this = module.exports = new class {
         "Bot started ",
       ].join("\n")
     });
+    setTimeout(this.resetMessage.bind(this), ONE_MINUTE * 10)
   }
 
   resetMessage() {
@@ -68,7 +70,7 @@ const $this = module.exports = new class {
     maxChange = +maxChange || 0;
     minChange = +minChange || 0;
 
-    let message_id = tradesMessageId[clientOrderId];
+
     //--
     let strategy = trade.strategy = _.defaults(trade.strategy, { takeProfit: 3, stopLoss: -3, trailling: 2 })
     let duration = Date.now() - timestamp;
@@ -79,7 +81,7 @@ const $this = module.exports = new class {
       change > .15 ? WINNING : change < .15 ? LOOSING : "?";
     let msg = {
       chat_id: M24_CHAT_ID,
-      message_id,
+      message_id: tradesMessageId[clientOrderId],
       text: [
         "💎 #trade_changed",
         `#${strategyName}, #${symbolId}`,
@@ -93,11 +95,14 @@ const $this = module.exports = new class {
         ` type [/sell ${symbolId}] to sell at market price`
       ].join("\n")
     };
-    if (!message_id) {
-      ({ message_id } = await tme.sendMessage(msg));
-      tradesMessageId[clientOrderId] = message_id;
+    if (!tradesMessageId[clientOrderId]) {
+      tradesMessageId[clientOrderId] = tme.sendMessage(msg);
+      tradesMessageId[clientOrderId].then(
+        ({ message_id }) => tradesMessageId[clientOrderId] = message_id,
+        () => delete tradesMessageId[clientOrderId]
+      );
       //await saveTrade(trade);
-    } else {
+    } else if (+tradesMessageId[clientOrderId]) {
       await tme.editMessageText(msg);
     }
   }
