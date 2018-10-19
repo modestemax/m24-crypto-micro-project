@@ -6,18 +6,30 @@ const { publish, subscribe, redisSet, redisGet } = require('common/redis');
 const { candleUtils, saveDatum, exchange, humanizeDuration } = require('common');
 const { computeChange, valuePercent } = candleUtils;
 
+const redisSetThrottle = _.throttle(redisSet, 1e3 * 2);
+
 module.exports = class extends M24Base {
 	constructor(...args) {
 		super(...args);
 	}
-	setTracking({ id, open, symbolId, now, position, ...args }) {
+	async	setTracking({ id, open, symbolId, now, position, change_from_open, ...args }) {
 		this._stopTrackings = this._stopTrackings || {};
 		this._stopTrackings[id] = this._stopTrackings[id] || {};
-		this._stopTrackings[id][symbolId] = { open, now, position };
+		this._stopTrackings[id][symbolId] = { open, now, position, change_from_open };
+		redisSetThrottle({
+			key: this.getTrackKey(id),
+			data: await this.getTrackings(id),
+			expire: 60 * 60 * 24 * 7
+		});
 	}
 	hasTracking({ id, open, symbolId, ...args }) {
 		return _.get(this._stopTrackings[id], symbolId);
 	}
+	getTracking({ id, symbolId }) {
+
+		return _.get(this._stopTrackings, `${id}[${symbolId}]`);
+	}
+
 	async getTrackings(id) {
 		if (this._stopTrackings) {
 			return this._stopTrackings;
@@ -31,10 +43,17 @@ module.exports = class extends M24Base {
 	async canBuy({ symbolId, timeframe }, last, prev, signal) {
 		let current = signal.candle;
 		await this.getTrackings(current.id);
+		let tracking = this.getTracking(current);
 		if (current && last)
 			if (+current.rating >= 0)
 				if (current.position <= this.options.min_position)
-					if (current.change_from_open > this.options.change_from_open_min)
+					if (current.change_from_open > this.options.change_from_open_min) {
+						if (tracking) {
+							if (!tracking.max_change_from_open) { return false }
+							if (current.change_from_open < tracking.max_change_from_open) {
+								return false;
+							}
+						}
 						// if (current.close > (last.close + last.high) / 2)
 						// if (
 						// 	(new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
@@ -49,13 +68,9 @@ module.exports = class extends M24Base {
 						// if (current.close > (_.max([last.open, last.close]) + last.high) / 2)
 						if (true) {
 							this.setTracking(current);
-							redisSet({
-								key: this.getTrackKey(current.id),
-								data: await this.getTrackings(current.id),
-								expire: 60 * 60 * 24 * 7
-							});
-							// return true;
+							return true;
 						}
+					}
 	}
 
 	async canSell({ symbolId, timeframe }, last, prev, signal) { }
@@ -70,7 +85,9 @@ module.exports = class extends M24Base {
 		// if ((maxChange - change) / maxChange > .5) {
 		//     return true
 		// }
+
 		if (current) {
+			this.setTracking({ ...current, max_change_from_open: computeChange(current.open, current.high) });
 			if (current.position > this.options.min_position) {
 				this.logStrategy(`#position_lost_${symbolId}\n${symbolId} has lost his position`);
 				if (change > 0.3) {
