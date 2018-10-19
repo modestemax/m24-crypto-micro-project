@@ -1,7 +1,7 @@
 const debug = require("debug")("C:market");
 const _ = require("lodash");
 
-const { fetchBalance,tickers, assets} = require("./prices");
+const { fetchBalance, tickers, assets } = require("./prices");
 const { exchange } = require("./exchange");
 const { publish } = require("./redis");
 
@@ -20,15 +20,15 @@ const $this = module.exports = {
     })
     return orders;
   },
-   getAssetBalance(assetName, part) {
-    let nonNulAssets =  $this.getNonNulAssets();
+  getAssetBalance(assetName, part) {
+    let nonNulAssets = $this.getNonNulAssets();
     if (nonNulAssets && nonNulAssets[assetName]) {
       return nonNulAssets[assetName][part || 'total'];
     }
     return 0;
   },
 
-     getNonNulAssets() {  
+  getNonNulAssets() {
     return _.reduce(assets, (nonNulAssets, balance, assetName) => {
       let symbol = assetName + '/BTC';
       let ticker = tickers[symbol];
@@ -47,26 +47,26 @@ const $this = module.exports = {
 
   async   getTrades() {
 
-    let nonNulAssets =  $this.getNonNulAssets();
+    let nonNulAssets = $this.getNonNulAssets();
 
     return Promise.all(_.map(_.omit(nonNulAssets, ['BTC', 'BNB']), async (balance, asset) => {
       let orders = await exchange.fetchOrders(asset + '/BTC');
       // let order = _(orders).filter({ side: 'buy', status: 'closed' }).last();
-      let buyOrder = _(orders).filter({ side: 'buy',  }).last();
-      let sellOrder = _(orders).filter({ side: 'sell',  }).last();
+      let buyOrder = _(orders).filter({ side: 'buy', }).last();
+      let sellOrder = _(orders).filter({ side: 'sell', }).last();
       return {
         symbolId: buyOrder.info.symbol,
         clientOrderId: buyOrder.info.clientOrderId,
         openPrice: buyOrder.price,
         quantity: buyOrder.filled,
         timestamp: buyOrder.timestamp,
-        forgotten:!!asset.free,
+        forgotten: !!asset.free,
         sellOrder
       }
     }))
   },
-   estimatedValue() {    
-    return _.sumBy(_.toArray(  $this.getNonNulAssets()), 'btc').toFixed(8)
+  estimatedValue() {
+    return _.sumBy(_.toArray($this.getNonNulAssets()), 'btc').toFixed(8)
   }
 }
 

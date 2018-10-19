@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const { strategies } = require('common/settings');
-const { candleUtils, loadAsset, delAsset, saveAsset, exchange, redis } = require("common");
+
+const { candleUtils, loadAsset, delAsset, saveAsset, saveBalances,exchange, redis } = require("common");
 const { valuePercent, computeChange } = candleUtils;
 const { publish } = redis;
 const assets = {};
@@ -24,7 +25,7 @@ const $this = module.exports = {
       }
     }
   },
-  async onBuy({ symbolId, clientOrderId, openPrice, quantity, timestamp,forgotten, stopTick }) {
+  async onBuy({ symbolId, clientOrderId, openPrice, quantity, timestamp, forgotten, stopTick }) {
     let strategyName = clientOrderId.split('_')[0];
     if (strategyName in strategies) {
       let asset = await loadAsset({ clientOrderId });
@@ -32,7 +33,7 @@ const $this = module.exports = {
         delAsset(asset)
       }
       assets[clientOrderId] = Object.assign({}, asset, {
-        symbolId, clientOrderId, strategyName, timestamp,forgotten,
+        symbolId, clientOrderId, strategyName, timestamp, forgotten,
         strategy: Object.assign({}, strategies[strategyName]),
         openPrice, quantity, stopTick
       })
@@ -60,6 +61,7 @@ const $this = module.exports = {
     const assetsChanged = _.filter(assets, { symbolId })
     _.forEach(assetsChanged, asset => {
       if (asset) {
+        $this.tryToStopTick(asset);
         saveAssetThrottled(asset);
         asset.closePrice = lastPrice
         asset.prevChange = asset.change;
@@ -68,7 +70,7 @@ const $this = module.exports = {
           asset.maxChange = _.max([asset.maxChange, asset.change]);
           asset.minChange = _.min([asset.minChange, asset.change]);
 
-          if (!asset.prevChange||Math.abs(asset.prevChange - asset.change) > 0.01) {
+          if (!asset.prevChange || Math.abs(asset.prevChange - asset.change) > 0.01) {
             publish("asset:value_changed", asset);
           }
         }
@@ -76,7 +78,24 @@ const $this = module.exports = {
       }
     })
   },
-
+  tryToStopTick(asset) {
+    const ONE_MINUTE = 1e3 * 60;
+    const lastCheckDurationInMinute=(Date.now() - asset.tradeExist)/ONE_MINUTE
+    if (asset.stopTick) {
+      if (!asset.tradeExist) {
+        asset.tradeExist = Date.now();
+      } else if (lastCheckDurationInMinute >  (10 + 10 * Math.random())) {
+        asset.tradeExist = Date.now();
+        exchange.fetchBalance().then(balances => {
+          const market = exchange.marketsById[asset.symbolId];
+          if (!balances[market.baseId].total) {
+            asset.stopTick();
+          }
+          saveBalances(balances)
+        })
+      }
+    }
+  }
 }
 
 function takeADecision(asset) {
