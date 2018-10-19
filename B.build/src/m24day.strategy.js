@@ -96,12 +96,15 @@ module.exports = class extends M24Base {
 
 		if (current) {
 			this.setTracking({ ...current, last_sell_change: current.change_from_open });
+
+			//------------SORTI DU LE TOP------------------
 			if (current.position > this.options.min_position) {
 				this.logStrategy(`#position_lost_${symbolId}\n${symbolId} has lost his position`);
 
 				if (price && valuePercent(openPrice, price.ask) > .3) {
 					return true
-				} else if (change > 0.3) {
+				}
+				if (change > 0.3) {
 					this.logStrategy(`${symbolId} trying to get ${change.toFixed(2)}% `);
 					return valuePercent(openPrice, change);
 				} else {
@@ -117,7 +120,9 @@ module.exports = class extends M24Base {
 
 			}
 		}
-		if (maxChange - change > 3) {
+
+		//------------ENCORE DANS LE TOP------------------
+		if (change > .3 && maxChange - change > 1) {
 			return true;
 		}
 		if (change < maxChange && minChange < 2 && change > 0.5 && change < 1) {
