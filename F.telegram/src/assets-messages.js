@@ -62,11 +62,11 @@ const $this = module.exports = new class {
 
   async tradeChanged(trade) {
     let { symbolId, change, openPrice, closePrice, clientOrderId, timestamp, maxChange, minChange } = trade;
-    openPrice = openPrice || 0;
-    closePrice = closePrice || 0;
-    change = change || 0;
-    maxChange = maxChange || 0;
-    minChange = minChange || 0;
+    openPrice = +openPrice || 0;
+    closePrice = +closePrice || 0;
+    change = +change || 0;
+    maxChange = +maxChange || 0;
+    minChange = +minChange || 0;
 
     let message_id = tradesMessageId[clientOrderId];
     //--
