@@ -51,11 +51,13 @@ module.exports = class extends M24Base {
 						if (tracking) {
 							[1, 5, 15, 60, 60 * 4].reduce((canBuy, timeframe) => {
 								const currentX = this.signals[timeframe] && this.signals[timeframe][symbolId].candle;
+								const lastX = this.signals[timeframe] && this.signals[timeframe][symbolId].candle_1;
 								if (currentX && canBuy)
 									if (+currentX.rating >= 0)
 										if (currentX.change_from_open > 0)
 											if (computeChange(currentX.open, currentX.high) - currentX.change_from_open <= current.spread_percentage)
-												return canBuy
+												if (currentX.close > (lastX.close + lastX.high) / 2)
+													return true
 								return false
 							}, true)
 
@@ -107,13 +109,13 @@ module.exports = class extends M24Base {
 
 		const H1 = 1e3 * 60 * 60;
 		const M1 = 1e3 * 60;
-		const price = this.prices[symbolId];
+		const price = this.prices[symbolId]||{};
 		const duration = Date.now() - timestamp;
 		const current = _.get(this.signal, `[${symbolId}].candle`);
 		// if ((maxChange - change) / maxChange > .5) {
 		//     return true
 		// }
-		const market = valuePercent(openPrice, price.ask);
+		const market = computeChange(openPrice, price.ask);
 
 		if (current) {
 			this.setTracking({ ...current, last_sell_change: current.change_from_open });

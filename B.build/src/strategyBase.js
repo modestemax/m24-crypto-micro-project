@@ -4,9 +4,9 @@ const _ = require('lodash');
 const [SELL, BUY] = ['SELL', 'BUY'];
 
 const { publish, subscribe } = require('common/redis');
-const { tradingView, candleUtils, computeChange, exchange, market, fetchTickers, fetchBalance } = require('common');
+const { tradingView, candleUtils,  exchange, market, fetchTickers, fetchBalance } = require('common');
 const { getAssetBalance } = market;
-const { findSignal, loadPoints } = candleUtils;
+const { findSignal, loadPoints,computeChange,  valuePercent } = candleUtils;
 
 const signals = {}
 module.exports = class Strategy {
@@ -72,10 +72,14 @@ module.exports = class Strategy {
 	}
 	selfSell(asset) {
 		let ask;
-		if (asset.change < this.options.stopLoss) {
+		const { change, openPrice } = asset;
+		if (change < this.options.stopLoss) {
 			ask = true;
 		}
-		ask = ask || this.getSellPriceIfSellable(asset);
+		ask = ask
+			|| this.getSellPriceIfSellable(asset)
+			|| valuePercent(openPrice, this.options.takeProfit);;
+
 		if (ask) {
 			if (typeof ask === 'boolean') {
 				delete asset.closePrice;
