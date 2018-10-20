@@ -73,7 +73,7 @@ module.exports = class Strategy {
 	selfSell(asset) {
 		let ask;
 		const { change, openPrice } = asset;
-		if (change < this.options.stopLoss) {
+		if (change <= this.options.stopLoss) {
 			ask = true;
 		}
 		ask = ask
