@@ -46,7 +46,9 @@ module.exports = class extends M24Base {
 				if (current.position <= this.options.min_position)
 					if (current.change_from_open > this.options.change_from_open_min)
 						if (current.close > (last.close + last.high) / 2)
-							return true;
+							if ((new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
+								this.options.timeframe * 3 / 4)
+								return true;
 	}
 
 	async canSell({ symbolId, timeframe }, last, prev, signal) { }

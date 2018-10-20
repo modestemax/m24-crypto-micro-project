@@ -12,7 +12,7 @@ const defaultStrategyOptions = {
     buyMode: 'limit',
     sellMode: 'limit',
 };
-const MAX_TRADE_COUNT = 4;
+const MAX_TRADE_COUNT = 2;
 module.exports = {
     MAX_TRADE_COUNT_PER_STRATEGY: 3,
     MAX_TRADE_COUNT,
@@ -355,14 +355,14 @@ module.exports = {
         },
         "m24day": {
             isActive: true,
-            // doTrade: true,
+            doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 60 * 24,
-            timeframes:[1],
+            timeframes: [1],
             change_from_open_min: 2,
             min_position: MAX_TRADE_COUNT,
-            multiEnter:false,
+            multiEnter: false,
             takeProfit: 10,
             // takeProfit: 2,
             // takeProfit: .5,
