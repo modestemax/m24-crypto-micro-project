@@ -46,7 +46,7 @@ function getScheduleRule(timeframe) {
     // interval.prev().toString()
     switch (+timeframe) {
         case 1:
-            return '56,57,58,59,10,20,30,40,50 * * * * *'
+            return '58,59,10,20,30,40,50 * * * * *'
         // return '56,57,58,59 * * * * *'
         case 5:
             //return '56,57,58,59 4,9,14,19,24,29,34,39,44,49,54,59 * * * *'
