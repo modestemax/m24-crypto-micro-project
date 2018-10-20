@@ -71,7 +71,11 @@ module.exports = class Strategy {
 		}
 	}
 	selfSell(asset) {
-		let ask = this.getSellPriceIfSellable(asset);
+		let ask;
+		if (asset.change < this.options.stopLoss) {
+			ask = true;
+		}
+		ask = ask || this.getSellPriceIfSellable(asset);
 		if (ask) {
 			if (typeof ask === 'boolean') {
 				delete asset.closePrice;

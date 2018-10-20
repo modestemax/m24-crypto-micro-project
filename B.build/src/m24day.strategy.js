@@ -54,7 +54,7 @@ module.exports = class extends M24Base {
 								if (currentX && canBuy)
 									if (+currentX.rating >= 0)
 										if (currentX.change_from_open > 0)
-											if (computeChange(currentX.open, currentX.high) - currentX.change_from_open <=current.spread_percentage)
+											if (computeChange(currentX.open, currentX.high) - currentX.change_from_open <= current.spread_percentage)
 												return canBuy
 								return false
 							}, true)
@@ -103,6 +103,8 @@ module.exports = class extends M24Base {
 
 	getSellPriceIfSellable(rawAsset) {
 		const { change, maxChange, minChange, openPrice, closePrice, symbolId, timestamp } = rawAsset;
+		const SELL_AT_MARKET_PRICE = true;
+
 		const H1 = 1e3 * 60 * 60;
 		const M1 = 1e3 * 60;
 		const price = this.prices[symbolId];
@@ -111,6 +113,7 @@ module.exports = class extends M24Base {
 		// if ((maxChange - change) / maxChange > .5) {
 		//     return true
 		// }
+		const market = valuePercent(openPrice, price.ask);
 
 		if (current) {
 			this.setTracking({ ...current, last_sell_change: current.change_from_open });
@@ -119,8 +122,8 @@ module.exports = class extends M24Base {
 			if (current.position > this.options.min_position) {
 				this.logStrategy(`#position_lost_${symbolId}\n${symbolId} has lost his position`);
 
-				if (price && valuePercent(openPrice, price.ask) > .3) {
-					return true
+				if (price && market > .3) {
+					return SELL_AT_MARKET_PRICE
 				}
 				if (change > 0.3) {
 					this.logStrategy(`${symbolId} trying to get ${change.toFixed(2)}% `);
@@ -131,7 +134,7 @@ module.exports = class extends M24Base {
 						return valuePercent(openPrice, 0.3);
 					} else {
 						this.logStrategy(`${symbolId} bad trade ask at market price `);
-						return true;
+						return SELL_AT_MARKET_PRICE;
 					}
 				}
 			} else {
@@ -140,15 +143,22 @@ module.exports = class extends M24Base {
 		}
 
 		//------------ENCORE DANS LE TOP------------------
-		if (change > .3 && maxChange - change > 1) {
-			return true;
+		if (change < maxChange) {
+			if (maxChange > 1.5 && change < 1 && market > .3) {
+				return SELL_AT_MARKET_PRICE
+			}
+
+
+			if (maxChange - change > 1 && market > .3) {
+				return SELL_AT_MARKET_PRICE;
+			}
+			if (minChange < -2 && change > 0.5 && change < 1) {
+				return SELL_AT_MARKET_PRICE;
+			}
+			if (change <= -2 && maxChange <= 0) {
+				return SELL_AT_MARKET_PRICE;
+			}
 		}
-		if (change < maxChange && minChange < 2 && change > 0.5 && change < 1) {
-			return true;
-		}
-		if (change < this.options.stopLoss || (change <= -2 && maxChange <= 0)) {
-			return true;
-		}
-		return valuePercent(openPrice, this.options.takeProfit);
+
 	}
 };
