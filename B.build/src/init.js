@@ -12,7 +12,8 @@ redisSubscribe('newData:*', {
             debug('checkin strategy', strategy, signal.symbolId, signal.timeframe);
             strategy.signals[+signal.timeframe] = strategy.signals[+signal.timeframe] || {};
             strategy.signals[+signal.timeframe][signal.symbolId] = signal;
-            if (+signal.timeframe === +strategy.options.timeframe) {
+
+            if (_.compact([strategy.options.timeframe].concat(strategy.options.timeframes)).includes(+signal.timeframe)) {
                 strategy.check(signal);
             }
         }

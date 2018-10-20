@@ -49,20 +49,16 @@ module.exports = class extends M24Base {
 					if (current.change_from_open > this.options.change_from_open_min) {
 						let canBuy;
 						if (tracking) {
-							const currentH4 = this.signals[60 * 4] && this.signals[60 * 4][symbolId].candle;
-							const currentH1 = this.signals[60 * 1] && this.signals[60 * 1][symbolId].candle;
-							const currentM15 = this.signals[15] && this.signals[15][symbolId].candle;
-							const currentM5 = this.signals[5] && this.signals[5][symbolId].candle;
-							const currentM1 = this.signals[1] && this.signals[1][symbolId].candle;
-							if (currentM1 && currentM5 && currentM15 && currentH1 && currentH4) {
-								if (+currentM1.rating >= 0 && +currentM5.rating >= 0 && +currentM15.rating >= 0
-									&& +currentH1.rating >= 0 && +currentH4.rating >= 0) {
-									if (currentM1.change_from_open > 0 && currentM5.change_from_open > 0 && currentM15.change_from_open > 0
-										&& currentH1.change_from_open > 0 && currentH4.change_from_open > 0) {
-										canBuy = true
-									}
-								}
-							}
+							[1, 5, 15, 60, 60 * 4].reduce((canBuy, timeframe) => {
+								const currentX = this.signals[timeframe] && this.signals[timeframe][symbolId].candle;
+								if (currentX && canBuy)
+									if (+currentX.rating >= 0)
+										if (currentX.change_from_open > 0)
+											if (computeChange(currentX.open, currentX.high) - currentX.change_from_open <=current.spread_percentage)
+												return canBuy
+								return false
+							}, true)
+
 							if (!canBuy) {
 								return false;
 							}
@@ -85,21 +81,21 @@ module.exports = class extends M24Base {
 						// }
 						//---------------------------
 						// if (current.close > (last.close + last.high) / 2)
-						// if (
-						// 	(new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
-						// 	this.options.timeframe / 2
-						// )
-						// if (!this.hasTracking(current))
-						// const change = computeChange(current.open, current.close);
-						// const changeMax = computeChange(current.open, current.high);
+						if (
+							(new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
+							this.options.timeframe * 3 / 4
+						)
+							// if (!this.hasTracking(current))
+							// const change = computeChange(current.open, current.close);
+							// const changeMax = computeChange(current.open, current.high);
 
-						//if (change > this.options.enterThreshold && changeMax - change < 1)
-						// if (current.close > last.high)
-						// if (current.close > (_.max([last.open, last.close]) + last.high) / 2)
-						if (true) {
-							this.setTracking(current);
-							return true;
-						}
+							//if (change > this.options.enterThreshold && changeMax - change < 1)
+							// if (current.close > last.high)
+							// if (current.close > (_.max([last.open, last.close]) + last.high) / 2)
+							if (true) {
+								this.setTracking(current);
+								return true;
+							}
 					}
 	}
 
