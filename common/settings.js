@@ -363,10 +363,11 @@ module.exports = {
             change_from_open_min: 2,
             min_position: MAX_TRADE_COUNT,
             // takeProfit: 10,
-            takeProfit: 2,
+            // takeProfit: 2,
+            takeProfit: .5,
             enterThreshold: 5,
             lossThreshold: 2,
-            stopLoss: -3,
+            stopLoss: -1.5,
             buyMode: 'market',
         },
         "m24dayH4": {

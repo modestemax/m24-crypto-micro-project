@@ -49,7 +49,7 @@ module.exports = class extends M24Base {
 					if (current.change_from_open > this.options.change_from_open_min) {
 						let canBuy;
 						if (tracking) {
-							[1, 5, 15, 60, 60 * 4].reduce((canBuy, timeframe) => {
+							[1, 5, 15, 60, /*60 * 4*/].reduce((canBuy, timeframe) => {
 								const currentX = this.signals[timeframe] && this.signals[timeframe][symbolId].candle;
 								const lastX = this.signals[timeframe] && this.signals[timeframe][symbolId].candle_1;
 								if (currentX && canBuy)
