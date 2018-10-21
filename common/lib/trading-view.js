@@ -160,7 +160,7 @@ function getSignals({ options = params(), rate = 1e3 } = {}) {
                       let  beautifyData1 = _.mapKeys(_.orderBy(beautifyData, 'change_from_open', 'desc')
                         .map((a, i) => ({ position: ++i, ...a })), a => a.symbolId)
                   
-                      let  beautifyData2 = _.mapKeys(_.orderBy(_.filter(beautifyData,a=>a.spread_percentage<1), 'change_from_open', 'desc')
+                      let  beautifyData2 = _.mapKeys(_.orderBy(_.filter(beautifyData1,a=>a.spread_percentage<1), 'change_from_open', 'desc')
                         .map((a, i) => ({ position_good_spread: ++i, ...a })), a => a.symbolId)
                      
                         resolve({...beautifyData1,...beautifyData2});
