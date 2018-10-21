@@ -66,14 +66,15 @@ function getScheduleRule(timeframe) {
             // let tz = new Date().getTimezoneOffset() / 60;
             // let hours = [3, 7, 11, 15, 19, 23].map(q => (q - tz + 24) % 24).join();
             // return `56,57,58,59 59 ${hours} * * *`
-            return '58 * * * * *'
+            // return '58 * * * * *'
+            return '58,59,10,20,30,40,50 * * * * *'
         case 60 * 24:
             // let tz = new Date().getTimezoneOffset() / 60;
             // let hours = [3, 7, 11, 15, 19, 23].map(q => (q - tz + 24) % 24).join();
             // return `56,57,58,59 59 ${hours} * * *`
             // return '56,57,58,59 59 */1 * * *'  
-            // return '0 * * * * *'
-            return '58,59,10,20,30,40,50 * * * * *'
+            return '0 * * * * *'
+            // return '58,59,10,20,30,40,50 * * * * *'
         default:
         //return '* */10 * * * *'
     }
