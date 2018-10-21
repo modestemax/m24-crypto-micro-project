@@ -379,7 +379,7 @@ module.exports = {
             buyMode: 'market',
             selfStop: true,
             timeframe: 60 * 4,
-            change_from_open_min: 2,
+            change_from_open_min: 1.5,
             min_position: MAX_TRADE_COUNT,
             multiEnter: false,
             takeProfit: 1,

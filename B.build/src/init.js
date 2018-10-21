@@ -6,8 +6,11 @@ const { subscribe: redisSubscribe, publish } = require('common/redis');
 
 redisSubscribe('newData:*', {
     'newData:.*': function (signal, channel) {
-        console.log(`signal received tf:${signal.timeframe} ${signal.symbolId} rang:${signal.candle.position_good_spread}/${signal.candle.position} spread:${signal.candle.spread_percentage.toFixed(2)}`)
-        debug('data received', channel);
+        if (signal.candle.position_good_spread < 5) {
+            console.log(`signal received tf:${signal.timeframe} ${signal.symbolId} rang:${signal.candle.position_good_spread}/${signal.candle.position} change:${signal.candle.change_from_open.toFixed(2)}`)
+            debug('data received', channel);
+        }
+
         for (let [name, strategy] of Object.entries(strategies)) {
             debug('checkin strategy', strategy, signal.symbolId, signal.timeframe);
             strategy.signals[+signal.timeframe] = strategy.signals[+signal.timeframe] || {};
