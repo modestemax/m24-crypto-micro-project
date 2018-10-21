@@ -13,12 +13,8 @@ process.on('analyse:newData', async (signal) => {
     _.extend(signal, {
         __key__: key,
         __prev_key__: getKeyById({ exchange, symbolId, timeframe, id: id - 1 }),
-    });
-    const jsData = (_.omit(signal, ['points']));
-    await publish(`newData:m${timeframe}`, jsData);
-  //  console.log(`newData:m${timeframe} ${symbolId} published`);
-    // await redisSet({ key, data: jsData, expire: timeframe * 2 * 60 }); //last 7 days
-    //console.log(key + ' saved');
+    });    
+    await publish(`newData:m${timeframe}`, signal);  
 });
 
 

@@ -6,7 +6,7 @@ const [SELL, BUY] = ['SELL', 'BUY'];
 const { publish, subscribe } = require('common/redis');
 const { tradingView, candleUtils,  exchange, market, fetchTickers, fetchBalance } = require('common');
 const { getAssetBalance } = market;
-const { findSignal, loadPoints,computeChange,  valuePercent } = candleUtils;
+const { findSignal, loadCandles,computeChange,  valuePercent } = candleUtils;
 
 const signals = {}
 module.exports = class Strategy {
@@ -31,7 +31,7 @@ module.exports = class Strategy {
 	tick(price) { }
 	async check(signal) {
 		const { symbolId, timeframe, spread_percentage } = signal.candle;
-		// const [current24] = (await loadPoints({ symbolId, timeframe: 60 * 24 })).reverse();
+		// const [current24] = (await loadPoints({ symbolId, timeframe: 60 * 24 }));
 
 		this.lastCheck = signal;
 		// const change24 = computeChange(current24.open, current24.close);

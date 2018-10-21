@@ -1,4 +1,4 @@
-const { redisKeysExists, redisGet } = require('./redis');
+const { redisKeysExists, redisGet, redisSet } = require('./redis');
 
 const $this = module.exports = {
     timeframeDuration: (timeframe) => timeframe * 60e3,
@@ -69,12 +69,14 @@ const $this = module.exports = {
     valuePercent(price, change_percent) {
         return price * (1 + change_percent / 100);
     },
-    loadPoints({ symbolId, timeframe }) {
-        return redisGet(`points:${symbolId}:${timeframe}`).then(points => {
-            points = points || [];
-            if (!points.push) points = [];
-            return points;
+    loadCandles({ symbolId, timeframe }) {
+        return redisGet(`candles:${symbolId}:${timeframe}`).then(candles => {
+            candles = candles || [];
+            if (!candles.push) candles = [];
+            return candles;
         })
+    },
+    saveCandles({ symbolId, timeframe, candles }) {
+        return redisSet({ key: `candles:${symbolId}:${timeframe}`, data: (candles), expire: timeframe * 60 + 5 * 60 });
     }
-
 }

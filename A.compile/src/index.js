@@ -1,8 +1,8 @@
 const { wait } = require('common')
 
 wait('B', 'A', () => {
-    require('./signals')
-    require('./builder');
-    require('./saveIndicator');
+    require('./get-signals')
+    require('./backup-signal');
+    require('./publish-signal');
 }, { immediate: true, loadMarkets: false })
 

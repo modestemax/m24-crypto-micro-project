@@ -374,7 +374,7 @@ module.exports = {
         },
         "m24dayH4": {
             isActive: true,
-            // doTrade: true,
+            doTrade: true,
             timeInForce: 'GTC',
             buyMode: 'market',
             selfStop: true,
