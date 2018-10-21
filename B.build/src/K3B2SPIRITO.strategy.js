@@ -8,7 +8,6 @@ const Template = require('./strategyBase');
 module.exports = class extends Template {
 
     async canBuy({ symbolId, timeframe }, last, prev, signal) {
-        const [, last, prev] = (await loadPoints({ symbolId, timeframe: this.options.timeframe }));
         let current = signal.candle;
         if (last && prev && current) {
 
@@ -24,7 +23,6 @@ module.exports = class extends Template {
 
     async canSell({ symbolId, timeframe }, last, prev, signal) {
         let current = signal.candle;
-        const [, last, prev] = (await loadPoints({ symbolId, timeframe: this.options.timeframe }));
 
         if (current && last)
             if ((current.macd_signal < last.macd_distance)) {

@@ -78,7 +78,7 @@ module.exports = class Strategy {
 		}
 		ask = ask
 			|| this.getSellPriceIfSellable(asset)
-			|| valuePercent(openPrice, this.options.takeProfit);;
+			|| valuePercent(openPrice, this.options.takeProfit);
 
 		if (ask) {
 			if (typeof ask === 'boolean') {

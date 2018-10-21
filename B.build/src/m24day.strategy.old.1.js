@@ -97,10 +97,10 @@ module.exports = class extends M24Base {
 							//if (change > this.options.enterThreshold && changeMax - change < 1)
 							// if (current.close > last.high)
 							// if (current.close > (_.max([last.open, last.close]) + last.high) / 2)
-							if (true) {
+							// if (true) {
 								this.setTracking(current);
 								return true;
-							}
+							// }
 					}
 	}
 

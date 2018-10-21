@@ -134,7 +134,7 @@ async function cryptoSell({ symbolId, clientOrderId: newClientOrderId, quantity,
           //debugger
 
           const trades = await getTrades();
-          trade = _.find(trades, { symbolId });
+          const trade = _.find(trades, { symbolId });
           trade ?
             trackTrade(trade)
             : publish('asset:buy:order_forgotten', { clientOrderId: newClientOrderId, symbolId, timestamp: args.timestamp, openPrice: args.openPrice, closePrice, quantity })

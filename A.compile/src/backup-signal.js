@@ -6,7 +6,7 @@ const { redisSet, redisGet } = require('common/redis');
 const { candleUtils } = require('common');
 const { getNewCandleId, loadCandles, saveCandles } = candleUtils;
 const allCandles = {};
-limitPointCount = 3;
+const LIMIT_CANDLES_COUNT = 3;
 
 process.on('tv:signals', ({ markets, timeframe }) => {
     _.forEach(markets, async (signal, symbolId) => {
@@ -19,9 +19,9 @@ process.on('tv:signals', ({ markets, timeframe }) => {
             _.extend(_.first(candles), signal);
         } else {
             candles.unshift(signal);
-            candles.splice(limitPointCount);
+            candles.splice(LIMIT_CANDLES_COUNT);
         }
-        [candle, candle_1, candle_2, candle_3] = candles;
+     const   [candle, candle_1, candle_2, candle_3] = candles;
         process.emit('analyse:newData', { candle, candle_1, candle_2, candle_3 });
         saveCandles({ symbolId, timeframe, candles })
     })
