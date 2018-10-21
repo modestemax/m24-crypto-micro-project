@@ -113,9 +113,9 @@ const beautify = (data, timeframe) => {
         };
         return {
             ...signal,
-            green: getRatingText.change_from_open > 0,
-            spread_percentage: computeChange(getRatingText.bid, getRatingText.ask),
-            change_to_high: computeChange(getRatingText.open, getRatingText.high)
+            green: signal.change_from_open > 0,
+            spread_percentage: computeChange(signal.bid, signal.ask),
+            change_to_high: computeChange(signal.open, signal.high)
         }
         function getRatingText(int) {
             switch (true) {
