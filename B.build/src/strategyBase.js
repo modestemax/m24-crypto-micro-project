@@ -38,7 +38,7 @@ module.exports = class Strategy {
 		// const change24Max = computeChange(current24.open, current24.high);
 
 		// if (change24 > 2)
-		if (+timeframe === this.options.timeframe && spread_percentage < 1) {
+		// if (/*+timeframe === this.options.timeframe &&*/ spread_percentage < 1) {
 			this.logStrategyThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
 			this.subscribeOnce('m24:algo:check', (args) =>
 				this.logStrategyThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args)
@@ -68,7 +68,7 @@ module.exports = class Strategy {
 					}
 				}
 			}
-		}
+		// }
 	}
 	selfSell(asset) {
 		let ask;
