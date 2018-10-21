@@ -363,7 +363,7 @@ module.exports = {
             change_from_open_min: 2,
             min_position: MAX_TRADE_COUNT,
             multiEnter: false,
-            takeProfit: 2,
+            takeProfit: 1,
             // takeProfit: 2,
             // takeProfit: .5,
             enterThreshold: 5,
