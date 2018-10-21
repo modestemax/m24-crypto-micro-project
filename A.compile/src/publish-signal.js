@@ -11,10 +11,11 @@ process.on('analyse:newData', async (signal) => {
 
     const key = getKeyById({ exchange, symbolId, timeframe, id });
     _.extend(signal, {
+        timeframe, exchange, symbolId, id,
         __key__: key,
         __prev_key__: getKeyById({ exchange, symbolId, timeframe, id: id - 1 }),
-    });    
-    await publish(`newData:m${timeframe}`, signal);  
+    });
+    await publish(`newData:m${timeframe}`, signal);
 });
 
 
