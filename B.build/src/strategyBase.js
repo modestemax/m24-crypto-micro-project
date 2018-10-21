@@ -104,7 +104,7 @@ module.exports = class Strategy {
 
 		if (!balance && balanceBTC > market.limits.cost.min) {
 			this.notify(BUY);
-		} else {
+		} else if(!balance) {
 			this.logStrategy(`Buy event not published, balance insufisante #${symbolId} #no_balance_${symbolId}`);
 		}
 	}

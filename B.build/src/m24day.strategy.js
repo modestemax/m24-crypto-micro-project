@@ -64,7 +64,7 @@ module.exports = class extends M24Base {
 				return SELL_AT_MARKET_PRICE;
 			} else {
 				//------------ENCORE DANS LE TOP------------------
-				if (maxChange - change >= 3) {
+				if (maxChange - change >= 2) {
 					return SELL_AT_MARKET_PRICE
 				}
 			}
