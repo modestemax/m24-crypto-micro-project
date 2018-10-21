@@ -378,7 +378,7 @@ module.exports = {
             timeInForce: 'GTC',
             buyMode: 'market',
             selfStop: true,
-            timeframe: 60 ,
+            timeframe: 60 * 4,
             change_from_open_min: 2,
             min_position: MAX_TRADE_COUNT,
             multiEnter: false,

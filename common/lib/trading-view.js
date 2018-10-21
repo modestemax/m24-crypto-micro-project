@@ -63,15 +63,15 @@ const params = ({ timeframe, filter = 'btc$', exchangeId = 'binance' } = {}) => 
 const beautify = (data, timeframe) => {
     return _(data).map(({ d }) => {
         let id = getNewCandleId({ timeframe });
-        return {
+        const signal = {
             timeframe,
             symbolId: d[0],
             now: new Date(),
             time: getCandleTime({ id, timeframe }),
             id,
             close: d[1],
-            change_percent: +d[2],//.toFixed(2),
-            change_from_open: +d[21],//.toFixed(2),
+            change_percent: +d[2],
+            change_from_open: +d[21],
             high: d[3],
             low: d[4],
             volume: d[5],
@@ -101,10 +101,8 @@ const beautify = (data, timeframe) => {
             aroon_down: d[18],
             vwma: d[19],
             open: d[20],
-            green: d[21] > 0,
             bid: d[28],
             ask: d[29],
-            spread_percentage: computeChange(d[28], d[29]),
             bbl20: d[30],
             bbu20: d[31],
             bbb20: (d[30] + d[31]) / 2,
@@ -113,7 +111,12 @@ const beautify = (data, timeframe) => {
             ema100: d[34],
             ema30: d[35],
         };
-
+        return {
+            ...signal,
+            green: signal.change_from_open > 0,
+            spread_percentage: computeChange(signal.bid, signal.ask),
+            change_to_high: computeChange(signal.open, signal.high)
+        }
         function signal(int) {
             switch (true) {
                 case int > 0:
@@ -156,14 +159,14 @@ function getSignals({ options = params(), rate = 1e3 } = {}) {
                     if (jsonData.data && !jsonData.error) {
                         let beautifyData = beautify(jsonData.data, timeframe);
                         timeframe && debug(`signals ${timeframe} ${_.keys(beautifyData).length} symbols loaded`);
-                      
-                      let  beautifyData1 = _.mapKeys(_.orderBy(beautifyData, 'change_from_open', 'desc')
-                        .map((a, i) => ({ position: ++i, ...a })), a => a.symbolId)
-                  
-                      let  beautifyData2 = _.mapKeys(_.orderBy(_.filter(beautifyData1,a=>a.spread_percentage<1), 'change_from_open', 'desc')
-                        .map((a, i) => ({ position_good_spread: ++i, ...a })), a => a.symbolId)
-                     
-                        resolve({...beautifyData1,...beautifyData2});
+
+                        let beautifyData1 = _.mapKeys(_.orderBy(beautifyData, 'change_from_open', 'desc')
+                            .map((a, i) => ({ position: ++i, ...a })), a => a.symbolId)
+
+                        let beautifyData2 = _.mapKeys(_.orderBy(_.filter(beautifyData1, a => a.spread_percentage < 1), 'change_from_open', 'desc')
+                            .map((a, i) => ({ position_good_spread: ++i, ...a })), a => a.symbolId)
+
+                        resolve({ ...beautifyData1, ...beautifyData2 });
                     }
                     err = jsonData.error;
                 }
