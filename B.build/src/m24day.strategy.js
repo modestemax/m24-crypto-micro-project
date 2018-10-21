@@ -41,18 +41,17 @@ module.exports = class extends M24Base {
 	}
 	async canBuy({ symbolId, timeframe }, last, prev, signal) {
 		let current = signal.candle;
-		const maxChange = computeChange(current.open, current.high);
 		if (current)
 			// if (last)
-				if (+current.rating >= 0)
-					if (current.position_good_spread <= this.options.min_position)
-						if (current.change_from_open > this.options.change_from_open_min)
-							if (maxChange - current.change_from_open <=current.spread_percentage)
+			if (+current.rating >= 0)
+				if (current.position_good_spread <= this.options.min_position)
+					if (current.change_from_open > this.options.change_from_open_min)
+						if (current.change_to_high - current.change_from_open <= current.spread_percentage)
 							// if (maxChange - current.change_from_open <= Math.abs(this.options.stopLoss) - 1)
-								// if (current.close > (last.close + last.high) / 2)
-								if ((new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
-									this.options.timeframe * 3 / 4)
-									return true;
+							// if (current.close > (last.close + last.high) / 2)
+							if ((new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
+								this.options.timeframe * 3 / 4)
+								return true;
 	}
 
 	async canSell({ symbolId, timeframe }, last, prev, signal) { }

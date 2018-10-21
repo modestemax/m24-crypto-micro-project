@@ -76,7 +76,7 @@ const beautify = (data, timeframe) => {
             low: d[4],
             volume: d[5],
             rating: d[6],
-            signal: signal(d[6]),
+            signal: getRatingText(d[6]),
             signal_strength: strength(d[6]),
             signal_string: signal_string(d[6]),
             exchange: d[7].toLowerCase(),
@@ -113,11 +113,11 @@ const beautify = (data, timeframe) => {
         };
         return {
             ...signal,
-            green: signal.change_from_open > 0,
-            spread_percentage: computeChange(signal.bid, signal.ask),
-            change_to_high: computeChange(signal.open, signal.high)
+            green: getRatingText.change_from_open > 0,
+            spread_percentage: computeChange(getRatingText.bid, getRatingText.ask),
+            change_to_high: computeChange(getRatingText.open, getRatingText.high)
         }
-        function signal(int) {
+        function getRatingText(int) {
             switch (true) {
                 case int > 0:
                     return 'buy';
@@ -141,7 +141,7 @@ const beautify = (data, timeframe) => {
 
         function signal_string(int) {
 
-            return (strength(int) === 1 ? 'Strong ' : '') + signal(int)
+            return (strength(int) === 1 ? 'Strong ' : '') + getRatingText(int)
         }
     }
     ).filter(d => d).groupBy('symbolId').mapValues(([v]) => v).value()
