@@ -12,9 +12,9 @@ module.exports = class extends Template {
         if (last && prev && current) {
 
             if ((current.ema10 > current.ema20) && (current.ema20 >= current.ema30) && (current.ema30 >= current.ema50))
-                if ((current.ema100 > current.ema200) && (current.ema20 > current.bbb20))
-                    if ((current.close > current.open) && (current.close / current.open >= 1.02) && (current.bbu20 / current.bbl20 > last.bbu20 / last.bbl20))
-                        if ((current.macd_distance > last.macd_distance) && (last.macd_distance >= prev.macd_distance))
+                if ((current.ema100 > current.ema200) /*&& (current.ema20 >= current.bbb20)*/)
+                    if ((current.close / (Math.min(last.open, current.open)) >= 1.02) && (current.bbu20 / current.bbl20 > last.bbu20 / last.bbl20))
+                        if ((current.macd_distance >= last.macd_distance) /*&& (current.macd_distance >= prev.macd_distance)*/)
                             if ((current.macd_signal >= 0)) {
                                 return true;
                             }
