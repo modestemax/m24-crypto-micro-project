@@ -2,13 +2,14 @@ const debug = require('debug')('A:builder');
 const _ = require('lodash');
 
 
-const { redisSet, redisGet } = require('common/redis');
+const { redisSet, redisGet,publish } = require('common/redis');
 const { candleUtils } = require('common');
 const { getNewCandleId, loadCandles, saveCandles } = candleUtils;
 const allCandles = {};
 const LIMIT_CANDLES_COUNT = 3;
 
 process.on('tv:signals', ({ markets, timeframe }) => {
+    publish('tv:signals',{ markets, timeframe });
     _.forEach(markets, async (signal, symbolId) => {
         const candles = allCandles[`${symbolId}:${timeframe}`]
             = allCandles[`${symbolId}:${timeframe}`]

@@ -23,6 +23,9 @@
 		},
 		{
 			"path": "."
+		},
+		{
+			"path": "F.ui"
 		}
 	],
 	"settings": {
