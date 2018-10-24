@@ -13,5 +13,5 @@ const resolvers = {
 module.exports={resolvers}
 
 subscribe('tv:signals',({timeframe,markets})=>{
-    pubsub.publish(SIGNAL_LOADED,{timeframe,market:Object.values(markets)})
+    pubsub.publish(SIGNAL_LOADED,{signalLoaded:{timeframe,markets:Object.values(markets)}})
 })

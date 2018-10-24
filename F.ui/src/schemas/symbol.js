@@ -22,10 +22,10 @@ type Query {
 }
 type Market{
     timeframe:Int
-    market:[Symbol]
+    markets:[Symbol]
 }
 type Subscription{
-    signalLoaded:Market!
+    signalLoaded:Market
 }
 `
 
