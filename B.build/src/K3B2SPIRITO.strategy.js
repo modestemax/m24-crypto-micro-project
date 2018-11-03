@@ -63,3 +63,4 @@ module.exports = class extends Template {
             // return valuePercent(openPrice, this.options.takeProfit);
         }
     }
+}
