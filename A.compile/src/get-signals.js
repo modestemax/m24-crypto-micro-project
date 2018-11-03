@@ -25,13 +25,15 @@ TIMEFRAMES.split(',').forEach((timeframe) => {
     //     , 10e3);
 
     const getSignals = () => tradingView({ timeframe, filter: SYMBOLS_FILTER, exchangeId: EXCHANGE })
+        .then((data) => (publish('tv:signals', { markets: data, timeframe }), data))
         .then(
             data => (process.emit('tv:signals', { markets: data, timeframe }), data),
             (err) => {
                 publish('m24:error', { message: typeof err === 'string' ? err : err.message, stack: err.stack });
                 console.error(err);
             }
-        ).then((data) => data && console.log(`TV data loaded TF:${timeframe} id:${data[SYMBOLID_SAMPLE].id} time:${data['ADABTC'].time}  at:${data['ADABTC'].now} `),
+        )
+        .then((data) => data && console.log(`TV data loaded TF:${timeframe} id:${data[SYMBOLID_SAMPLE].id} time:${data['ADABTC'].time}  at:${data['ADABTC'].now} `),
             () => console.error('TV data load error TF:' + timeframe));
 
     getSignals();
@@ -47,7 +49,7 @@ function getScheduleRule(timeframe) {
     switch (+timeframe) {
         case 1:
             // return '58,59,10,20,30,40,50 * * * * *'
-        return '59,30 * * * * *'
+            return '59,30 * * * * *'
         case 5:
             //return '56,57,58,59 4,9,14,19,24,29,34,39,44,49,54,59 * * * *'
             //return '56,57,58,59 0,2,4,5,7,9,10,12,14,15,17,19,20,22,24,25,27,29,30,32,34,35,37,39,40,42,44,45,47,49,50,52,54,55,57,59 * * * *'
@@ -75,7 +77,7 @@ function getScheduleRule(timeframe) {
             // return `56,57,58,59 59 ${hours} * * *`
             // return '56,57,58,59 59 */1 * * *'  
             return '0 * * * * *'
-            // return '58,59,10,20,30,40,50 * * * * *'
+        // return '58,59,10,20,30,40,50 * * * * *'
         default:
         //return '* */10 * * * *'
     }

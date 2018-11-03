@@ -1,4 +1,0 @@
-
-type  IName {
-    id:ID!
-}

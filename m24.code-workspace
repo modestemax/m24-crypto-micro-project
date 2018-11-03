@@ -25,7 +25,13 @@
 			"path": "."
 		},
 		{
-			"path": "F.ui"
+			"path": "G.gui"
+		},
+		{
+			"path": "F.api"
+		},
+		{
+			"path": "GUI"
 		}
 	],
 	"settings": {
