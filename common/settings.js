@@ -286,8 +286,8 @@ module.exports = {
             selfStop: true,
             timeframe: 60,
             timeframeX: 60 * 24,
-            takeProfit: 5,
-            stopLoss: -2,
+            takeProfit: 20,
+            stopLoss: -5,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
         "K3B2SPIRITOH4": {
@@ -297,8 +297,8 @@ module.exports = {
             selfStop: true,
             timeframe: 60,
             timeframeX: 60 * 4,
-            takeProfit: 5,
-            stopLoss: -2,
+            takeProfit: 20,
+            stopLoss: -5,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
         "K3B2SPIRITOH1": {
