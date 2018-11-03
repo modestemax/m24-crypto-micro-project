@@ -34,33 +34,34 @@ module.exports = class extends Template {
 
 
         }
+    }
 
-        getSellPriceIfSellable(rawAsset) {
-            // const { change, maxChange, openPrice, closePrice, symbolId, timestamp } = rawAsset;
-            // const H1 = 1e3 * 60 * 60;
-            // const M1 = 1e3 * 60;
-            // const price = this.prices[symbolId];
-            // const duration = Date.now() - timestamp;
+    getSellPriceIfSellable(rawAsset) {
+        // const { change, maxChange, openPrice, closePrice, symbolId, timestamp } = rawAsset;
+        // const H1 = 1e3 * 60 * 60;
+        // const M1 = 1e3 * 60;
+        // const price = this.prices[symbolId];
+        // const duration = Date.now() - timestamp;
 
-            // if (maxChange > 0) {
-            //     if (change == maxChange) {
-            //         return false;
-            //     }
-            // }
-            // if (price) {
+        // if (maxChange > 0) {
+        //     if (change == maxChange) {
+        //         return false;
+        //     }
+        // }
+        // if (price) {
 
-            //     if (valuePercent(openPrice, price.bid) >= .45) {
-            //         return true
-            //     }
-            // }
-            // if (change < this.options.stopLoss) {
-            //     return true;
-            // }
-            // if (duration > 3 * H1) {
-            //     return true
-            // }
+        //     if (valuePercent(openPrice, price.bid) >= .45) {
+        //         return true
+        //     }
+        // }
+        // if (change < this.options.stopLoss) {
+        //     return true;
+        // }
+        // if (duration > 3 * H1) {
+        //     return true
+        // }
 
-            // return valuePercent(openPrice, this.options.takeProfit);
-        }
+        // return valuePercent(openPrice, this.options.takeProfit);
     }
 }
+
