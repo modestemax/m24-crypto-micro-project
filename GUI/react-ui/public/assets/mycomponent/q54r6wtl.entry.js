@@ -1,0 +1,2 @@
+/*! Built with http://stenciljs.com */
+const{h:t}=window.mycomponent;class r{format(){return(this.first||"")+(this.middle?` ${this.middle}`:"")+(this.last?` ${this.last}`:"")}render(){return t("div",null,"Hello, World! I'm ",this.format())}static get is(){return"symbol-signal"}static get encapsulation(){return"shadow"}static get properties(){return{first:{type:String,attr:"first"},last:{type:String,attr:"last"},middle:{type:String,attr:"middle"}}}static get style(){return""}}export{r as SymbolSignal};

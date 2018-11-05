@@ -8,8 +8,8 @@ const Template = require('./strategyBase');
 module.exports = class extends Template {
 
     async canBuy({ symbolId, timeframe }, last, prev, signal) {
-        const [currentX, lastX, prevX] = (await loadPoints({ symbolId, timeframe: this.options.timeframeX }));
-        const [candle, candle_1, candle_2, candle_3, candle_4] = (await loadPoints({ symbolId, timeframe: this.options.timeframe }));
+       // const [currentX, lastX, prevX] = (await loadPoints({ symbolId, timeframe: this.options.timeframeX }));
+       // const [candle, candle_1, candle_2, candle_3, candle_4] = (await loadPoints({ symbolId, timeframe: this.options.timeframe }));
         let current = signal.candle;
         if (last && prev && current) {
 
