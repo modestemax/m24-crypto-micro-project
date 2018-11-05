@@ -13,14 +13,11 @@ module.exports = class extends Template {
         let current = signal.candle;
         if (last && prev && current) {
 
-            if (((last.ema100 >= last.bbu20) && (current.ema100 < current.bbu20)))
-                if ((current.ema10 >= current.ema20) && (current.ema20 >= current.ema30) && (current.ema20 > current.bbb20))
-                    if (/*(current.ema200 > current.ema100) &&*/ (current.ema50 >= current.ema20))
-                        if ((current.macd_distance >= last.macd_distance) && (last.macd_distance >= prev.macd_distance))
-                            if (current.bbu20 / current.bbl20 >= 1.013)
-                                if ((current.bbu20 / current.bbl20 > last.bbu20 / last.bbl20) && (last.bbu20 / last.bbl20 >= prev.bbu20 / prev.bbl20))
-                                    if ((current.plus_di > 20) && (current.minus_di < 20) && (current.adx > last.adx))
-                                        if (current.close < current.bbu20) {
+            if((prev.ema50 >= prev.ema10) && (last.ema50 >= last.ema10) && (current.ema50 < current.ema10))
+            if((current.ema20 > current.ema30) && (current.ema10 > current.ema20) && (current.ema20 > current.bbb20))
+              if((current.macd > 0) && (current.macd >= current.macd_signal))
+                if((current.bbu20 > last.bbu20) && (current.bbl20 <= last.bbl20))
+                  if((current.close < current.bbu20)){
                                             return true;
                                         }
         }
