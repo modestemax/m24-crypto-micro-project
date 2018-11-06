@@ -24,8 +24,8 @@ module.exports = class extends Template {
     }
 
     async canSell({ symbolId, timeframe }, last, prev, signal) {
-        let current = signal.candle;
-        const [currentX, lastX, prevX] = (await loadPoints({ symbolId, timeframe: this.options.timeframeX }));
+        // let current = signal.candle;
+        // const [currentX, lastX, prevX] = (await loadPoints({ symbolId, timeframe: this.options.timeframeX }));
 
         // if (current && last)
         //     if ((current.ema20 < current.bbb20) && (last.ema20 >= last.bbb20))
