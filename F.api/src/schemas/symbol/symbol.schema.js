@@ -25,7 +25,8 @@ type Market{
     markets:[Symbol]
 }
 type Subscription{
-    signalLoaded(timeframe:Int,position_min:Int):Market!
+    signalLoaded1(timeframe:Int,position_min:Int):Market!
+    signalLoaded(timeframes:[String!]!):Market!
 }
 `
 

@@ -166,7 +166,19 @@ function getSignals({ options = params(), rate = 1e3 } = {}) {
                         let beautifyData2 = _.mapKeys(_.orderBy(_.filter(beautifyData1, a => a.spread_percentage < 1), 'change_from_open', 'desc')
                             .map((a, i) => ({ position_good_spread: ++i, ...a })), a => a.symbolId)
 
-                        resolve({ ...beautifyData1, ...beautifyData2 });
+                        const markets = { ...beautifyData1, ...beautifyData2 }
+                        resolve(markets);
+
+                        const marketsList = Object.values(markets);
+                        const ONE_MINUTE = 1e3 * 60;
+
+                        redisSet({
+                            key: 'tv:signals:' + timeframe + ':' + marketsList[0].id,
+                            data: marketsList,
+                            expire: +timeframe * ONE_MINUTE * 4
+                        });
+
+
                     }
                     err = jsonData.error;
                 }
