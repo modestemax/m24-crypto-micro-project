@@ -2,6 +2,7 @@ const debug = require('debug')('tv');
 const curl = require('curl');
 const _ = require('lodash');
 const { getNewCandleId, getCandleTime, computeChange } = require('./candle-utils');
+const { subscribe, redisSet, redisGet } = require('../redis')
 
 const params = ({ timeframe, filter = 'btc$', exchangeId = 'binance' } = {}) => {
     let timeframeFilter = !timeframe || /1d/i.test(timeframe) || +timeframe === 60 * 24 ? '' : '|' + timeframe;
