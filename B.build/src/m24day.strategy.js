@@ -50,10 +50,10 @@ module.exports = class extends M24Base {
 							if (current.change_to_high - current.change_from_open <= current.spread_percentage)
 								if (current.close > (last.close + last.high) / 2)
 									if ((new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
-										this.options.timeframe * 3 / 4)
-									{
-										if(this.outOfTop[current.symbolId])
-										return true;}
+										this.options.timeframe * 3 / 4) {
+										// if (this.outOfTop[current.symbolId])
+											return true;
+									}
 	}
 
 	async canSell({ symbolId, timeframe }, last, prev, signal) { }
@@ -63,7 +63,7 @@ module.exports = class extends M24Base {
 		const SELL_AT_MARKET_PRICE = true;
 		const current = _.get(this.signal, `[${symbolId}].candle`);
 
-		
+
 		const ONE_MINUTE = 1e3 * 60;
 
 		if (current) {
@@ -78,6 +78,8 @@ module.exports = class extends M24Base {
 				//------------ENCORE DANS LE TOP------------------
 				if (maxChange - change >= 2) {
 					return SELL_AT_MARKET_PRICE
+				} else {
+					delete this.outOfTop[symbolId];
 				}
 			}
 		}

@@ -39,17 +39,13 @@ const resolvers = {
                 //    return payload.signalLoaded;
                 
                process.nextTick(async()=>{
-                let prev;
-                if(!/-/.test(signalLoaded.timeframe)){
-                    prev=1
-                }else{
-                    prev=+signalLoaded.timeframe.split('-')[1]
-                    prev++;
-                }
-                let timeframe=signalLoaded.markets[0].timeframe;
+                let prev=signalLoaded.position?signalLoaded.position+1:1;
+                
+                let timeframe=signalLoaded.timeframe;
                     if (timeframes.includes(timeframe + '-' + prev)) {
                         let signals =await redisGet('tv:signals:' + timeframe + ':' + (signalLoaded.markets[0].id - prev));
-                       signals && pubsub.publish(SIGNAL_LOADED, {
+                        signals&&  console.log(timeframe,prev,signals[0].symbolId,signals[0].id,signalLoaded.markets[0].id)
+                        signals && pubsub.publish(SIGNAL_LOADED, {
                             signalLoaded: {
                                 timeframe,
                                 position:prev,

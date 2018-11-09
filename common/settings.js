@@ -376,8 +376,8 @@ module.exports = {
             takeProfit: 4,
         },
         "m24day": {
-            // isActive: true,
-            // doTrade: true,
+            isActive: true,
+            doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 60 * 24,
