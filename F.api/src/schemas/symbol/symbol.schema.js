@@ -22,6 +22,7 @@ type Query {
 }
 type Market{
     timeframe:Int!
+    position:Int
     markets:[Symbol]
 }
 type Subscription{

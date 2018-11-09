@@ -46,6 +46,7 @@ function getScheduleRule(timeframe) {
     // var interval = parser.parseExpression('*/2 * * * *');
     // interval.next().toString()
     // interval.prev().toString()
+    return '*/10 * * * * *'
     switch (+timeframe) {
         case 1:
             // return '58,59,10,20,30,40,50 * * * * *'

@@ -48,16 +48,21 @@ const resolvers = {
                 }
                 let timeframe=signalLoaded.markets[0].timeframe;
                     if (timeframes.includes(timeframe + '-' + prev)) {
-                        let signals =await redisGet('tv:signals:' + timeframe + ':' + signalLoaded.markets[0].id - prev);
+                        let signals =await redisGet('tv:signals:' + timeframe + ':' + (signalLoaded.markets[0].id - prev));
                        signals && pubsub.publish(SIGNAL_LOADED, {
                             signalLoaded: {
-                                timeframe: signalLoaded.timeframe + '-' + prev,
+                                timeframe,
+                                position:prev,
                                 markets: signals
                             }
                         })
                     }            
                 }); 
-                return signalLoaded
+                //return {...signalLoaded,markets:[signalLoaded.markets[0]]}
+                return {
+                    ...signalLoaded,
+                    markets: signalLoaded.markets.filter(m => m.position_good_spread)
+                }
 
             },
             // Additional event labels can be passed to asyncIterator creation
