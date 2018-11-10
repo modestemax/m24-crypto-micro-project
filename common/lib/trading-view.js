@@ -171,12 +171,12 @@ function getSignals({ options = params(), rate = 1e3 } = {}) {
                         resolve(markets);
 
                         const marketsList = Object.values(markets);
-                        const ONE_MINUTE =  60;
+                        const ONE_MINUTE = 60;
 
-                        redisSet({
+                        timeframe && redisSet({
                             key: 'tv:signals:' + timeframe + ':' + marketsList[0].id,
                             data: marketsList,
-                            expire: +timeframe * ONE_MINUTE * 4
+                            expire: +timeframe * 4
                         });
 
 

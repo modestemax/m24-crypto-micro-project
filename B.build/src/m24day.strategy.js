@@ -42,6 +42,7 @@ module.exports = class extends M24Base {
 	}
 	async canBuy({ symbolId, timeframe }, last, prev, signal) {
 		let current = signal.candle;
+		await this.getTrackings(current.id);
 		if (current)
 			if (last)
 				if (+current.rating >= 0)
@@ -51,7 +52,8 @@ module.exports = class extends M24Base {
 								if (current.close > (last.close + last.high) / 2)
 									if ((new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
 										this.options.timeframe * 3 / 4) {
-										// if (this.outOfTop[current.symbolId])
+										// if (this.outOfTop[current.symbolId])										
+										if (!this.hasTracking({ id: current.id, symbolId }))
 											return true;
 									}
 	}
@@ -64,22 +66,29 @@ module.exports = class extends M24Base {
 		const current = _.get(this.signal, `[${symbolId}].candle`);
 
 
+
 		const ONE_MINUTE = 1e3 * 60;
 
 		if (current) {
+			if (!this.hasTracking({ id: current.id, symbolId })) {
+				this.setTracking({ id: current.id, symbolId })
+			}
+
 			if (current.position_good_spread > this.options.min_position) {
 				//------------SORTI DU LE TOP------------------
+
 				if (this.outOfTop[symbolId] && (Date.now - this.outOfTop[symbolId].since) > ONE_MINUTE * 5) {
-					return SELL_AT_MARKET_PRICE;
+					// return SELL_AT_MARKET_PRICE;					
+					return Math.max(1, change)
 				} else if (!this.outOfTop[symbolId]) {
 					this.outOfTop[symbolId] = { since: Date.now }
 				}
 			} else {
 				//------------ENCORE DANS LE TOP------------------
 				if (maxChange - change >= 2) {
-					return SELL_AT_MARKET_PRICE
+					// return SELL_AT_MARKET_PRICE
 				} else {
-					delete this.outOfTop[symbolId];
+					// delete this.outOfTop[symbolId];
 				}
 			}
 		}

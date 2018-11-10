@@ -2,7 +2,7 @@ const { pubsub, SIGNAL_LOADED } = require('../../gql')
 const { subscribe, redisSet, redisGet } = require('common/redis')
 const { withFilter } = require('apollo-server');
 const { candleUtils } = require('common');
-const {loadCandles} = candleUtils;
+const { loadCandles } = candleUtils;
 const resolvers = {
 
 
@@ -34,26 +34,26 @@ const resolvers = {
             ),
         },
         signalLoaded: {
-            resolve:async ({ signalLoaded }, {  timeframes }, context, info) => {
+            resolve: async ({ signalLoaded }, { timeframes }, context, info) => {
                 // Manipulate and return the new value
                 //    return payload.signalLoaded;
-                
-               process.nextTick(async()=>{
-                let prev=signalLoaded.position?signalLoaded.position+1:1;
-                
-                let timeframe=signalLoaded.timeframe;
+
+                process.nextTick(async () => {
+                    let prev = signalLoaded.position ? signalLoaded.position + 1 : 1;
+
+                    let timeframe = signalLoaded.timeframe;
                     if (timeframes.includes(timeframe + '-' + prev)) {
-                        let signals =await redisGet('tv:signals:' + timeframe + ':' + (signalLoaded.markets[0].id - prev));
-                        signals&&  console.log(timeframe,prev,signals[0].symbolId,signals[0].id,signalLoaded.markets[0].id)
+                        let signals = await redisGet('tv:signals:' + timeframe + ':' + (signalLoaded.markets[0].id - prev));
+                        signals && console.log(timeframe, prev, signals[0].symbolId, signals[0].id, signalLoaded.markets[0].id)
                         signals && pubsub.publish(SIGNAL_LOADED, {
                             signalLoaded: {
                                 timeframe,
-                                position:prev,
+                                position: prev,
                                 markets: signals
                             }
                         })
-                    }            
-                }); 
+                    }
+                });
                 //return {...signalLoaded,markets:[signalLoaded.markets[0]]}
                 return {
                     ...signalLoaded,
@@ -64,9 +64,13 @@ const resolvers = {
             // Additional event labels can be passed to asyncIterator creation
             subscribe: withFilter(
                 () => pubsub.asyncIterator([SIGNAL_LOADED]),
-                (payload, { timeframe }) => {
+                (payload, { timeframes }) => {
                     // debugger
-                    return true;
+                    // return true;
+                    let pos = payload.signalLoaded.position ? '-'+payload.signalLoaded.position :'';
+
+                    return (timeframes.includes(payload.signalLoaded.timeframe + pos))
+
                     // return payload.signalLoaded.timeframe === timeframe;
                 },
             ),
@@ -75,6 +79,6 @@ const resolvers = {
 }
 
 module.exports = { resolvers }
-    subscribe('tv:signals', ({ timeframe, markets }) => {    
-    pubsub.publish(SIGNAL_LOADED, { signalLoaded: { timeframe, markets: Object.values(markets) } })   
+subscribe('tv:signals', ({ timeframe, markets }) => {
+    pubsub.publish(SIGNAL_LOADED, { signalLoaded: { timeframe, markets: Object.values(markets) } })
 })
