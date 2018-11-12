@@ -39,10 +39,10 @@ module.exports = class Strategy {
 
 		// if (change24 > 2)
 		// if (/*+timeframe === this.options.timeframe &&*/ spread_percentage < 1) {
-			this.logStrategyThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
-			this.subscribeOnce('m24:algo:check', (args) =>
-				this.logStrategyThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args)
-			);
+			// this.logStrategyThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
+			// this.subscribeOnce('m24:algo:check', (args) =>
+			// 	this.logStrategyThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args)
+			// );
 			const last = signal.candle_1;
 			const prev = signal.candle_2;
 			const market = exchange.marketsById[symbolId];
