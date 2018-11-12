@@ -4,9 +4,9 @@ const _ = require('lodash');
 const [SELL, BUY] = ['SELL', 'BUY'];
 
 const { publish, subscribe } = require('common/redis');
-const { tradingView, candleUtils,  exchange, market, fetchTickers, fetchBalance } = require('common');
+const { tradingView, candleUtils, exchange, market, fetchTickers, fetchBalance } = require('common');
 const { getAssetBalance } = market;
-const { findSignal, loadCandles,computeChange,  valuePercent } = candleUtils;
+const { findSignal, loadCandles, computeChange, valuePercent } = candleUtils;
 
 const signals = {}
 module.exports = class Strategy {
@@ -39,35 +39,35 @@ module.exports = class Strategy {
 
 		// if (change24 > 2)
 		// if (/*+timeframe === this.options.timeframe &&*/ spread_percentage < 1) {
-			// this.logStrategyThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
-			// this.subscribeOnce('m24:algo:check', (args) =>
-			// 	this.logStrategyThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args)
-			// );
-			const last = signal.candle_1;
-			const prev = signal.candle_2;
-			const market = exchange.marketsById[symbolId];
-			if (market) {
-				let canBuy = await this.canBuy(signal.candle, last, prev, signal, this.tickers[market.symbol]);
-				let canSell = await this.canSell(signal.candle, last, prev, signal, this.tickers[market.symbol]);
+		// this.logStrategyThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`);
+		// this.subscribeOnce('m24:algo:check', (args) =>
+		// 	this.logStrategyThrottled(`I'm alive, checking ${this.lastCheck.candle.symbolId} now.`, args)
+		// );
+		const last = signal.candle_1;
+		const prev = signal.candle_2;
+		const market = exchange.marketsById[symbolId];
+		if (market) {
+			let canBuy = await this.canBuy(signal.candle, last, prev, signal, this.tickers[market.symbol]);
+			let canSell = await this.canSell(signal.candle, last, prev, signal, this.tickers[market.symbol]);
 
-				if (canBuy || canSell) {
-					let ticker = await this.getTicker({ symbolId });
-					let bid = _.get(ticker, this.options.buyMode === 'limit' ? 'bid' : 'ask');
-					let ask = _.get(ticker, this.options.sellMode === 'limit' ? 'ask' : 'bid');
-					let now = _.get(ticker, 'now');
-					canBuy && console.log(`${this.name} ${symbolId} BID AT ${bid} ${now} `);
-					canSell && console.log(`${this.name} ${symbolId} ASK AT ${ask} ${now} `);
+			if (canBuy || canSell) {
+				let ticker = await this.getTicker({ symbolId });
+				let bid = _.get(ticker, this.options.buyMode === 'limit' ? 'bid' : 'ask');
+				let ask = _.get(ticker, this.options.sellMode === 'limit' ? 'ask' : 'bid');
+				let now = _.get(ticker, 'now');
+				canBuy && console.log(`${this.name} ${symbolId} BID AT ${bid} ${now} `);
+				canSell && console.log(`${this.name} ${symbolId} ASK AT ${ask} ${now} `);
 
-					Object.assign(this, { symbolId, bid, ask, timeframe });
-					if (canBuy) {
-						debug(`${this.name} Buy OK`);
-						this.notifyBuy();
-					} else if (canSell) {
-						debug(`${this.name} Sell OK`);
-						this.notifySell();
-					}
+				Object.assign(this, { symbolId, bid, ask, timeframe });
+				if (canBuy) {
+					debug(`${this.name} Buy OK`);
+					this.notifyBuy();
+				} else if (canSell) {
+					debug(`${this.name} Sell OK`);
+					this.notifySell();
 				}
 			}
+		}
 		// }
 	}
 	selfSell(asset) {
@@ -104,7 +104,7 @@ module.exports = class Strategy {
 
 		if (!balance && balanceBTC > market.limits.cost.min) {
 			this.notify(BUY);
-		} else if(!balance) {
+		} else if (!balance && options.doTrade) {
 			this.logStrategy(`Buy event not published, balance insufisante #${symbolId} #no_balance_${symbolId}`);
 		}
 	}
@@ -132,7 +132,13 @@ module.exports = class Strategy {
 		}
 	}
 
+	pairFounds = {}
 	logPairFound({ side, symbolId, price, test }) {
+		const ONE_MINUTE = 1e3 * 60;
+		if (this.pairFounds[symbolId + side] && Date.now() - this.pairFounds[symbolId + side].since < ONE_MINUTE * 20) {
+			return;
+		}
+		this.pairFounds[symbolId + side] = { since: Date.now() }
 		publish(`m24:algo:pair_found`, {
 			side,
 			strategyName: this.name,
