@@ -132,8 +132,9 @@ module.exports = class Strategy {
 		}
 	}
 
-	pairFounds = {}
+
 	logPairFound({ side, symbolId, price, test }) {
+		this.pairFounds =this.pairFounds|| {}
 		const ONE_MINUTE = 1e3 * 60;
 		if (this.pairFounds[symbolId + side] && Date.now() - this.pairFounds[symbolId + side].since < ONE_MINUTE * 20) {
 			return;
