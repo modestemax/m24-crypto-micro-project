@@ -71,6 +71,18 @@ module.exports = {
         NODE_ENV: 'production'
       }
     },
+    {
+      name: 'F.api',
+      script: 'F.api/src/index.js',
+      "exec_mode": "cluster",
+      env: {
+        APP_NAME:'GraphQL API',
+        // "DEBUG": "*"
+      },
+      env_production: {
+        NODE_ENV: 'production'
+      }
+    },
 
   ],
 
