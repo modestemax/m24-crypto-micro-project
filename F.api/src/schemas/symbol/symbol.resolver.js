@@ -1,4 +1,4 @@
-const { pubsub, SIGNAL_LOADED } = require('../../gql')
+const { pubsub, SIGNAL_LOADED, KLINES } = require('../../gql')
 const { subscribe, redisSet, redisGet } = require('common/redis')
 const { withFilter } = require('apollo-server');
 const { candleUtils } = require('common');
@@ -67,7 +67,7 @@ const resolvers = {
                 (payload, { timeframes }) => {
                     // debugger
                     // return true;
-                    let pos = payload.signalLoaded.position ? '-'+payload.signalLoaded.position :'';
+                    let pos = payload.signalLoaded.position ? '-' + payload.signalLoaded.position : '';
 
                     return (timeframes.includes(payload.signalLoaded.timeframe + pos))
 
@@ -75,10 +75,19 @@ const resolvers = {
                 },
             ),
         },
+        klines: {
+            resolve: async ({ klines }, { _ }, context, info) => {
+                return klines;
+            },
+            subscribe: () => pubsub.asyncIterator([KLINES])
+        }
     }
 }
 
 module.exports = { resolvers }
-subscribe('tv:signals', ({ timeframe, markets }) => {
-    pubsub.publish(SIGNAL_LOADED, { signalLoaded: { timeframe, markets: Object.values(markets) } })
+// subscribe('tv:signals', ({ timeframe, markets }) => {
+//     pubsub.publish(SIGNAL_LOADED, { signalLoaded: { timeframe, markets: Object.values(markets) } })
+// })
+subscribe('klines', (klines) => {
+    pubsub.publish(KLINES, { klines })
 })

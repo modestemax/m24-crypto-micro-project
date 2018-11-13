@@ -1,3 +1,4 @@
+require('./binance')
 const { ApolloServer, gql } = require('apollo-server');
 
 
