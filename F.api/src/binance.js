@@ -68,7 +68,7 @@ binance.exchangeInfo(function (error, data) {
 
                 klines[period] = _.orderBy(Object.values(periodKlines), ['change_from_open'], 'desc')
                     .map((k, position) => ({ ...k, position:++position }));
-                publish('klines', klines[period])
+                publish('klines',_.map(klines,(klines,interval)=>({interval,klines})))
             });
 
         })
