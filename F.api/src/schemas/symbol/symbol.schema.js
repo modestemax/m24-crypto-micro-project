@@ -45,7 +45,7 @@ type Market{
 type Subscription{
     signalLoaded1(timeframe:Int,position_min:Int):Market!
     signalLoaded(timeframes:[String!]!):Market!
-    klines:[Kline]!
+    klines:[Klines]!
 }
 `
 
