@@ -1,6 +1,6 @@
 node_modules
 .idea
-.vscode
+#.vscode
 D.positions-manager
 E.monitor
 .git0

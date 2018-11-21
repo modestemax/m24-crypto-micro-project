@@ -1,0 +1,28 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "F.telegram",
+      "program": "${workspaceFolder}/src/index.js",
+      "env": {
+        "DEBUG": "*",
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "F.telegram Remote",
+      "program": "${workspaceFolder}/src/index.js",
+      "env": {
+        "DEBUG": "*",
+        "__REDIS_HOST": "54.210.121.117",
+        "REDIS_HOST": "142.44.246.201"
+      }
+    }
+  ]
+}

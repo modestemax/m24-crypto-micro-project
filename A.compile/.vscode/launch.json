@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "A.compile",
+            "program": "${workspaceFolder}/src/index.js",
+            "env": {
+                "DEBUG": "*",
+                "TIMEFRAMES": "240,1440",    
+                // "TIMEFRAMES": "1,15,60,240,1440",    
+                "SYMBOLS_FILTER": "btc$",
+                // SYMBOLS_FILTER: '(eth|xrp|bcc|ltc|eos|ada|xlm|miota|trx|neo|tusd|bcn|xmr|dash|xem|ven|bnb|etc|qtum|ont)btc$',         
+            }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "A.compile Remote",
+            "program": "${workspaceFolder}/src/index.js",
+            "env": {
+                "DEBUG": "*",
+                "TIMEFRAMES": "240,1440",
+                "__REDIS_HOST": "54.210.121.117",
+                "REDIS_HOST": "142.44.246.201"
+            }
+        }
+    ]
+}
