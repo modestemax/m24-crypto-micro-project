@@ -1,6 +1,6 @@
-const {gql}=require('apollo-server')
+const { gql } = require('apollo-server')
 
-const typeDefs=gql`
+const typeDefs = gql`
 type Symbol  {
     # id:Int
     # baseId:String
@@ -19,8 +19,15 @@ type Symbol  {
 }
 enum Interval { m1 m3 m5 m15 m30 h1 h2 h4 h6 h8 h12 d1 d3}
 
+type Market{
+    timeframe:Int!
+    position:Int
+    markets:[Symbol]
+}
+#union Signal=Kline | Bonus
+
 type Kline{
-    symbolId:String!
+    symbol:String!
     open:Float!
     close:Float!
     low:Float!
@@ -30,23 +37,37 @@ type Kline{
     interval:String!
     position:Int!
 }
-type Klines{
-    interval:String!
-    klines:[Kline!]!
+type Bonus{
+    symbol:String! 
+    total:Float
 }
+type Klines{
+    m1:[Kline]
+    m3:[Kline]
+    m5:[Kline]
+    m15:[Kline]
+    m30:[Kline]
+    h1:[Kline]
+    h2:[Kline]
+    h4:[Kline]
+    h6:[Kline]
+    h8:[Kline]
+    h12:[Kline]
+    h24:[Kline]
+    d1:[Kline]
+    d3:[Kline]
+    bonus:[Bonus]
+}
+
 type Query {
     signals:[Symbol!]!
 }
-type Market{
-    timeframe:Int!
-    position:Int
-    markets:[Symbol]
-}
+
 type Subscription{
     signalLoaded1(timeframe:Int,position_min:Int):Market!
     signalLoaded(timeframes:[String!]!):Market!
-    klines:[Klines]!
+    klines:[Klines!]!
 }
 `
 
-module.exports={typeDefs}
+module.exports = { typeDefs }
