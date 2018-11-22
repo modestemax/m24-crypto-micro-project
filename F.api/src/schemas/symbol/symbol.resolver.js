@@ -1,8 +1,8 @@
 const { pubsub, SIGNAL_LOADED, KLINES } = require('../../gql')
 const { subscribe, redisSet, redisGet } = require('common/redis')
 const { withFilter } = require('apollo-server');
-const { candleUtils } = require('common');
-const { loadCandles } = candleUtils;
+// const { candleUtils } = require('common');
+// const { loadCandles } = candleUtils;
 const resolvers = {
 
 

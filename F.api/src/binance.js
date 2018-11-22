@@ -1,8 +1,8 @@
 // @flow
 
-const _ = require('lodash')
+const _ = require('lodash');
 const auth = require((process.env.HOME || '~') + '/.api.json').KEYS;
-const { publish } = require('common/redis')
+const { publish } = require('common/redis');
 const getBinance = () => require('node-binance-api')().options({
     APIKEY: auth.api_key,
     APISECRET: auth.secret,
@@ -10,121 +10,107 @@ const getBinance = () => require('node-binance-api')().options({
     test: true // If you want to use sandbox mode where orders are simulated
 });
 
+const binance = getBinance();
+
+const durations = _.mapValues({
+    '5m': 5, '15m': 15, '30m': 30, '1h': 60, '2h': 120,
+    '4h': 240, '6h': 360, '8h': 480, '12h': 720, '24h': 1440,
+}, duration => duration * 60 * 1e3);
+
 const change = (open, close) => (close - open) / open;
 const changePercent = (open, close) => change(open, close) * 100;
 
-const orderBy = (array, prop, orderProp = 'position') => _(array).orderBy([prop], 'desc')
-    .map((k, position) => ({ ...k, [orderProp]: ++position })).mapKeys('symbol').value()
-
-const orderByGoodSpread = (map, prop) => {
-    let orderedMap = orderBy(map, prop);
-    let mapWgoodSpread = _.filter(orderedMap, a => a['spread_percentage'] < MAX_SPREAD)
-    let orderedMapWgoodSpread = orderBy(mapWgoodSpread, prop, 'position_good_spread')
-    return { ...orderedMap, ...orderedMapWgoodSpread }
-}
-
-
-const computeBonus = (symbols, periods, klines) => {
-    const coefChange = {
-        '1m': 10, '3m': 5, '5m': 3, '15m': 2.5, '30m': 2, '1h': 1.5, '2h': 1,
-        '4h': .75, '6h': .6, '8h': .5, '12h': .4, '24h': 1, '1d': .3, '3d': .1
-    }
-    let bonus = _.map(symbols, symbol => {
-        let bonus = [...periods, PREV_DAY_INTERVAL].reduce(({ green, prevDay, change }, interval) => {
-            let kline = klines[interval][symbol];
-            let kline24h = klines[PREV_DAY_INTERVAL][symbol];
-            if (kline && kline24h /*&& kline24h.change_from_open > MIN_CHANGE_PREV_DAY*/) {
-                green += kline.green ? 1 : 0;
-                prevDay += interval === PREV_DAY_INTERVAL ?
-                    (kline.change_from_open > MIN_CHANGE_PREV_DAY ? 5 : -10) : 0;
-                // change += coefChange[interval] * (kline.change_from_open / _.maxBy(klines[interval], 'change_from_open').change_from_open)
-                change += coefChange[interval] * kline.change_from_open /// _.maxBy(klines[interval], 'change_from_open').change_from_open)
+function indexTicksByTime(ticks) {
+    return ticks.reduce((ticks, tick) => {
+        let [time, open, high, low, close, volume, closeTime, assetVolume, trades, buyBaseVolume, buyAssetVolume, ignored] = tick;
+        return {
+            ...ticks,
+            [time]: {
+                time, open, high, low, close, volume, closeTime,
+                assetVolume, trades, buyBaseVolume, buyAssetVolume, ignored
             }
-            return { green, prevDay, change, total: green + change }
-        }, { green: 0, prevDay: 0, change: 0, total: null })
-        return { symbol, ...bonus };
+        }
+    }, {});
+}
+
+function binanceCandlesticks( {symbol, interval, startTime, limit = 1000} ) {
+    return new Promise(((resolve, reject) => {
+        binance.candlesticks(symbol, interval, (error, ticks, symbol) => {
+            if (error) return reject(error);
+            let last_tick = ticks[ticks.length - 1];
+            let closeTime = last_tick[6];
+            resolve({ closeTime, ticks });
+        }, { startTime, limit });
+    }));
+}
+
+async function getPrevCandles(symbol, interval = '1m', limit = 1440) {
+
+    let { ticks: ticks1, closeTime } = await binanceCandlesticks({
+        symbol, interval, startTime: Date.now() - limit * 30 * 1e3
     });
-    return _(bonus).orderBy(['total'], 'desc').mapKeys('symbol').value();
+
+    let { ticks: ticks2 } = await binanceCandlesticks({
+        symbol, interval, startTime: closeTime
+    });
+
+    return indexTicksByTime([...ticks1, ...ticks2]);
 }
 
-const computeBonusPublish = _.throttle((symbols, periods, klines) => {
-    console.log('compute bonus & publish')
+function updatePerf({symbol,prevCandles,prevPerf}){
+    binance.websockets.candlesticks(symbol, '1m', (candlesticks) => {
+        let { e: eventType, E: eventTime, s: symbol, k: ticks } = candlesticks;
+        let { t: startTime, x: isFinal, i: interval, } = ticks;
+        console.log(symbol + " " + interval + " candlestick update");
 
-    klines['bonus'] = computeBonus(symbols, periods, klines);
-    publish('klines', _.mapKeys(klines, (_, key) => userPeriods[key]))
-}, 1e3)
+        prevPerf[symbol] = getPrevPerformance({ prevCandles, symbol, ticks })
 
-const PREV_DAY_INTERVAL = '24h';
-const MAX_SPREAD = .8;
-const MIN_CHANGE_PREV_DAY = 2;
-const periods = [
-    '1m', '3m', '5m', '15m', '30m',
-    '1h', '2h', '4h', '6h', '8h', '12h',
-    '1d', '3d'
-];
-const userPeriods = {
-    '1m': 'm1', '3m': 'm3', '5m': 'm5', '15m': 'm15', '30m': 'm30',
-    '1h': 'h1', '2h': 'h2', '4h': 'h4', '6h': 'h6', '8h': 'h8', '12h': 'h12',
-    '1d': 'd1', '3d': 'd3', '24h': 'h24'
+        if (isFinal && prevCandles[symbol]) {
+            let prevTime = startTime - durations['24h'];
+            delete prevCandles[symbol][prevTime]
+        }
+        publish('prevPerf', Object.values(prevPerf));
+
+    });}
+
+function getPrevPerformance({ prevCandles, symbol, ticks }) {
+    let { t: startTime, o: open, h: high, l: low, c: close, v: volume,
+        n: trades, i: interval, x: isFinal, q: quoteVolume, V: buyVolume,
+        Q: quoteBuyVolume } = ticks;
+    if (!prevCandles[symbol]) return;
+
+
+    return _.reduce(durations, (prev, duration, period) => {
+        let prevTime = startTime - duration;
+        let prevCandle = prevCandles[symbol][prevTime];
+        if (prevCandle) {
+            return {
+                ...prev, [period]: {
+                    symbol, period,
+                    change: changePercent(prevCandle.open, close)
+                }
+            }
+        }
+    }, {});
 }
-const periodsInt = {
-    '1m': 1, '3m': 3, '5m': 5, '15m': 15, '30m': 30,
-    '1h': 60, '2h': 120, '4h': 240, '6h': 360, '8h': 480, '12h': 720,
-    '1d': 1440, '3d': 4320, '24h': 1440
-}
-
-const binance = getBinance();
 
 binance.exchangeInfo(function (error, data) {
     if (!error) {
+        // const symbols = ['ETHBTC']
         const symbols = data.symbols
             .filter(s => s.status === "TRADING")
             .filter(s => s.quoteAsset === "BTC")
             .map(s => s.symbol);
-        const klines = {}
-        const prevDayKlines = {};
 
-        const periodKlines = {}
-        let periodKlinesOrdered;
+        const prevCandles = {};
+        const prevPerf = {};
 
-        // symbols.forEach(symbol => {
-        ['ETHBTC'].forEach(symbol => {
-
-            binance.candlesticks(symbol, "1m", (error, ticks, symbol) => {
-
-                let last_tick = ticks[ticks.length - 1];
-                let [time, open, high, low, close, volume, closeTime, assetVolume, trades, buyBaseVolume, buyAssetVolume, ignored] = last_tick;
-                klines[symbol] = ticks;
-                binance.candlesticks(symbol, "1m", (error, ticks, symbol) => {
-                    klines[symbol] = [...klines[symbol], ...ticks];
-                }, { startTime: closeTime });
-
-            }, { limit: 1000, startTime: Date.now() - 1440 * 60 * 1e3 });
-
-
-        })
-
-
-
-        // binance.websockets.candlesticks(symbols, '1m', (candlesticks) => {
-        //     let { e: eventType, E: eventTime, s: symbol, k: ticks } = candlesticks;
-        //     let { o: open, h: high, l: low, c: close, v: volume, n: trades, i: interval, x: isFinal, q: quoteVolume, V: buyVolume, Q: quoteBuyVolume } = ticks;
-        //     console.log(symbol + " " + interval + " candlestick update");
-        //
-        //     periodKlines[symbol] = {
-        //         symbol, open, high, low, close, interval,
-        //         timeframe: periodsInt[interval],
-        //         change_from_open: changePercent(open, close),
-        //         change_to_high: changePercent(open, high),
-        //         isFinal, volume,
-        //         spread_percentage: _.get(prevDayKlines[symbol], 'spread_percentage'),
-        //         green: close > open
-        //     };
-        //
-        //     klines[interval] = orderByGoodSpread(periodKlines, 'change_from_open');
-        //     computeBonusPublish(symbols, periods, klines)
-        // });
-
+        symbols.forEach(function getPrev(symbol) {
+            getPrevCandles(symbol)
+                .then(r => prevCandles[symbol] = r)
+                .then(() => updatePerf({symbol,prevCandles,prevPerf}))
+                .catch((e) => console.log(e), setTimeout(() => getPrev(symbol), 60 * 1e3))
+        });
 
     }
-})
+});
