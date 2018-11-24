@@ -33,12 +33,13 @@ function indexTicksByTime(ticks) {
     }, {});
 }
 
-function binanceCandlesticks( {symbol, interval, startTime, limit = 1000} ) {
+function binanceCandlesticks({ symbol, interval, startTime, limit = 1000 }) {
     return new Promise(((resolve, reject) => {
         binance.candlesticks(symbol, interval, (error, ticks, symbol) => {
             if (error) return reject(error);
-            let last_tick = ticks[ticks.length - 1];
-            let closeTime = last_tick[6];
+            let last_tick = _.last(ticks);
+            let closeTime = last_tick && last_tick[6];
+
             resolve({ closeTime, ticks });
         }, { startTime, limit });
     }));
@@ -46,18 +47,20 @@ function binanceCandlesticks( {symbol, interval, startTime, limit = 1000} ) {
 
 async function getPrevCandles(symbol, interval = '1m', limit = 1440) {
 
+    // $FlowFixMe
     let { ticks: ticks1, closeTime } = await binanceCandlesticks({
-        symbol, interval, startTime: Date.now() - limit * 30 * 1e3
+        symbol, interval, startTime: Date.now() - limit * 60 * 1e3
     });
 
-    let { ticks: ticks2 } = await binanceCandlesticks({
+    // $FlowFixMe
+    let { ticks: ticks2 } = closeTime ? await binanceCandlesticks({
         symbol, interval, startTime: closeTime
-    });
+    }) : { ticks: [] };
 
     return indexTicksByTime([...ticks1, ...ticks2]);
 }
 
-function updatePerf({symbol,prevCandles,prevPerf}){
+function updatePerf({ symbol, prevCandles, prevPerf }) {
     binance.websockets.candlesticks(symbol, '1m', (candlesticks) => {
         let { e: eventType, E: eventTime, s: symbol, k: ticks } = candlesticks;
         let { t: startTime, x: isFinal, i: interval, } = ticks;
@@ -71,7 +74,8 @@ function updatePerf({symbol,prevCandles,prevPerf}){
         }
         publish('prevPerf', Object.values(prevPerf));
 
-    });}
+    });
+}
 
 function getPrevPerformance({ prevCandles, symbol, ticks }) {
     let { t: startTime, o: open, h: high, l: low, c: close, v: volume,
@@ -83,19 +87,20 @@ function getPrevPerformance({ prevCandles, symbol, ticks }) {
     return _.reduce(durations, (prev, duration, period) => {
         let prevTime = startTime - duration;
         let prevCandle = prevCandles[symbol][prevTime];
-        if (prevCandle) {
-            return {
-                ...prev, [period]: {
-                    symbol, period,
-                    change: changePercent(prevCandle.open, close)
-                }
+
+        return prevCandle ? {
+            ...prev, [period]: {
+                symbol, period,
+                change: changePercent(prevCandle.open, close)
             }
-        }
+        } : prev;
     }, {});
 }
 
 binance.exchangeInfo(function (error, data) {
-    if (!error) {
+    if(error)
+    console.log(error)
+    else  {
         // const symbols = ['ETHBTC']
         const symbols = data.symbols
             .filter(s => s.status === "TRADING")
@@ -108,8 +113,8 @@ binance.exchangeInfo(function (error, data) {
         symbols.forEach(function getPrev(symbol) {
             getPrevCandles(symbol)
                 .then(r => prevCandles[symbol] = r)
-                .then(() => updatePerf({symbol,prevCandles,prevPerf}))
-                .catch((e) => console.log(e), setTimeout(() => getPrev(symbol), 60 * 1e3))
+                .then(() => updatePerf({ symbol, prevCandles, prevPerf }))
+                .catch((e) => console.log(e), setTimeout(() => getPrev(symbol), 30 * 1e3))
         });
 
     }
