@@ -111,10 +111,11 @@ binance.exchangeInfo(function (error, data) {
         const prevPerf = {};
 
         symbols.forEach(function getPrev(symbol) {
+             console.log(symbol,'loading previous candles');
             getPrevCandles(symbol)
                 .then(r => prevCandles[symbol] = r)
                 .then(() => updatePerf({ symbol, prevCandles, prevPerf }))
-                .catch((e) => console.log(e), setTimeout(() => getPrev(symbol), 30 * 1e3))
+                .catch((e) => console.log(symbol,e), setTimeout(() => getPrev(symbol), 30 * 1e3))
         });
 
     }
