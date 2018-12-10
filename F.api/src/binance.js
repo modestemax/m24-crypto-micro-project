@@ -1,5 +1,7 @@
 // @flow
-
+//const QUOTE_ASSET="BTC";
+const QUOTE_ASSET_REGEX = /usd|pax/i;
+// const QUOTE_ASSET="USDT";
 const _ = require('lodash');
 const auth = require((process.env.HOME || '~') + '/.api.json').KEYS;
 const { publish } = require('common/redis');
@@ -9,6 +11,7 @@ const getBinance = () => require('node-binance-api')().options({
     useServerTime: true, // If you get timestamp errors, synchronize to server time at startup
     test: true // If you want to use sandbox mode where orders are simulated
 });
+publish.throttle=_.throttle(publish,1e3);
 
 const binance = getBinance();
 
@@ -63,30 +66,45 @@ async function getPrevCandles(symbol, interval = '1m', limit = 1440) {
 function updatePerf({ symbol, prevCandles, prevPerf }) {
     binance.websockets.candlesticks(symbol, '1m', (candlesticks) => {
         let { e: eventType, E: eventTime, s: symbol, k: ticks } = candlesticks;
-        let { t: startTime, x: isFinal, i: interval, } = ticks;
-        console.log(symbol + " " + interval + " candlestick update");
+        let {
+            t: startTime, x: isFinal, i: interval, t: time, o: open, h: high, l: low, c: close, v: volume, T: closeTime,
+            assetVolume, n: trades,/*V: buyBaseVolume,q: buyAssetVolume, ignored*/
+        } = ticks;
+        // console.log(symbol + " " + interval + " candlestick update");
 
-        prevPerf[symbol] = getPrevPerformance({ prevCandles, symbol, ticks })
+        prevPerf[symbol] = getPrevPerformance({ prevCandles, symbol, ticks });
 
-        if (isFinal && prevCandles[symbol]) {
-            let prevTime = startTime - durations['24h'];
-            delete prevCandles[symbol][prevTime]
+        if (isFinal) {
+            console.log(symbol + ' final');
+            const ONE_MIN = 1e3 * 60;
+            let prevTime = startTime - (durations['24h'] + 10 * ONE_MIN);
+            delete prevCandles[symbol][prevTime];
+            prevCandles[symbol][startTime] = {
+                time, open, high, low, close, volume, closeTime,
+                assetVolume, trades,/*V: buyBaseVolume,q: buyAssetVolume, ignored*/
+            }
         }
-        publish('prevPerf', Object.values(prevPerf));
+        publish.throttle('prevPerf', Object.values(prevPerf)
+            .map(perf =>
+                _.mapKeys(perf, (p, period) =>
+                    _.last(period) + _.initial(period).join(''))));
 
     });
 }
 
 function getPrevPerformance({ prevCandles, symbol, ticks }) {
-    let { t: startTime, o: open, h: high, l: low, c: close, v: volume,
+    let {
+        t: startTime, o: open, h: high, l: low, c: close, v: volume,
         n: trades, i: interval, x: isFinal, q: quoteVolume, V: buyVolume,
-        Q: quoteBuyVolume } = ticks;
+        Q: quoteBuyVolume
+    } = ticks;
     if (!prevCandles[symbol]) return;
 
 
     return _.reduce(durations, (prev, duration, period) => {
         let prevTime = startTime - duration;
         let prevCandle = prevCandles[symbol][prevTime];
+        prevCandle = prevCandle ||period==='24h'? _.values(prevCandles[symbol])[0]:prevCandle;
 
         return prevCandle ? {
             ...prev, [period]: {
@@ -97,26 +115,35 @@ function getPrevPerformance({ prevCandles, symbol, ticks }) {
     }, {});
 }
 
-binance.exchangeInfo(function (error, data) {
-    if(error)
-    console.log(error)
-    else  {
-        // const symbols = ['ETHBTC']
+binance.exchangeInfo(async function (error, data) {
+    if (error)
+        console.log(error);
+    else {
+        // const symbols = ['ETHBTC', 'ADABTC'];
         const symbols = data.symbols
             .filter(s => s.status === "TRADING")
-            .filter(s => s.quoteAsset === "BTC")
+            .filter(s => QUOTE_ASSET_REGEX.test(s.quoteAsset))
             .map(s => s.symbol);
 
         const prevCandles = {};
         const prevPerf = {};
+        (async function getPrev(symbols) {
+            const errors = [];
+            for (const symbol of symbols) {
+                try {
+                    console.log(symbol, 'loading previous candles');
+                    const prevCandles = await getPrevCandles(symbol);
+                    prevCandles[symbol] = prevCandles;
+                    await updatePerf({ symbol, prevCandles, prevPerf });
+                    console.log(symbol + " candlestick update");
+                } catch (e) {
+                    console.log(symbol, e.message);
+                    errors.push(symbol);
+                }
+            }
+            setTimeout(() => getPrev(errors), 30 * 1e3)
+        }(symbols))
 
-        symbols.forEach(function getPrev(symbol) {
-             console.log(symbol,'loading previous candles');
-            getPrevCandles(symbol)
-                .then(r => prevCandles[symbol] = r)
-                .then(() => updatePerf({ symbol, prevCandles, prevPerf }))
-                .catch((e) => console.log(symbol,e), setTimeout(() => getPrev(symbol), 30 * 1e3))
-        });
 
     }
 });
