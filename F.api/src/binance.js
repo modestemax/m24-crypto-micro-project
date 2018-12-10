@@ -1,6 +1,7 @@
 // @flow
 //const QUOTE_ASSET="BTC";
 const QUOTE_ASSET_REGEX = /usd|pax/i;
+// const QUOTE_ASSET_REGEX = /btc$/i;
 // const QUOTE_ASSET="USDT";
 const _ = require('lodash');
 const auth = require((process.env.HOME || '~') + '/.api.json').KEYS;
@@ -104,7 +105,7 @@ function getPrevPerformance({ prevCandles, symbol, ticks }) {
     return _.reduce(durations, (prev, duration, period) => {
         let prevTime = startTime - duration;
         let prevCandle = prevCandles[symbol][prevTime];
-        prevCandle = prevCandle ||period==='24h'? _.values(prevCandles[symbol])[0]:prevCandle;
+        prevCandle = prevCandle ||(period==='24h'? _.values(prevCandles[symbol])[0]:prevCandle);
 
         return prevCandle ? {
             ...prev, [period]: {
@@ -132,8 +133,7 @@ binance.exchangeInfo(async function (error, data) {
             for (const symbol of symbols) {
                 try {
                     console.log(symbol, 'loading previous candles');
-                    const prevCandles = await getPrevCandles(symbol);
-                    prevCandles[symbol] = prevCandles;
+                    prevCandles[symbol] = await getPrevCandles(symbol);
                     await updatePerf({ symbol, prevCandles, prevPerf });
                     console.log(symbol + " candlestick update");
                 } catch (e) {
