@@ -1,7 +1,7 @@
 // @flow
 //const QUOTE_ASSET="BTC";
-const QUOTE_ASSET_REGEX = /usd|pax/i;
-// const QUOTE_ASSET_REGEX = /btc$/i;
+// const QUOTE_ASSET_REGEX = /usd|pax/i;
+const QUOTE_ASSET_REGEX = /btc$/i;
 // const QUOTE_ASSET="USDT";
 const _ = require('lodash');
 const auth = require((process.env.HOME || '~') + '/.api.json').KEYS;
