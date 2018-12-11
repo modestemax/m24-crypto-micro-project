@@ -28,7 +28,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "prepush-gh-pages": "rm -r ~/projects/modestemax.github.io/m24 && mkdir ~/projects/modestemax.github.io/m24 && cp  -r   $(pwd)/build/* ~/projects/modestemax.github.io/m24",
-    "push-gh-pages": "cd ~/projects/modestemax.github.io &&  git add --all && git commit -m \" m24 \"  && git push -u origin master",
+    "push-gh-pages": "cd ~/projects/modestemax.github.io &&  git add --all && git commit -m \" $( date +%b%d-%HH-%M\n) \"  && git push -u origin master",
     "publish": "npm run deploy &&  npm run push-gh-pages "
   },
   "browserslist": [
