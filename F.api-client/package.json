@@ -1,6 +1,7 @@
 {
   "name": "react-graphql-apollo-tutorial-boilerplate",
   "version": "0.1.0",
+  "homepage": "http://modestemax.github.io/m24",
   "private": true,
   "dependencies": {
     "apollo-cache-inmemory": "^1.3.9",
@@ -23,12 +24,20 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom --passWithNoTests",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "prepush-gh-pages": "cp  -r   $(pwd)/build ~/projects/modestemax.github.io/m24",
+    "push-gh-pages": "cd ~/projects/modestemax.github.io/m24 &&  git add --all && git commit -m \" m24 \"  && git push -u origin master",
+    "publish": "npm run deploy &&  npm run push-gh-pages "
   },
   "browserslist": [
     ">0.2%",
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "gh-pages": "^2.0.1"
+  }
 }

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import registerServiceWorker from './registerServiceWorker';
@@ -18,8 +19,11 @@ import {WebSocketLink} from 'apollo-link-ws';
 import {split} from 'apollo-link';
 import {getMainDefinition} from 'apollo-utilities';
 
+const HOST_NAME='142.44.246.201';
+// const HOST_NAME='localhost';
+
 const wsLink = new WebSocketLink({
-    uri: `ws://localhost:4000/graphql`,
+    uri: `ws://${HOST_NAME}:4000/graphql`,
     options: {
         reconnect: true
     }
@@ -38,7 +42,7 @@ const errorLink = onError(({graphQLErrors, networkError}) => {
 
 let httpLink = new HttpLink({
     // uri: GITHUB_BASE_URL,
-    uri: 'http://localhost:4000/',
+    uri: `http://${HOST_NAME}:4000/`,
     // uri: 'http://142.44.246.201:4000/',
     headers: {
         authorization: `Bearer ${
