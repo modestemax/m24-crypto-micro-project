@@ -4,3 +4,4 @@ node_modules
 D.positions-manager
 E.monitor
 .git0
+/F.api-client/build/

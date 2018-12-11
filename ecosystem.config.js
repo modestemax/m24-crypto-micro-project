@@ -7,7 +7,7 @@ module.exports = {
 
     // First application
     {
-      name: 'F.telegram',
+      name: 'f_telegram',
       script: 'F.telegram/src/index.js',
       "exec_mode": "cluster",
       env: {
@@ -19,7 +19,7 @@ module.exports = {
       }
     },
     {
-      name: 'D.run',
+      name: 'd_run',
       script: 'D.run/src/index.js',
       "exec_mode": "cluster",
       env: {
@@ -31,7 +31,7 @@ module.exports = {
       }
     },
     {
-      name: 'C.publish ',
+      name: 'c_publish ',
       script: 'C.publish/src/index.js',
       "exec_mode": "cluster",
       env: {
@@ -43,7 +43,7 @@ module.exports = {
       }
     },
     {
-      name: 'B.build',
+      name: 'b_build',
       script: 'B.build/src/index.js',
       "exec_mode": "cluster",
       env: {
@@ -55,7 +55,7 @@ module.exports = {
       }
     },
     {
-      name: 'A.compile',
+      name: 'a_compile',
       script: 'A.compile/src/index.js',
       "exec_mode": "cluster",
       env: {
@@ -72,11 +72,23 @@ module.exports = {
       }
     },
     {
-      name: 'F.api',
+      name: 'f_api',
       script: 'F.api/src/index.js',
       "exec_mode": "cluster",
       env: {
         APP_NAME:'GraphQL API',
+        // "DEBUG": "*"
+      },
+      env_production: {
+        NODE_ENV: 'production'
+      }
+    },
+    {
+      name: 'f_api_cli',
+      script: 'serve',
+      args:'F.api-client/build',
+      env: {
+
         // "DEBUG": "*"
       },
       env_production: {
@@ -102,7 +114,7 @@ module.exports = {
       ref: 'origin/master',
       repo: 'https://github.com/modestemax/m24-crypto-micro-project',
       path: '/home/ubuntu/m24/prod',
-      'post-deploy': 'npm install && pm2 reset all && pm2 flush && pm2 reload ecosystem.config.js --env production --update-env'
+      'post-deploy': 'npm install && cd F.api-client && npm install && npm run build && pm2 reset all && pm2 flush && pm2 reload ecosystem.config.js --env production --update-env'
     },
     dev: {
       // user: 'node',
