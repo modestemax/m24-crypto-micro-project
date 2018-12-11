@@ -10,12 +10,27 @@ export default class Screener extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { sortColumn: 'h1' };
+        this.state = { sortColumns: { h1: 'desc' } };
     }
 
     changeSortColumn = (e) => {
-//        debugger
-        this.setState({ ...this.state, sortColumn: e.target.id })
+        debugger;
+        let col = e.target.id;
+        let sortColumns = this.state.sortColumns;
+        let dir = sortColumns[col];
+
+        switch (dir) {
+            case 'asc':
+                delete sortColumns [col];
+                break;
+            case 'desc':
+                sortColumns[col] = 'asc';
+                break;
+            default:
+                sortColumns[col] = 'desc';
+                break;
+        }
+        this.setState({ ...this.state, sortColumns })
     };
     changeDisplay = (e) => {
 //        debugger
@@ -27,9 +42,11 @@ export default class Screener extends Component {
     };
 
     sort = (data) => {
-        return this.state.sortColumn ?
-            _.orderBy(data, p => p[this.state.sortColumn].change, ['desc'])
-            : data
+        return _.orderBy(data,
+            _.keys(this.state.sortColumns).map((col) => `${col}.change`),
+            // p => this.state.sortColumns.map(col => p[col].change),
+            _.values(this.state.sortColumns).map((dir) => dir)
+        )
     };
 
     render() {
@@ -38,7 +55,8 @@ export default class Screener extends Component {
 
         return (<Container className="App" fluid>
             <SignalHeaderRow columns={columns} changeSortColumn={this.changeSortColumn}
-                             resetSorting={()=> this.setState({ ...this.state, sortColumn:null })}/>
+                             sortColumns={this.state.sortColumns}
+                             resetSorting={() => this.setState({ ...this.state, sortColumns: {} })}/>
             {performances.map(perf =>
                 <SignalRow key={perf[columns[0]].symbol}
                            showHigh={this.state.showHigh}

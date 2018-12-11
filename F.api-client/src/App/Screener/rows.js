@@ -3,13 +3,19 @@ import {Col, Row} from "reactstrap";
 import * as PropTypes from "prop-types";
 
 
-export function SignalHeaderRow({ columns, changeSortColumn, resetSorting }) {
+export function SignalHeaderRow({ columns, changeSortColumn, sortColumns, resetSorting }) {
     return <Row>
         <Col onClick={resetSorting}>Reset</Col>
         {/*<Col id={'pos'} onClick={changeSortColumn}>Position</Col>*/}
         {/*<Col key={col} id={col} onClick={changeSortColumn}>{col}</Col>*/}
         {columns.map(col =>
-            <Col key={col} id={col} onClick={changeSortColumn}>{col.toUpperCase()}</Col>
+            <Col key={col} id={col} onClick={changeSortColumn}
+                 style={{
+                     color: sortColumns[col] ? (sortColumns[col] === 'desc' ? '#83ff83' : 'red') : '',
+                     fontWeight: sortColumns[col] ? 'bold' : ''
+                 }}>
+                {col.toUpperCase()}
+            </Col>
         )}
         {/* <Col>
                     <Dropdown group isOpen={this.state.dropdownOpen} size="sm" toggle={this.toggle}>
@@ -26,7 +32,7 @@ export function SignalHeaderRow({ columns, changeSortColumn, resetSorting }) {
     </Row>
 }
 
-export   class SignalRow extends Component {
+export class SignalRow extends Component {
     constructor(props) {
         super(props);
         this.state = { selected: false }
