@@ -34,12 +34,12 @@ module.exports = {
         "emaH1H4": {
             timeframe: 24 * 60,
             timeInForce: 'GTC',
-            isActive: true,
+            // isActive: true,
         },
         "macdH1H4": {
             timeframe: 24 * 60,
             timeInForce: 'GTC',
-            isActive: true,
+            // isActive: true,
             // doTrade: true,
             takeProfit: 2,
         },
@@ -335,7 +335,7 @@ module.exports = {
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
         "K3B2SPIRITV2H1": {
-            isActive: true,
+            // isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
@@ -387,7 +387,7 @@ module.exports = {
             takeProfit: 4,
         },
         "m24day": {
-            isActive: true,
+            // isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
