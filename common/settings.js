@@ -302,7 +302,7 @@ module.exports = {
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
         "K3B2SPIRITOH1": {
-            // isActive: true,
+            isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
