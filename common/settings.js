@@ -12,7 +12,7 @@ const defaultStrategyOptions = {
     buyMode: 'limit',
     sellMode: 'limit',
 };
-const MAX_TRADE_COUNT = 2;
+const MAX_TRADE_COUNT = 1;
 module.exports = {
     MAX_TRADE_COUNT_PER_STRATEGY: 3,
     MAX_TRADE_COUNT,
@@ -291,7 +291,7 @@ module.exports = {
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
         "K3B2SPIRITOH4": {
-            // isActive: true,
+            isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
@@ -303,13 +303,13 @@ module.exports = {
         },
         "K3B2SPIRITOH1": {
             isActive: true,
-            // doTrade: true,
+            doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
             timeframe: 60,
             timeframeX: 60 ,
-            takeProfit: 5,
-            stopLoss: -2,
+            takeProfit: 1,
+            stopLoss: -5,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
         "K3B2SPIRITOM5": {
