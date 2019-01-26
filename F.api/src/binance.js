@@ -26,7 +26,8 @@ const changePercent = (open, close) => change(open, close) * 100;
 
 function indexTicksByTime(ticks) {
     return ticks.reduce((ticks, tick) => {
-        let [time, open, high, low, close, volume, closeTime, assetVolume, trades, buyBaseVolume, buyAssetVolume, ignored] = tick;
+        let [time, open, high, low, close, volume, closeTime, assetVolume,
+            trades, buyBaseVolume, buyAssetVolume, ignored] = tick;
         return {
             ...ticks,
             [time]: {
@@ -50,12 +51,10 @@ function binanceCandlesticks({ symbol, interval, startTime, limit = 1000 }) {
 }
 
 async function getPrevCandles(symbol, interval = '1m', limit = 1440) {
-
     // $FlowFixMe
     let { ticks: ticks1, closeTime } = await binanceCandlesticks({
         symbol, interval, startTime: Date.now() - limit * 60 * 1e3
     });
-
     // $FlowFixMe
     let { ticks: ticks2 } = closeTime ? await binanceCandlesticks({
         symbol, interval, startTime: closeTime
@@ -72,7 +71,7 @@ function updatePerf({ symbol, prevCandles, prevPerf }) {
             assetVolume, n: trades,/*V: buyBaseVolume,q: buyAssetVolume, ignored*/
         } = ticks;
         // console.log(symbol + " " + interval + " candlestick update");
-
+        publish('price',{symbol,close});
         prevPerf[symbol] = getPrevPerformance({ prevCandles, symbol, ticks });
 
         if (isFinal) {
@@ -86,8 +85,8 @@ function updatePerf({ symbol, prevCandles, prevPerf }) {
             }
         }
         publish.throttle('prevPerf', Object.values(prevPerf)
-            .map(perf =>
-                _.mapKeys(perf, (p, period) =>
+            .map(perfs =>
+                _.mapKeys(perfs, (perf, period) =>
                     _.last(period) + _.initial(period).join(''))));
 
     });
@@ -143,7 +142,5 @@ binance.exchangeInfo(async function (error, data) {
             }
             setTimeout(() => getPrev(errors), 30 * 1e3)
         }(symbols))
-
-
     }
 });
