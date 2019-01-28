@@ -83,12 +83,12 @@ module.exports = {
                 NODE_ENV: 'production'
             }
         },
-        {
+       /* {
             name: 'f_api_cli',
             script: 'F.api-client/run.sh',
             _cwd:'F.api-cli',
             "exec_mode": "cluster",            
-        }
+        }*/
 
     ],
 
