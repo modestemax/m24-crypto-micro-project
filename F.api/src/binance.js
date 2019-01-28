@@ -15,7 +15,7 @@ const getBinance = () => require('node-binance-api')().options({
 publish.throttle = _.throttle(publish, 1e3);
 
 const binance = getBinance();
-
+const satoshi=1e-8
 const durations = _.mapValues({
     '1m': 1, '2m': 2, '3m': 3, '5m': 5, '15m': 15, '30m': 30, '1h': 60, '2h': 120,
     '4h': 240, '6h': 360, '8h': 480, '12h': 720, '24h': 1440,
@@ -72,8 +72,10 @@ function updatePerf({ symbol, prevCandles, prevPerf }) {
         } = ticks;
         // console.log(symbol + " " + interval + " candlestick update");
         publish('price', { symbol, close });
-        prevPerf[symbol] = getPrevPerformance({ prevCandles, symbol, ticks });
 
+        if (changePercent(close, close + satoshi) < .6) {
+            prevPerf[symbol] = getPrevPerformance({ prevCandles, symbol, ticks });
+        }
         if (isFinal) {
             console.log(symbol + ' final');
             const ONE_MIN = 1e3 * 60;

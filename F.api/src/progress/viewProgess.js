@@ -17,11 +17,11 @@ setInterval(function () {
         vs.change = changePercent(vs.startAt, prices[vs.symbol]);
         vs.change_max = Math.max(vs.change, vs.change_max);
         if (vs.change !== vs.change_prev) {
-            console.log(`${vs.symbol} ${vs.change.toFixed(2)}% | ${vs.change_max}%`)
+            console.log(`${vs.symbol} ${vs.change.toFixed(2)}% | ${vs.change_max.toFixed(2)}%`)
         }
         if (vs.change < -2 || vs.change_max - vs.change > 2) {
             delete viewing[vs.symbol];
-            console.log(`${vs.symbol} max= ${vs.change_max}%`)
+            console.log(`${vs.symbol} max= ${vs.change_max.toFixed(2)}%`)
 
         }
     }
