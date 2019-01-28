@@ -12,12 +12,12 @@ const getBinance = () => require('node-binance-api')().options({
     useServerTime: true, // If you get timestamp errors, synchronize to server time at startup
     test: true // If you want to use sandbox mode where orders are simulated
 });
-publish.throttle=_.throttle(publish,1e3);
+publish.throttle = _.throttle(publish, 1e3);
 
 const binance = getBinance();
 
 const durations = _.mapValues({
-    '5m': 5, '15m': 15, '30m': 30, '1h': 60, '2h': 120,
+    '1m': 1, '2m': 2, '3m': 3, '5m': 5, '15m': 15, '30m': 30, '1h': 60, '2h': 120,
     '4h': 240, '6h': 360, '8h': 480, '12h': 720, '24h': 1440,
 }, duration => duration * 60 * 1e3);
 
@@ -71,7 +71,7 @@ function updatePerf({ symbol, prevCandles, prevPerf }) {
             assetVolume, n: trades,/*V: buyBaseVolume,q: buyAssetVolume, ignored*/
         } = ticks;
         // console.log(symbol + " " + interval + " candlestick update");
-        publish('price',{symbol,close});
+        publish('price', { symbol, close });
         prevPerf[symbol] = getPrevPerformance({ prevCandles, symbol, ticks });
 
         if (isFinal) {
@@ -104,7 +104,7 @@ function getPrevPerformance({ prevCandles, symbol, ticks }) {
     return _.reduce(durations, (prev, duration, period) => {
         let prevTime = startTime - duration;
         let prevCandle = prevCandles[symbol][prevTime];
-        prevCandle = prevCandle ||(period==='24h'? _.values(prevCandles[symbol])[0]:prevCandle);
+        prevCandle = prevCandle || (period === '24h' ? _.values(prevCandles[symbol])[0] : prevCandle);
 
         return prevCandle ? {
             ...prev, [period]: {

@@ -8,6 +8,9 @@ type Performance  {
 }
 
 type Performances{
+    m1:Performance!
+    m2:Performance!
+    m3:Performance!
     m5:Performance!
     m15:Performance!
     m30:Performance!

@@ -9,7 +9,19 @@ import Screener from "./Screener"
 const SUBS_SIGNALS = gql`
     subscription {
         symbolPerformance {
-            m5 {
+            m1 {
+                symbol
+                change
+            }  
+             m2 {
+                symbol
+                change
+            }
+               m3 {
+                symbol
+                change
+            }
+              m5 {
                 symbol
                 change
             }

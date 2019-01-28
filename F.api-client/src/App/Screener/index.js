@@ -21,7 +21,7 @@ export default class Screener extends Component {
 
         switch (dir) {
             case 'asc':
-                delete sortColumns [col];
+                delete sortColumns[col];
                 break;
             case 'desc':
                 sortColumns[col] = 'asc';

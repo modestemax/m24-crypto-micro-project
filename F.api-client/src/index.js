@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import registerServiceWorker from './registerServiceWorker';
@@ -19,8 +18,9 @@ import {WebSocketLink} from 'apollo-link-ws';
 import {split} from 'apollo-link';
 import {getMainDefinition} from 'apollo-utilities';
 
-const HOST_NAME='142.44.246.201';
-// const HOST_NAME='localhost';
+
+// const HOST_NAME='142.44.246.201';
+const HOST_NAME = (/localhost|127./.test(window.location.host)) ? 'localhost' : '142.44.246.201';
 
 const wsLink = new WebSocketLink({
     uri: `ws://${HOST_NAME}:4000/graphql`,
@@ -29,7 +29,7 @@ const wsLink = new WebSocketLink({
     }
 });
 
-const errorLink = onError(({graphQLErrors, networkError}) => {
+const errorLink = onError(({ graphQLErrors, networkError }) => {
     if (graphQLErrors) {
         // do something with graphql error
     }
@@ -54,8 +54,8 @@ httpLink = ApolloLink.from([errorLink, httpLink]);
 
 const link = split(
     // split based on operation type
-    ({query}) => {
-        const {kind, operation} = getMainDefinition(query);
+    ({ query }) => {
+        const { kind, operation } = getMainDefinition(query);
         return kind === 'OperationDefinition' && operation === 'subscription';
     },
     wsLink,

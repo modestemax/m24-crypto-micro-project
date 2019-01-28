@@ -15,8 +15,8 @@ setInterval(function () {
         let vs = viewing[symbol];
         vs.change_prev = vs.change;
         vs.change = changePercent(vs.startAt, prices[vs.symbol]);
-        if (vs.change != vs.change_prev) {
-            console.log(`${vs.symbol} ${vs.change}%`)
+        if (vs.change !== vs.change_prev) {
+            console.log(`${vs.symbol} ${vs.change.toFixed(2)}%`)
         }
         if (vs.change < -2) {
             delete viewing[vs.symbol]
