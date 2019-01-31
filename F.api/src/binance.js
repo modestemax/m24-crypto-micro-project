@@ -6,6 +6,13 @@ const QUOTE_ASSET_REGEX = /btc$/i;
 const _ = require('lodash');
 const auth = require((process.env.HOME || '~') + '/.api.json').KEYS;
 const { publish } = require('common/redis');
+var term = require('terminal-kit').terminal;
+const log = console.log;
+console.log = (...args) => {
+    console.clear();
+    term.move(0, 0, args.join(' '))
+}
+
 const getBinance = () => require('node-binance-api')().options({
     APIKEY: auth.api_key,
     APISECRET: auth.secret,
@@ -75,7 +82,7 @@ function updatePerf({ symbol, prevCandles, prevPerf }) {
 
         if (changePercent(close, +close + satoshi) < .6) {
             prevPerf[symbol] = getPrevPerformance({ prevCandles, symbol, ticks });
-        }
+        }else return;
         if (isFinal) {
             console.log(symbol + ' final');
             const ONE_MIN = 1e3 * 60;
@@ -118,6 +125,7 @@ function getPrevPerformance({ prevCandles, symbol, ticks }) {
 }
 
 binance.exchangeInfo(async function (error, data) {
+
     if (error)
         console.log(error);
     else {
