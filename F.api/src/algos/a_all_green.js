@@ -13,8 +13,8 @@ algo(function (perfByTime) {
     _.forEach(top, perf => {
         let [h24, h12, h8, h6, h4, h2, h1, m30, m15, m5, m3, m2, m1] =
             ['h24', 'h12', 'h8', 'h6', 'h4', 'h2', 'h1', 'm30', 'm15', 'm5', 'm3', 'm2', 'm1'].map(t => getPerf(perf.symbol, t))
-        if (h24 * h12 * h8 * h6 * h4 * h2 * h1 * m30 * m15 * m5 * m3 * m2 * m1 > 0)
-            if (h24 * h12 * h8 * h6 * h4 * h2 * h1 * m30 * m15 * m5 > 1)
+        if (_.min([h24, h12, h8, h6, h4, h2, h1, m30, m15, m5, m3, m2, m1]) > 0)
+            if (_.min([h24, h12, h8, h6, h4, h2, h1, m30, m15, m5]) > 1)
                 prices[perf.symbol] && found.push(perf.symbol)
     });
     if (found.length) {
