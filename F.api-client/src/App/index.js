@@ -62,6 +62,10 @@ const SUBS_SIGNALS = gql`
                 symbol
                 change
             }
+            day {
+                symbol
+                change
+            }
         }
     }
 `;

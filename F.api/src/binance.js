@@ -82,7 +82,8 @@ function updatePerf({ symbol, prevCandles, prevPerf }) {
 
         if (changePercent(close, +close + satoshi) < .6) {
             prevPerf[symbol] = getPrevPerformance({ prevCandles, symbol, ticks });
-        }else return;
+        } else return;
+
         if (isFinal) {
             console.log(symbol + ' final');
             const ONE_MIN = 1e3 * 60;
@@ -96,7 +97,7 @@ function updatePerf({ symbol, prevCandles, prevPerf }) {
         publish.throttle('prevPerf', Object.values(prevPerf)
             .map(perfs =>
                 _.mapKeys(perfs, (perf, period) =>
-                    _.last(period) + _.initial(period).join(''))));
+                  period==='day'?period:  _.last(period) + _.initial(period).join(''))));
 
     });
 }
@@ -110,7 +111,7 @@ function getPrevPerformance({ prevCandles, symbol, ticks }) {
     if (!prevCandles[symbol]) return;
 
 
-    return _.reduce(durations, (prev, duration, period) => {
+    const perfs = _.reduce(durations, (prev, duration, period) => {
         let prevTime = startTime - duration;
         let prevCandle = prevCandles[symbol][prevTime];
         prevCandle = prevCandle || (period === '24h' ? _.values(prevCandles[symbol])[0] : prevCandle);
@@ -122,6 +123,12 @@ function getPrevPerformance({ prevCandles, symbol, ticks }) {
             }
         } : prev;
     }, {});
+    const unJour = 24 * 60 * 60 * 1000;
+    let now = Date.now();
+    let dayOpenCandle = prevCandles[symbol][now - now % unJour];
+
+    perfs['day'] = { symbol, period: 'day', change: changePercent(dayOpenCandle.open, close) }
+    return perfs;
 }
 
 binance.exchangeInfo(async function (error, data) {

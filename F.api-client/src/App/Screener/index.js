@@ -10,7 +10,7 @@ export default class Screener extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { sortColumns: { h1: 'desc' } };
+        this.state = { sortColumns: { day: 'desc' } };
     }
 
     changeSortColumn = (e) => {
