@@ -63,7 +63,8 @@ module.exports = {
                 APP_NAME: 'Signal Compiler',
                 SYMBOLS_FILTER: 'btc$',
                 // SYMBOLS_FILTER: '(eth|xrp|bcc|ltc|eos|ada|xlm|miota|trx|neo|tusd|bcn|xmr|dash|xem|ven|bnb|etc|qtum|ont)btc$',
-                TIMEFRAMES: '5,15,60,240,1440'
+                TIMEFRAMES: '60,240,1440,10080'
+                // TIMEFRAMES: '5,15,60,240,1440'
                 // TIMEFRAMES: '1,5,15,60,240,1440'
                 // TIMEFRAMES: '240,1440,60'
             },
@@ -83,12 +84,12 @@ module.exports = {
                 NODE_ENV: 'production'
             }
         },
-       /* {
-            name: 'f_api_cli',
-            script: 'F.api-client/run.sh',
-            _cwd:'F.api-cli',
-            "exec_mode": "cluster",            
-        }*/
+        /* {
+             name: 'f_api_cli',
+             script: 'F.api-client/run.sh',
+             _cwd:'F.api-cli',
+             "exec_mode": "cluster",
+         }*/
 
     ],
 

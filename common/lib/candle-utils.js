@@ -55,7 +55,7 @@ const $this = module.exports = {
             return $this.computeChange(signal.candle.open, signal.candle.close);
         }
     },
-    async   getLastKey({ exchange, symbolId, timeframe, position = 0 }) {
+    async getLastKey({ exchange, symbolId, timeframe, position = 0 }) {
         let key = await $this.keyExistsAtPosition.apply(null, arguments);
         if (key) {
             return key
@@ -64,7 +64,7 @@ const $this = module.exports = {
         }
     },
     computeChange(openPrice, closePrice) {
-        return ((closePrice - openPrice) / openPrice) * 100;
+        return ((closePrice - openPrice) / (openPrice || NaN)) * 100;
     },
     valuePercent(price, change_percent) {
         return price * (1 + change_percent / 100);

@@ -47,22 +47,25 @@ module.exports = class extends M24Base {
 
     async canBuy({ symbolId, timeframe }, last, prev, signal) {
         let current = signal.candle;
+        const currentWeek = this.signals[10080][symbolId].candle;
         await this.getTrackings(current.id);
-        if (current)
-            if (last)
-                if (computeChange(last.ema20, last.ema10) > 1)
-                // if (computeChange(last.ema20, last.ema10) > 1)
-                    if (+current.rating >= 0)
-                        if (current.position_good_spread <= this.options.min_position)
-                            if (current.change_from_open > this.options.change_from_open_min)
-                                if (current.change_to_high - current.change_from_open <= current.spread_percentage)
-                                    if (current.close > (last.close + last.high) / 2)
-                                        if ((new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
-                                            this.options.timeframe * 3 / 4) {
-                                            // if (this.outOfTop[current.symbolId])
-                                            if (!this.hasTracking({ id: current.id, symbolId }))
-                                                return true;
-                                        }
+        if (currentWeek)
+            if (computeChange(currentWeek.ema20, currentWeek.ema10) > 1)
+                if (current)
+                    if (computeChange(current.ema20, current.ema10) > 1)
+                        if (last)
+                            if (computeChange(last.ema20, last.ema10) > 1)
+                                if (+current.rating >= 0)
+                                    if (current.position_good_spread <= this.options.min_position)
+                                        if (current.change_from_open > this.options.change_from_open_min)
+                                            if (current.change_to_high - current.change_from_open <= current.spread_percentage)
+                                                if (current.close > (last.close + last.high) / 2)
+                                                    if ((new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
+                                                        this.options.timeframe * 3 / 4) {
+                                                        // if (this.outOfTop[current.symbolId])
+                                                        if (!this.hasTracking({ id: current.id, symbolId }))
+                                                            return true;
+                                                    }
     }
 
     async canSell({ symbolId, timeframe }, last, prev, signal) {

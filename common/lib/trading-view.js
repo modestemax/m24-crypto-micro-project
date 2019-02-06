@@ -5,7 +5,14 @@ const { getNewCandleId, getCandleTime, computeChange } = require('./candle-utils
 const { subscribe, redisSet, redisGet } = require('../redis')
 
 const params = ({ timeframe, filter = 'btc$', exchangeId = 'binance' } = {}) => {
-    let timeframeFilter = !timeframe || /1d/i.test(timeframe) || +timeframe === 60 * 24 ? '' : '|' + timeframe;
+    let timeframeFilter;
+    if (!timeframe || /1d/i.test(timeframe) || +timeframe === 60 * 24) {
+        timeframeFilter = '';
+    } else if (+timeframe === 60 * 24 * 7) {
+        timeframeFilter = '|1W'
+    } else {
+        timeframeFilter = '|' + timeframe;
+    }
     return {
         timeframe,
         data: {
@@ -63,88 +70,89 @@ const params = ({ timeframe, filter = 'btc$', exchangeId = 'binance' } = {}) => 
 
 const beautify = (data, timeframe) => {
     return _(data).map(({ d }) => {
-        let id = getNewCandleId({ timeframe });
-        const signal = {
-            timeframe,
-            symbolId: d[0],
-            now: new Date(),
-            time: getCandleTime({ id, timeframe }),
-            id,
-            close: d[1],
-            change_percent: +d[2],
-            change_from_open: +d[21],
-            high: d[3],
-            low: d[4],
-            volume: d[5],
-            rating: d[6],
-            signal: getRatingText(d[6]),
-            signal_strength: strength(d[6]),
-            signal_string: signal_string(d[6]),
-            exchange: d[7].toLowerCase(),
-            description: d[8],
-            ema10: d[13],
-            ema20: d[14],
-            adx: d[9],
-            minus_di: d[10],
-            plus_di: d[11],
-            di_distance: d[11] - d[10],
-            macd: d[15],
-            macd_signal: d[16],
-            macd_distance: d[15] - d[16],
-            rsi: d[12],
-            volatility: d[22],
-            stochastic_k: d[23],
-            stochastic_d: d[24],
-            stochastic_rsik: d[25],
-            stochastic_rsid: d[26],
-            momentum: d[27],
-            aroon_up: d[17],
-            aroon_down: d[18],
-            vwma: d[19],
-            open: d[20],
-            bid: d[28],
-            ask: d[29],
-            bbl20: d[30],
-            bbu20: d[31],
-            bbb20: (d[30] + d[31]) / 2,
-            ema200: d[32],
-            ema50: d[33],
-            ema100: d[34],
-            ema30: d[35],
-        };
-        return {
-            ...signal,
-            green: signal.change_from_open > 0,
-            spread_percentage: computeChange(signal.bid, signal.ask),
-            change_to_high: computeChange(signal.open, signal.high)
-        }
-        function getRatingText(int) {
-            switch (true) {
-                case int > 0:
-                    return 'buy';
-                case int < 0:
-                    return 'sell';
-                default:
-                    return 'neutral'
+            let id = getNewCandleId({ timeframe });
+            const signal = {
+                timeframe,
+                symbolId: d[0],
+                now: new Date(),
+                time: getCandleTime({ id, timeframe }),
+                id,
+                close: d[1],
+                change_percent: +d[2],
+                change_from_open: +d[21],
+                high: d[3],
+                low: d[4],
+                volume: d[5],
+                rating: d[6],
+                signal: getRatingText(d[6]),
+                signal_strength: strength(d[6]),
+                signal_string: signal_string(d[6]),
+                exchange: d[7].toLowerCase(),
+                description: d[8],
+                ema10: d[13],
+                ema20: d[14],
+                adx: d[9],
+                minus_di: d[10],
+                plus_di: d[11],
+                di_distance: d[11] - d[10],
+                macd: d[15],
+                macd_signal: d[16],
+                macd_distance: d[15] - d[16],
+                rsi: d[12],
+                volatility: d[22],
+                stochastic_k: d[23],
+                stochastic_d: d[24],
+                stochastic_rsik: d[25],
+                stochastic_rsid: d[26],
+                momentum: d[27],
+                aroon_up: d[17],
+                aroon_down: d[18],
+                vwma: d[19],
+                open: d[20],
+                bid: d[28],
+                ask: d[29],
+                bbl20: d[30],
+                bbu20: d[31],
+                bbb20: (d[30] + d[31]) / 2,
+                ema200: d[32],
+                ema50: d[33],
+                ema100: d[34],
+                ema30: d[35],
+            };
+            return {
+                ...signal,
+                green: signal.change_from_open > 0,
+                spread_percentage: computeChange(signal.bid, signal.ask),
+                change_to_high: computeChange(signal.open, signal.high)
+            }
+
+            function getRatingText(int) {
+                switch (true) {
+                    case int > 0:
+                        return 'buy';
+                    case int < 0:
+                        return 'sell';
+                    default:
+                        return 'neutral'
+                }
+            }
+
+            function strength(int) {
+                switch (true) {
+                    case int > .5:
+                        return 1;
+                    case int < -.5:
+                        return 1;
+                    default:
+                        return 0
+                }
+            }
+
+            function signal_string(int) {
+
+                return (strength(int) === 1 ? 'Strong ' : '') + getRatingText(int)
             }
         }
-
-        function strength(int) {
-            switch (true) {
-                case int > .5:
-                    return 1;
-                case int < -.5:
-                    return 1;
-                default:
-                    return 0
-            }
-        }
-
-        function signal_string(int) {
-
-            return (strength(int) === 1 ? 'Strong ' : '') + getRatingText(int)
-        }
-    }
     ).filter(d => d).groupBy('symbolId').mapValues(([v]) => v).value()
 };
 
