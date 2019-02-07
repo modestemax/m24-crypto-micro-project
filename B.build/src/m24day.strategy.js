@@ -49,8 +49,8 @@ module.exports = class extends M24Base {
         let current = signal.candle;
         const currentWeek = this.signals[10080][symbolId].candle;
         await this.getTrackings(current.id);
-        if (currentWeek)
-            if (computeChange(currentWeek.ema20, currentWeek.ema10) > 1)
+        // if (currentWeek)
+        //     if (computeChange(currentWeek.ema20, currentWeek.ema10) > 1)
                 if (current)
                     if (computeChange(current.ema20, current.ema10) > 1)
                         if (last)
