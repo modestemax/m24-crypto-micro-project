@@ -1,28 +1,30 @@
 const prices = require('../progress/prices');
-
-const viewing = {};
-
+const { publish } = require('common/redis');
+const trades = {};
+const ONE_MIN = 1e3 * 60
 const change = (open, close) => (close - open) / open;
 const changePercent = (open, close) => change(open, close) * 100;
 
-module.exports = function ({ symbol, startAt }) {
-    if (!viewing[symbol])
-        viewing[symbol] = { symbol, startAt, change_max: -Infinity }
+module.exports = Object.assign(view, { trades });
+
+function view({ symbol, open }) {
+    if (!trades[symbol])
+        trades[symbol] = { symbol, open, time: Date.now(), change_max: -Infinity }
 };
 
 setInterval(function () {
-    for (let symbol in viewing) {
-        let vs = viewing[symbol];
-        vs.change_prev = vs.change;
-        vs.change = changePercent(vs.startAt, prices[vs.symbol]);
-        vs.change_max = Math.max(vs.change, vs.change_max);
-        if (vs.change !== vs.change_prev) {
-            console.log(`${vs.symbol} ${vs.change.toFixed(2)}% | ${vs.change_max.toFixed(2)}%`)
+    Object.values(trades).forEach(function (trade) {
+        trade.change_prev = trade.change;
+        trade.change = changePercent(trade.startAt, prices[trade.symbol]);
+        trade.change_max = Math.max(trade.change, trade.change_max);
+        if (trade.change !== trade.change_prev) {
+            console.log(`${trade.symbol} ${trade.change.toFixed(2)}% | ${trade.change_max.toFixed(2)}%`)
+            publish('TRADE_PROGRESS', trade)
         }
-        if (vs.change < -2 || vs.change_max - vs.change > 2) {
-            delete viewing[vs.symbol];
-            console.log(`${vs.symbol} max= ${vs.change_max.toFixed(2)}%`)
-
+        if (trade.change < 0 && (Date.now() - trade.time) > ONE_MIN * 30) {
+            delete trades[trade.symbol];
+            console.log(`${trade.symbol} max= ${trade.change_max.toFixed(2)}%`)
+            publish('TRADE_END', trade)
         }
-    }
+    });
 }, 1000);

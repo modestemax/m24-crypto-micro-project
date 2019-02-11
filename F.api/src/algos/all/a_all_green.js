@@ -1,8 +1,8 @@
 const _ = require('lodash');
 
-const algo = require('./index');
-const prices = require('../progress/prices');
-const viewProgess = require('../progress/viewProgess');
+const algo = require('..');
+const prices = require('../../progress/prices');
+const viewProgess = require('../../progress/viewProgess');
 
 let timeRef = 'h2';
 let changeRef = 3;

@@ -4,24 +4,18 @@
 const QUOTE_ASSET_REGEX = /btc$/i;
 // const QUOTE_ASSET="USDT";
 const _ = require('lodash');
-const auth = require((process.env.HOME || '~') + '/.api.json').KEYS;
 const { publish } = require('common/redis');
-var term = require('terminal-kit').terminal;
-const log = console.log;
-console.log = (...args) => {
-    console.clear();
-    term.move(0, 0, args.join(' '))
-}
+// var term = require('terminal-kit').terminal;
+// const log = console.log;
+// console.log = (...args) => {
+//     console.clear();
+//     term.move(0, 0, args.join(' '))
+// }
 
-const getBinance = () => require('node-binance-api')().options({
-    APIKEY: auth.api_key,
-    APISECRET: auth.secret,
-    useServerTime: true, // If you get timestamp errors, synchronize to server time at startup
-    test: true // If you want to use sandbox mode where orders are simulated
-});
+
+const binance =  require('./init-binance')
 publish.throttle = _.throttle(publish, 1e3);
 
-const binance = getBinance();
 const satoshi = 1e-8
 const durations = _.mapValues({
     '1m': 1, '2m': 2, '3m': 3, '5m': 5, '15m': 15, '30m': 30, '1h': 60, '2h': 120,
