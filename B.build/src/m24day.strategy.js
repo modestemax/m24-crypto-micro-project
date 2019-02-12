@@ -51,21 +51,28 @@ module.exports = class extends M24Base {
         await this.getTrackings(current.id);
         // if (currentWeek)
         //     if (computeChange(currentWeek.ema20, currentWeek.ema10) > 1)
-                if (current)
-                    if (computeChange(current.ema20, current.ema10) > 1)
-                        if (last)
-                            if (computeChange(last.ema20, last.ema10) > 1)
-                                if (+current.rating >= 0)
-                                    if (current.position_good_spread <= this.options.min_position)
-                                        if (current.change_from_open > this.options.change_from_open_min)
-                                            if (current.change_to_high - current.change_from_open <= current.spread_percentage)
-                                                if (current.close > (last.close + last.high) / 2)
-                                                    if ((new Date(current.now) - new Date(current.time)) / (1e3 * 60) <
-                                                        this.options.timeframe * 3 / 4) {
-                                                        // if (this.outOfTop[current.symbolId])
-                                                        if (!this.hasTracking({ id: current.id, symbolId }))
-                                                            return true;
-                                                    }
+        if (current && last)
+            //ema10>>ema20 sur le point courant
+            if (computeChange(current.ema20, current.ema10) > 1)
+                //ema10>>ema20 sur le point precedent
+                if (computeChange(last.ema20, last.ema10) > 1)
+                    //le status dois etre "buy"
+                    if (+current.rating >= 0)
+                        //ne considerer que les top
+                        if (current.position_good_spread <= this.options.min_position)
+                            //doit avoir fait un certain min
+                            if (current.change_from_open > this.options.change_from_open_min)
+                                //eviter ceux sui ont chuter avant
+                                if (current.change_to_high - current.change_from_open <= current.spread_percentage)
+                                    //la nouvelle bougie doit depasser le milieu de la bougie precedente si elle est rouge
+                                    //ou le milieu du filament supperieur si bougie verte 
+                                    if (current.close > (last.close + last.high) / 2)
+                                        //ne trade que pendant les 3/4 du temps, ie 0h-18h
+                                        if ((new Date(current.now) - new Date(current.time)) / (1e3 * 60) < this.options.timeframe * 3 / 4) {
+                                            // if (this.outOfTop[current.symbolId])
+                                            if (!this.hasTracking({ id: current.id, symbolId }))
+                                                return true;
+                                        }
     }
 
     async canSell({ symbolId, timeframe }, last, prev, signal) {
