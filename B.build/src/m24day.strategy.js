@@ -68,7 +68,7 @@ module.exports = class extends M24Base {
                                     //ou le milieu du filament supperieur si bougie verte 
                                     if (current.close > (last.close + last.high) / 2)
                                         //ne trade que pendant les 3/4 du temps, ie 0h-18h
-                                        if ((new Date(current.now) - new Date(current.time)) / (1e3 * 60) < this.options.timeframe * 3 / 4) {
+                                        if ((new Date(current.now) - new Date(current.time)) / (1e3 * 60) < this.options.timeframe * 4 / 4) {
                                             // if (this.outOfTop[current.symbolId])
                                             if (!this.hasTracking({ id: current.id, symbolId }))
                                                 return true;
