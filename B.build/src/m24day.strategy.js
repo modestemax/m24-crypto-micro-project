@@ -52,10 +52,10 @@ module.exports = class extends M24Base {
         // if (currentWeek)
         //     if (computeChange(currentWeek.ema20, currentWeek.ema10) > 1)
         if (current && last)
-            //ema10>>ema20 sur le point courant
-            if (computeChange(current.ema20, current.ema10) > 1)
-                //ema10>>ema20 sur le point precedent
-                if (computeChange(last.ema20, last.ema10) > 1)
+            //ema10>>ema20 sur le point precedent
+            if (computeChange(last.ema20, last.ema10) > .4)
+                //ema10>>ema20 sur le point courant
+                if (computeChange(current.ema20, current.ema10) > 1)
                     //le status dois etre "buy"
                     if (+current.rating >= 0)
                         //ne considerer que les top
