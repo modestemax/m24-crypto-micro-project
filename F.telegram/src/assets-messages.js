@@ -116,18 +116,18 @@ const $this = module.exports = new class {
     });
   }
   tradeForgotten({ clientOrderId, symbolId, timestamp, openPrice, closePrice, quantity }) {
-    clientOrderId = clientOrderId || 'UNKNOWN';
-    let duration = Date.now() - timestamp;
-    let change = computeChange(openPrice, closePrice);
-    const strategyName = clientOrderId.split("_")[0];
-    const M1 = 1e3 * 60;
-    duration > M1 && tme.sendMessage({
-      chat_id: M24_CHAT_ID,
-      text: ["#trade_forgotten",
-        `#${strategyName}, #${symbolId}`,
-        `change: ${change} `,
-        ` since ${humanizeDuration(duration)} `].join("\n")
-    });
+    // clientOrderId = clientOrderId || 'UNKNOWN';
+    // let duration = Date.now() - timestamp;
+    // let change = computeChange(openPrice, closePrice);
+    // const strategyName = clientOrderId.split("_")[0];
+    // const M1 = 1e3 * 60;
+    // duration > M1 && tme.sendMessage({
+    //   chat_id: M24_CHAT_ID,
+    //   text: ["#trade_forgotten",
+    //     `#${strategyName}, #${symbolId}`,
+    //     `change: ${change} `,
+    //     ` since ${humanizeDuration(duration)} `].join("\n")
+    // });
   }
 
   endTrade(trade) {
