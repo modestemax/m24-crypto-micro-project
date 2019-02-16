@@ -66,7 +66,7 @@ module.exports = {
                 // TIMEFRAMES: '60,240,1440,10080'
                 // TIMEFRAMES: '5,15,60,240,1440'
                 // TIMEFRAMES: '1,5,15,60,240,1440'
-                TIMEFRAMES: '5,15,60,1440'
+                TIMEFRAMES: '60,240,1440'
                 // TIMEFRAMES: '240,1440,60'
             },
             env_production: {
