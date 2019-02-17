@@ -50,7 +50,7 @@ module.exports = {
                 break;
         }
         tme.sendMessage({ chat_id: data.chat_id || M24_LOG_CHAT_ID, text });
-        /#m24day/.test(text) && tme.sendMessage({ chat_id: MODESTE_MAX, text });
+        /#m24/.test(text) && tme.sendMessage({ chat_id: MODESTE_MAX, text });
 
     },
     'm24sync:*': function (text) {

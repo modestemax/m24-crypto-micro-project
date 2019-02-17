@@ -16,7 +16,15 @@ module.exports = class extends M24Base {
 
     async canBuy({ symbolId, timeframe }, _last, _prev, signal) {
         let current = signal.candle;
-        if (current.position_good_spread == 1) first = current;
+        if (current.position_good_spread == 1) {
+            first = current;
+            if(in_>first.change_to_high){
+                sell()
+                last = null;
+                in_=5
+                out=3
+            }
+        }
         if (first)
             if (!last) {
                 if (last && last.symbolId === current.symbolId) last.close = current.close;
