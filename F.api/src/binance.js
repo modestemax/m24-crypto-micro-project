@@ -13,7 +13,7 @@ const { publish } = require('common/redis');
 // }
 
 
-const binance =  require('./init-binance')
+const binance = require('./init-binance')
 publish.throttle = _.throttle(publish, 1e3);
 
 const satoshi = 1e-8
@@ -91,7 +91,7 @@ function updatePerf({ symbol, prevCandles, prevPerf }) {
         publish.throttle('prevPerf', Object.values(prevPerf)
             .map(perfs =>
                 _.mapKeys(perfs, (perf, period) =>
-                  period==='day'?period:  _.last(period) + _.initial(period).join(''))));
+                    period[0] === '_' || period === 'day' ? period : _.last(period) + _.initial(period).join(''))));
 
     });
 }
@@ -112,24 +112,45 @@ function getPrevPerformance({ prevCandles, symbol, ticks }) {
 
         return prevCandle ? {
             ...prev, [period]: {
-                symbol, period,
+                symbol, period, close, time: startTime, time_f: new Date(startTime),
                 change: changePercent(prevCandle.open, close)
             }
         } : prev;
     }, {});
     const unJour = 24 * 60 * 60 * 1000;
     let now = Date.now();
-    let dayOpenCandle = prevCandles[symbol][now - now % unJour];
+    Object.entries({
+        _1m: 1,
+        _2m: 2,
+        _3m: 3,
+        _5m: 5,
+        _15m: 15,
+        _30m: 30,
+        _1h: 60,
+        _2h: 120,
+        _4h: 240,
+        _6h: 360,
+        _8h: 480,
+        _12h: 720,
+        _24h: 1440
+    })
+        .map(([period, durationMinutes]) => {
+            let duration = durationMinutes * 60 * 1000
+            let openCandle = prevCandles[symbol][now - now % duration];
+            perfs[period] = { symbol, period, change: +(openCandle && changePercent(openCandle.open, close)) }
+        })
+    // let dayOpenCandle = prevCandles[symbol][now - now % unJour];
 
-    perfs['day'] = { symbol, period: 'day', change: changePercent(dayOpenCandle.open, close) }
+    perfs['day'] = perfs['_24h']
     return perfs;
 }
 
-binance.exchangeInfo(async function (error, data) {
+binance.exchangeInfo(async function ex_info(error, data) {
 
-    if (error)
+    if (error) {
         console.log(error);
-    else {
+        binance.exchangeInfo(ex_info)
+    } else {
         // const symbols = ['ETHBTC', 'ADABTC'];
         const symbols = data.symbols
             .filter(s => s.status === "TRADING")

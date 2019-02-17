@@ -2,10 +2,10 @@ const Promise = require("bluebird");
 const _ = require("lodash");
 // const ccxt = require("ccxt");
 const redisLib = require("redis");
-// const redisClient = redisLib.createClient({ host: process.env.REDIS_HOST });
-const redis = Promise.promisifyAll(redisLib.createClient({ host: process.env.REDIS_HOST }));
-const redisSub = Promise.promisifyAll(redisLib.createClient({ host: process.env.REDIS_HOST }));
-const redisPub = Promise.promisifyAll(redisLib.createClient({ host: process.env.REDIS_HOST }));
+const redisClient = redisLib.createClient({ host: process.env.REDIS_HOST });
+const redis = Promise.promisifyAll(redisClient.duplicate());
+const redisSub = Promise.promisifyAll(redisClient.duplicate());
+const redisPub = Promise.promisifyAll(redisClient.duplicate());
 
 redisSub.setMaxListeners(0);
 
