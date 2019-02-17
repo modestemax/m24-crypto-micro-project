@@ -19,7 +19,7 @@ module.exports = class extends M24Base {
         if (current.position_good_spread == 1) first = current;
         if (first)
             if (!last) {
-                if(last.symbolId===current.symbolId)last.close=current.close;
+                if (last && last.symbolId === current.symbolId) last.close = current.close;
                 if (first.change_from_open > in_) {
                     last = first;
                     buy()
@@ -45,8 +45,10 @@ let log = []
 function buy() {
     log.push(last);
     last.openPercent = last.change_from_open;
-    publish(`m24:algo:tracking`, { strategyName:'m24first',
-        text: `buy ${last.symbolId} at ${last.close}` });
+    publish(`m24:algo:tracking`, {
+        strategyName: 'm24first',
+        text: `buy ${last.symbolId} at ${last.close}`
+    });
 
 }
 
