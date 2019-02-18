@@ -16,11 +16,20 @@ module.exports = class extends M24Base {
 
     async canBuy({ symbolId, timeframe }, _last, _prev, signal) {
         let current = signal.candle;
-        if (last && current && (current.symbolId !== last.symbolId || current.position_good_spread !== 1)) return
+        if (last && current) {
+            //update last
+            if (last.symbolId === current.symbolId) Object.assign(last, current)
+            //skip other symbol
+            if ((current.symbolId !== last.symbolId || current.position_good_spread !== 1)) return
+        }
 
         if (current.position_good_spread == 1) {
+            //update first
             first = current;
-            if (in_ > first.change_to_high) {
+
+            // if in_ is to far from first's high reset all
+            // in_>first.change_to_high
+            if (+(in_ - first.change_to_high).toFixed(2) > 0) {
                 last && sell()
                 init()
             }
@@ -29,12 +38,11 @@ module.exports = class extends M24Base {
             if (!last) {
                 if (
                     first.change_from_open > in_
-                    && first.change_to_high - first.change_from_open < 2
+                    && first.change_to_high - first.change_from_open < stop
                 ) {
                     buy()
                 }
             } else {
-                if (last.symbolId === current.symbolId) Object.assign(last, current)
 
                 if (last.change_from_open > out && last.symbolId === first.symbolId) {
                     in_ = _.max([in_, last.change_from_open]);
