@@ -421,7 +421,7 @@ module.exports = {
             // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
-            timeframe: 60 ,
+            timeframe: 60 *4,
             // timeframe: 60 * 24,
             timeframes: [],
             change_from_open_min: 2,
