@@ -27,7 +27,7 @@ module.exports = class extends M24Base {
         }
         if (first)
             if (!last) {
-                if (last && last.symbolId === current.symbolId) last.close = current.close;
+                if (last && last.symbolId === current.symbolId) Object.assign(last, current)
                 if (first.change_from_open > in_) {
                     last = first;
                     buy()
