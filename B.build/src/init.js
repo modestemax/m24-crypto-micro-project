@@ -12,7 +12,7 @@ redisSubscribe('newData:*', {
         }
 
         for (let [name, strategy] of Object.entries(strategies)) {
-            debug('checkin strategy', strategy, signal.symbolId, signal.timeframe);
+            debug('checkin strategy', strategy.name, signal.symbolId, signal.timeframe);
             strategy.signals[+signal.timeframe] = strategy.signals[+signal.timeframe] || {};
             strategy.signals[+signal.timeframe][signal.symbolId] = signal;
 
