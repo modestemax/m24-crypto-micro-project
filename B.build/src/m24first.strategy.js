@@ -16,6 +16,8 @@ module.exports = class extends M24Base {
 
     async canBuy({ symbolId, timeframe }, _last, _prev, signal) {
         let current = signal.candle;
+        if (current.symbolId !== last.symbolId || current.position_good_spread !== 1) return
+
         if (current.position_good_spread == 1) {
             first = current;
             if (in_ > first.change_to_high) {
@@ -29,7 +31,6 @@ module.exports = class extends M24Base {
                     first.change_from_open > in_
                     && first.change_to_high - first.change_from_open < 2
                 ) {
-                    last = first;
                     buy()
                 }
             } else {
@@ -43,7 +44,6 @@ module.exports = class extends M24Base {
                     || last.position_good_spread < 2
                     || first.change_from_open - last.change_from_open > 1) {
                     sell()
-                    last = null;
                 }
             }
     }
@@ -66,6 +66,7 @@ function init() {
 }
 
 function buy() {
+    last = first;
     log.push(last);
     last.openPercent = last.change_from_open;
     publish(`m24:algo:tracking`, {
@@ -83,5 +84,6 @@ function sell() {
         text: `#${log.length}sell  ${last.symbolId} at ${last.close} gain ${last.gain.toFixed(2)}% 
         [${last.change_from_open.toFixed(2)}%] [next buy at ${in_.toFixed(2)}%]`
     });
+    last = null;
 
 }
