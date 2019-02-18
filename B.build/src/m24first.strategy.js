@@ -25,16 +25,23 @@ module.exports = class extends M24Base {
         }
         if (first)
             if (!last) {
-                if (first.change_from_open > in_) {
+                if (
+                    first.change_from_open > in_
+                    && first.change_to_high - first.change_from_open < 2
+                ) {
                     last = first;
                     buy()
                 }
             } else {
                 if (last.symbolId === current.symbolId) Object.assign(last, current)
+
                 if (last.change_from_open > out && last.symbolId === first.symbolId) {
                     in_ = _.max([in_, last.change_from_open]);
                     out = in_ - stop
-                } else {
+                } else if (
+                    !(last.change_from_open > out)
+                    || last.position_good_spread < 2
+                    || first.change_from_open - last.change_from_open > 1) {
                     sell()
                     last = null;
                 }
