@@ -27,12 +27,12 @@ module.exports = class extends M24Base {
         }
         if (first)
             if (!last) {
-                if (last && last.symbolId === current.symbolId) Object.assign(last, current)
                 if (first.change_from_open > in_) {
                     last = first;
                     buy()
                 }
             } else {
+                if (last.symbolId === current.symbolId) Object.assign(last, current)
                 if (last.change_from_open > out && last.symbolId === first.symbolId) {
                     in_ = _.max([in_, last.change_from_open]);
                     out = in_ - 2
