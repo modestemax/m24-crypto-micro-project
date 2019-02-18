@@ -55,7 +55,7 @@ function buy() {
     last.openPercent = last.change_from_open;
     publish(`m24:algo:tracking`, {
         strategyName: 'm24first',
-        text: `buy ${last.symbolId} at ${last.close}`
+        text: `#${log.length}buy ${last.symbolId} at ${last.close}`
     });
 
 }
@@ -65,7 +65,7 @@ function sell() {
     last.gain = last.closePercent - last.openPercent
     publish(`m24:algo:tracking`, {
         strategyName: 'm24first',
-        text: `sell  ${last.symbolId} at ${last.close} gain ${last.gain}%`
+        text: `#${log.length}sell  ${last.symbolId} at ${last.close} gain ${last.gain}%`
     });
 
 }
