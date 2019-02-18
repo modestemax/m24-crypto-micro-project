@@ -60,8 +60,8 @@ init()
 
 function init() {
     last = null;
-    stop = 2
-    in_ = 5
+    stop = 1
+    in_ = 2.5
     out = in_ - stop
 }
 
