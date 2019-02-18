@@ -20,9 +20,7 @@ module.exports = class extends M24Base {
             first = current;
             if (in_ > first.change_to_high) {
                 last && sell()
-                last = null;
-                in_ = 5
-                out = 3
+                init()
             }
         }
         if (first)
@@ -35,7 +33,7 @@ module.exports = class extends M24Base {
                 if (last.symbolId === current.symbolId) Object.assign(last, current)
                 if (last.change_from_open > out && last.symbolId === first.symbolId) {
                     in_ = _.max([in_, last.change_from_open]);
-                    out = in_ - 2
+                    out = in_ - stop
                 } else {
                     sell()
                     last = null;
@@ -44,18 +42,28 @@ module.exports = class extends M24Base {
     }
 };
 
-let in_ = 5;
-let out = 3;
-let first = null;
+let in_;
+let out;
+let stop;
 let last = null;
+
+let first = null;
 let log = []
+init()
+
+function init() {
+    last = null;
+    stop = 2
+    in_ = 5
+    out = in_ - stop
+}
 
 function buy() {
     log.push(last);
     last.openPercent = last.change_from_open;
     publish(`m24:algo:tracking`, {
         strategyName: 'm24first',
-        text: `#${log.length}buy ${last.symbolId} at ${last.close}`
+        text: `#${log.length}buy ${last.symbolId} at ${last.close} [${last.change_from_open.toFixed(2)}%]`
     });
 
 }
@@ -65,7 +73,8 @@ function sell() {
     last.gain = last.closePercent - last.openPercent
     publish(`m24:algo:tracking`, {
         strategyName: 'm24first',
-        text: `#${log.length}sell  ${last.symbolId} at ${last.close} gain ${last.gain}%`
+        text: `#${log.length}sell  ${last.symbolId} at ${last.close} gain ${last.gain.toFixed(2)}% 
+        [${last.change_from_open.toFixed(2)}%] [next buy at ${in_.toFixed(2)}%]`
     });
 
 }
