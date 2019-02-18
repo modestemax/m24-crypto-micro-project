@@ -43,15 +43,17 @@ module.exports = class extends M24Base {
                     buy()
                 }
             } else {
-
-                if (last.change_from_open > out && last.symbolId === first.symbolId) {
-                    in_ = _.max([in_, last.change_from_open]);
-                    out = in_ - stop
-                } else if (
-                    !(last.change_from_open > out)
-                    || last.position_good_spread < 2
-                    || first.change_from_open - last.change_from_open > 1) {
-                    sell()
+                sellIfFastGrow()
+                if (last) {
+                    if (last.change_from_open > out && last.symbolId === first.symbolId) {
+                        in_ = _.max([in_, last.change_from_open]);
+                        out = in_ - stop
+                    } else if (
+                        !(last.change_from_open > out)
+                        || last.position_good_spread < 2
+                        || first.change_from_open - last.change_from_open > 1) {
+                        sell()
+                    }
                 }
             }
     }
@@ -64,11 +66,12 @@ let last = null;
 
 let first = null;
 let log = []
+const FAST_GROW = 5
 init()
 
 function init() {
     last = null;
-    stop = 1
+    stop = 2
     in_ = 2.5
     out = in_ - stop
 }
@@ -93,5 +96,12 @@ function sell() {
         [${last.change_from_open.toFixed(2)}%] [next buy at ${in_.toFixed(2)}%]`
     });
     last = null;
+}
 
+function sellIfFastGrow() {
+    last.prevGain = last.gain
+    last.gain = last.change_from_open - last.openPercent
+    if (last.gain - last.prevGain > FAST_GROW) {
+        sell()
+    }
 }
