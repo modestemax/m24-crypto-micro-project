@@ -6,7 +6,7 @@ const { subscribe: redisSubscribe, publish } = require('common/redis');
 
 redisSubscribe('newData:*', {
     'newData:.*': function (signal, channel) {
-        if (signal.candle.position_good_spread < 5) {
+        if (signal.candle.position_good_spread ===1) {
             console.log(`signal received tf:${signal.timeframe} ${signal.symbolId} rang:${signal.candle.position_good_spread}/${signal.candle.position} change:${signal.candle.change_from_open.toFixed(2)}`)
             debug('data received', channel);
         }

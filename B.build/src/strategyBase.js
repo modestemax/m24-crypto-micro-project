@@ -56,7 +56,7 @@ module.exports = class Strategy {
 				let ask = _.get(ticker, this.options.sellMode === 'limit' ? 'ask' : 'bid');
 				let now = _.get(ticker, 'now');
 				canBuy && console.log(`${this.name} ${symbolId} BID AT ${bid} ${now} `);
-				canSell && console.log(`${this.name} ${symbolId} ASK AT ${ask} ${now} `);
+				// canSell && console.log(`${this.name} ${symbolId} ASK AT ${ask} ${now} `);
 
 				Object.assign(this, { symbolId, bid, ask, timeframe });
 				if (canBuy) {
