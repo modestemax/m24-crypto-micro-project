@@ -18,11 +18,11 @@ module.exports = class extends M24Base {
         let current = signal.candle;
         if (current.position_good_spread == 1) {
             first = current;
-            if(in_>first.change_to_high){
-                sell()
+            if (in_ > first.change_to_high) {
+                last && sell()
                 last = null;
-                in_=5
-                out=3
+                in_ = 5
+                out = 3
             }
         }
         if (first)
