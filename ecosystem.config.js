@@ -9,7 +9,7 @@ module.exports = {
         {
             name: 'f_telegram',
             script: 'F.telegram/src/index.js',
-            "exec_mode": "cluster",
+            "exec_mode": "fork",
             "node_args": "--inspect=0.0.0.0:5855",
             env: {
                 APP_NAME: 'Telegram IHM',
@@ -22,7 +22,7 @@ module.exports = {
         {
             name: 'd_run',
             script: 'D.run/src/index.js',
-            "exec_mode": "cluster",
+            "exec_mode": "fork",
             "node_args": "--inspect=0.0.0.0:5854",
             env: {
                 APP_NAME: 'BINANCE Event Listener',
@@ -35,7 +35,7 @@ module.exports = {
         {
             name: 'c_publish ',
             script: 'C.publish/src/index.js',
-            "exec_mode": "cluster",
+            "exec_mode": "fork",
             "node_args": "--inspect=0.0.0.0:5853",
             env: {
                 APP_NAME: 'BID/ASK Maker',
@@ -48,7 +48,7 @@ module.exports = {
         {
             name: 'b_build',
             script: 'B.build/src/index.js',
-            "exec_mode": "cluster",
+            "exec_mode": "fork",
             "node_args": "--inspect=0.0.0.0:5852",
             env: {
                 APP_NAME: 'Strategy Matcher',
@@ -61,7 +61,7 @@ module.exports = {
         {
             name: 'a_compile',
             script: 'A.compile/src/index.js',
-            "exec_mode": "cluster",
+            "exec_mode": "fork",
             "node_args": "--inspect=0.0.0.0:5851",
             env: {
                 // DEBUG: '*',
