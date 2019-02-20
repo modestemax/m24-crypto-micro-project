@@ -4,7 +4,7 @@
 const QUOTE_ASSET_REGEX = /btc$/i;
 // const QUOTE_ASSET="USDT";
 const _ = require('lodash');
-const { publish } = require('common/redis');
+const { publish, subscribe } = require('common/redis');
 
 
 const binance = require('./init-binance')
@@ -16,6 +16,7 @@ publish.throttle = _.throttle(publish, 1e3);
 const MAX_SPREAD = .6
 const SATOSHI = 1e-8
 const candles = {}
+const symbols = []
 
 const DURATION = {
     MIN_1: 1, MIN_2: 2, MIN_3: 3, MIN_5: 5, MIN_15: 15, MIN_30: 30,
@@ -23,22 +24,38 @@ const DURATION = {
 }
 Object.keys(DURATION).forEach(duration => DURATION[duration] *= 60 * 1e3)
 
+const DEFAULT_PERIODS = {
+    m1: DURATION.MIN_1,
+    m2: DURATION.MIN_2,
+    m3: DURATION.MIN_3,
+    m5: DURATION.MIN_5,
+    m15: DURATION.MIN_15,
+    m30: DURATION.MIN_30,
+    h1: DURATION.HOUR_1,
+    h2: DURATION.HOUR_2,
+    h4: DURATION.HOUR_4,
+    h6: DURATION.HOUR_6,
+    h8: DURATION.HOUR_8,
+    h12: DURATION.HOUR_12,
+    h24: DURATION.HOUR_24,
+    day: () => Date.now() - Date.now() % DURATION.HOUR_24,
+    H4: () => Date.now() - Date.now() % DURATION.HOUR_4,
+}
+
 const change = (open, close) => (close - open) / open;
 const changePercent = (open, close) => change(open, close) * 100;
 
-function indexTicksByTime(ticks) {
-    return ticks.reduce((ticks, tick) => {
-        let [time, open, high, low, close, volume, closeTime, assetVolume,
-            trades, buyBaseVolume, buyAssetVolume, ignored] = tick;
-        return {
-            ...ticks,
-            [time]: {
-                time, open, high, low, close, volume, closeTime,
-                assetVolume, trades, buyBaseVolume, buyAssetVolume, ignored
-            }
+const indexTicksByTime = ticks => ticks.reduce((ticks, tick) => {
+    let [startTime, open, high, low, close, volume, closeTime, assetVolume,
+        trades, buyBaseVolume, buyAssetVolume, ignored] = tick;
+    return {
+        ...ticks,
+        [startTime]: {
+            startTime, open, high, low, close, volume, closeTime,
+            assetVolume, trades, buyBaseVolume, buyAssetVolume, ignored
         }
-    }, {});
-}
+    }
+}, {});
 
 
 /**
@@ -48,7 +65,7 @@ function indexTicksByTime(ticks) {
  * @param limit
  * @returns {Promise<*>}
  */
-async function loadCandles(symbol, interval = '1m', limit = 1440) {
+async function loadCandles(symbol, interval = '1m', limit = 1440 + 15) {
     // $FlowFixMe
     let { ticks: ticks1, closeTime } = await getCandlesticksFromBinance({
         symbol, interval, startTime: Date.now() - limit * 60 * 1e3
@@ -79,9 +96,9 @@ async function loadCandles(symbol, interval = '1m', limit = 1440) {
  * @param candles
  */
 function listenToPriceChange(symbol) {
-    binance.websockets.candlesticks(symbol, '1m', ({ ticks }) => {
+    binance.websockets.candlesticks(symbol, '1m', ({ k: ticks }) => {
         let {
-            t: startTime, x: isFinal, i: interval, t: time, o: open, h: high, l: low, c: close, v: volume, T: closeTime,
+            t: startTime, x: isFinal, i: interval, o: open, h: high, l: low, c: close, v: volume, T: closeTime,
             assetVolume, n: trades,/*V: buyBaseVolume,q: buyAssetVolume, ignored*/
         } = ticks;
         // console.log(symbol + " " + interval + " candlestick update");
@@ -92,8 +109,8 @@ function listenToPriceChange(symbol) {
         // } else return;
         addOrUpdateCandle({
             symbol, startTime, candle: {
-                isFinal,
-                time, open, high, low, close, volume, startTime, closeTime,
+                isFinal, interval,
+                open, high, low, close, volume, startTime, closeTime,
                 assetVolume, trades,/*V: buyBaseVolume,q: buyAssetVolume, ignored*/
                 // change:changePercent(open,close)
             }
@@ -101,7 +118,7 @@ function listenToPriceChange(symbol) {
 
         if (isFinal) {
             console.log(symbol + ' final');
-            forgetOldCandle(symbol)
+            forgetOldCandles(symbol)
         }
     });
 }
@@ -110,116 +127,69 @@ function addOrUpdateCandle({ symbol, startTime, candle }) {
     candles[symbol][startTime] = candle
 }
 
-function publishPerf() {
-    publish.throttle('prevPerf', Object.values(prevPerf)
-        .map(perfs =>
-            _.mapKeys(perfs, (perf, period) =>
-                period[0] === '_' || period === 'day' ? period : _.last(period) + _.initial(period).join(''))));
-
-}
-
 /**
  * forget candle older than 24h
  */
-function forgetOldCandle(symbol) {
+function forgetOldCandles(symbol) {
     if (candles[symbol]) {
-        const now = Date.now();
-        const time = now - now % DURATION.MIN_1
-        let oldTime = time - (DURATION.HOUR_24 + DURATION.MIN_5);
-        delete candles[symbol][oldTime];
+        const now = Date.now() - Date.now() % DURATION.MIN_1
+        let oldTime = now - (DURATION.HOUR_24 + DURATION.MIN_15);
+        Object.keys(candles[symbol]).forEach(time => time < oldTime && delete candles[symbol][oldTime])
     }
 }
 
-function getPrevPerformance({ candles, symbol, ticks }) {
-    let {
-        t: startTime, o: open, h: high, l: low, c: close, v: volume,
-        n: trades, i: interval, x: isFinal, q: quoteVolume, V: buyVolume,
-        Q: quoteBuyVolume
-    } = ticks;
-    if (!prevCandles[symbol]) return; //no candle for symbol
-
-
-    const perfs = _.reduce(DURATION, (prev, duration, period) => {
-        let prevTime = startTime - duration;
-        let prevCandle = prevCandles[symbol][prevTime];
-        prevCandle = prevCandle || (period === '24h' ? _.values(prevCandles[symbol])[0] : prevCandle);
-
-        return prevCandle ? {
-            ...prev, [period]: {
-                symbol, period, close, time: startTime, time_f: new Date(startTime),
-                change: changePercent(prevCandle.open, close)
+function getChangeFrom({ symbol, period, from, timeframeName }) {
+    const now = Date.now() - Date.now() % DURATION.MIN_1;
+    const now_1 = now - DURATION.MIN_1
+    const startTime = from || (typeof period === 'function' ? period() : now - period)
+    if (startTime && candles[symbol]) {
+        const startCandle = candles[symbol][startTime];
+        const lastCandle = candles[symbol][now] || candles[symbol][now_1];
+        if (startCandle && lastCandle) {
+            const [open, close] = [+startCandle.open, +lastCandle.close]
+            return {
+                symbol, timeframeName,
+                open, close,
+                change: changePercent(open, close)
             }
-        } : prev;
-    }, {});
-
-    const unJour = 24 * 60 * 60 * 1000;
-    let now = Date.now();
-    Object.entries({
-        _1m: 1,
-        _2m: 2,
-        _3m: 3,
-        _5m: 5,
-        _15m: 15,
-        _30m: 30,
-        _1h: 60,
-        _2h: 120,
-        _4h: 240,
-        _6h: 360,
-        _8h: 480,
-        _12h: 720,
-        _24h: 1440
-    })
-        .map(([period, durationMinutes]) => {
-            let duration = durationMinutes * 60 * 1000
-            let openCandle = prevCandles[symbol][now - now % duration];
-            perfs[period] = { symbol, period, change: +(openCandle && changePercent(openCandle.open, close)) }
-        })
-    // let dayOpenCandle = prevCandles[symbol][now - now % unJour];
-
-    perfs['day'] = perfs['_24h']
-    return perfs;
+        }
+        !startCandle && console.log(`${symbol} startCandle not found at [${startTime}] ${new Date(startTime)}`)
+        !lastCandle && console.log(`${symbol} lastCandle not found at [${now}] ${new Date(now)}`)
+    }
 }
 
-function getScreener({ symbol, period, from }) {
-const startTime=from
+/**
+ * get changes for all pairs in a defined period of time
+ * @param period : duration in millisecond
+ * @param from : start time
+ * @param timeframeName
+ * @returns {{}}
+ */
+function getSymbolsChanges({ period, from, timeframeName }) {
+    return _.mapValues(candles, (_, symbol) => getChangeFrom({ symbol, period, from, timeframeName }))
+}
 
-        let prevTime = startTime - duration;
-        let prevCandle = prevCandles[symbol][prevTime];
-        prevCandle = prevCandle || (period === '24h' ? _.values(prevCandles[symbol])[0] : prevCandle);
+/**
+ * get changes for all periods of a given pair
+ * @param symbol
+ * @param periods :{M1:12938747000,}
+ * @returns {{}}
+ */
+function getPeriodsChanges({ symbol, periods }) {
+    return _.mapValues(periods, (period, timeframeName) => getChangeFrom({ symbol, period, timeframeName }))
+}
 
-        return prevCandle ? {
-            ...prev, [period]: {
-                symbol, period, close, time: startTime, time_f: new Date(startTime),
-                change: changePercent(prevCandle.open, close)
-            }
-        } : prev;
 
-    const unJour = 24 * 60 * 60 * 1000;
-    let now = Date.now();
-    Object.entries({
-        _1m: 1,
-        _2m: 2,
-        _3m: 3,
-        _5m: 5,
-        _15m: 15,
-        _30m: 30,
-        _1h: 60,
-        _2h: 120,
-        _4h: 240,
-        _6h: 360,
-        _8h: 480,
-        _12h: 720,
-        _24h: 1440
+function publishPerf(periods = DEFAULT_PERIODS) {
+    const perfs = {}
+    subscribe('price', ({ symbol }) => {
+        const symbolPerfs = getPeriodsChanges({ symbol, periods });
+
+        perfs[symbol] = _.mapValues(symbolPerfs, (perf, period) =>
+            perf || (perfs[symbol] && perfs[symbol][period] && { isDirty: true, ...perfs[symbol][period] }))
+
+        publish.throttle('prevPerf', Object.values(perfs))
     })
-        .map(([period, durationMinutes]) => {
-            let duration = durationMinutes * 60 * 1000
-            let openCandle = prevCandles[symbol][now - now % duration];
-            perfs[period] = { symbol, period, change: +(openCandle && changePercent(openCandle.open, close)) }
-        })
-    // let dayOpenCandle = prevCandles[symbol][now - now % unJour];
-
-    perfs['day'] = perfs['_24h']
-    return perfs;
 }
 
 //startup
@@ -230,20 +200,20 @@ binance.exchangeInfo(async function ex_info(error, data) {
         binance.exchangeInfo(ex_info)
     } else {
         // const symbols = ['ETHBTC', 'ADABTC'];
-        const symbols = data.symbols
+        symbols.push.apply(symbols, data.symbols
             .filter(s => s.status === "TRADING")
             .filter(s => QUOTE_ASSET_REGEX.test(s.quoteAsset))
-            .map(s => s.symbol);
+            .map(s => s.symbol));
 
-        // const candles = {};
-        // const prevPerf = {};
+        publishPerf();
+
         (async function start(symbols) {
             const errors = [];
             for (const symbol of symbols) {
                 try {
                     console.log(symbol, 'loading previous candles');
                     candles[symbol] = await loadCandles(symbol);
-                    await listenToPriceChange(symbol);
+                    listenToPriceChange(symbol);
                     console.log(symbol + " candlestick started");
                 } catch (e) {
                     console.log(symbol, e.message);
@@ -254,3 +224,5 @@ binance.exchangeInfo(async function ex_info(error, data) {
         }(symbols))
     }
 });
+
+module.exports = { getPeriodsChanges, getSymbolsChanges, getChangeFrom, changePercent, change, publishPerf }

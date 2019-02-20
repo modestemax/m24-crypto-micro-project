@@ -22,6 +22,8 @@ type Performances{
     h12:Performance!
     h24:Performance!
     day:Performance!
+    H4:Performance!
+    
 }
 
 type Query {
