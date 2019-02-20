@@ -66,12 +66,12 @@ let last = null;
 
 let first = null;
 let log = []
-const FAST_GROW = 5
+const FAST_GROW = 2
 init()
 
 function init() {
     last = null;
-    stop = 2
+    stop = 4
     in_ = 2.5
     out = in_ - stop
 }
