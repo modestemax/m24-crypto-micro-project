@@ -13,8 +13,7 @@ publish.throttle = _.throttle(publish, 1e3);
 // const _1MIN = 1e3 * 60;
 // const _1H = _1MIN * 60;
 // const _24H = _1H * 24;
-const MAX_SPREAD = .6
-const SATOSHI = 1e-8
+
 const candles = {}
 const symbols = []
 
@@ -225,4 +224,4 @@ binance.exchangeInfo(async function ex_info(error, data) {
     }
 });
 
-module.exports = { getPeriodsChanges, getSymbolsChanges, getChangeFrom, changePercent, change, publishPerf }
+module.exports = { binance, getPeriodsChanges, getSymbolsChanges, getChangeFrom, changePercent, change, publishPerf }
