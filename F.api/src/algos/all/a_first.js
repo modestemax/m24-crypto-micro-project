@@ -29,25 +29,25 @@ function run(allGoodSymbolsCandles) {
         period
     })
     first = getFirst(screener)
-    logFirst()
-    if (!last) {
-        if (first.change > in_) {
-            buy()
-        }
-    } else {
+        logFirst()
+        if (!last) {
+            if (first.change > in_) {
+                buy()
+            }
+        } else {
         Object.assign(last, getChangeFrom({
             candles: allGoodSymbolsCandles[last.symbol],
             period, symbol: last.symbol
         }))
-        calculateGain()
-        tryRestart()
-        if (last)
-            if (last.gain > STOP_LOSS && last.symbol === first.symbol) {
-                in_ = _.max([in_, last.change]);
-                out = in_ - 2
-            } else if (!(last.gain > STOP_LOSS) || first.change - last.change > 1) {
-                sell()
-            }
+            calculateGain()
+            tryRestart()
+            if (last)
+                if (last.gain > STOP_LOSS && last.symbol === first.symbol) {
+                    in_ = _.max([in_, last.change]);
+                    out = in_ - 2
+                } else if (!(last.gain > STOP_LOSS) || first.change - last.change > 1) {
+                    sell()
+                }
     }
 }
 
@@ -64,7 +64,7 @@ let startTime
 function getStartTime() {
     if (!startTime) {
         const now = Date.now() - DURATION.HOUR_1;
-        startTime = now - now % DURATION.HOUR_1
+        startTime = now - now % DURATION.MIN_1
 
         // startTime =  timeframeStartAt(DURATION.HOUR_1)()
     }

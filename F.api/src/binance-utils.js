@@ -198,7 +198,7 @@ function publishPerf(allSymbolsCandles, periods = DEFAULT_PERIODS) {
         // publish.throttle('prevPerf', Object.values(perfs))
         // publish.throttle2('ALL_SYMBOLS_CANDLES', allSymbolsCandles)
         publish('prevPerf', Object.values(perfs))
-        publish('ALL_SYMBOLS_CANDLES', allSymbolsCandles)
+        // publish('ALL_SYMBOLS_CANDLES', allSymbolsCandles)
     })
 }
 

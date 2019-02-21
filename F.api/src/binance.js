@@ -1,12 +1,14 @@
 // @flow
 //const QUOTE_ASSET="BTC";
 // const QUOTE_ASSET_REGEX = /usd|pax/i;
-const QUOTE_ASSET_REGEX = /btc$/i;
+// const QUOTE_ASSET_REGEX = /btc$/i;
+const QUOTE_ASSET_REGEX = /bnb$/i;
 // const QUOTE_ASSET="USDT";
 const _ = require('lodash');
 const { publishPerf, loadCandles, listenToPriceChange } = require('./binance-utils')
 
 const binance = require('./init-binance')
+const algo = require('./algos/all/a_first')
 //startup
 binance.exchangeInfo(async function ex_info(error, data) {
 
