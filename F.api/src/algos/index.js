@@ -11,13 +11,14 @@ const MAX_SPREAD = .6
 const SATOSHI = 1e-8
 let perfByTime;
 const algos = [];
-
+let allSymbolsCandles = {}
 
 module.exports = function (algo) {
     !algos.includes(algo) && algos.push(algo)
 };
 
 let runalgo = (options) => algos.forEach(algo => algo(options));
+
 
 
 subscribe('prevPerf', perfs => {
