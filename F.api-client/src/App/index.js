@@ -66,6 +66,14 @@ const SUBS_SIGNALS = gql`
                 symbol
                 change
             }
+            H4 {
+                symbol
+                change
+            }
+            ALGO {
+                symbol
+                change
+            }
         }
     }
 `;

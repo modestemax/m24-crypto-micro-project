@@ -66,6 +66,9 @@ const $this = module.exports = {
     computeChange(openPrice, closePrice) {
         return ((closePrice - openPrice) / (openPrice || NaN)) * 100;
     },
+    changePercent(openPrice, closePrice) {
+        return ((closePrice - openPrice) / (openPrice || NaN)) * 100;
+    },
     valuePercent(price, change_percent) {
         return price * (1 + change_percent / 100);
     },

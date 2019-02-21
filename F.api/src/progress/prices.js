@@ -3,5 +3,5 @@ const prices = module.exports = {};
 
 
 subscribe('price', price => {
-    prices[price.symbol] = price.close
+    prices[price.symbol] = +price.close
 });
