@@ -65,16 +65,23 @@ function init() {
 }
 
 function resetInOut() {
-    in_ = 5
+    in_ = 3.5
     out = in_ - stop
 }
 
 function getStartTime() {
     if (!startTime) {
-        const now = Date.now() - DURATION.HOUR_8;
+        const now = Date.now() - DURATION.HOUR_2;
         startTime = now - now % DURATION.MIN_1
         console.log('startTime', new Date(startTime))
         // startTime =  timeframeStartAt(DURATION.HOUR_1)()
+
+        const text = `#newframe started at ${new Date(startTime)}`
+        publish(`m24:algo:tracking`, {
+            strategyName: 'm24first',
+            text
+        });
+        console.log(text)
     }
     return startTime
 }
@@ -94,9 +101,11 @@ function buy() {
 function sell() {
     last.closePercent = last.change
     calculateGain()
+    gain += last.gain
     const text = `#${log.length}sell  ${last.symbol} at ${last.close}
          gain ${last.gain.toFixed(2)}% 
          Max gain ${last.maxGain.toFixed(2)}% 
+          All time gain ${gain.toFixed(2)}%
         [${last.change.toFixed(2)}%] [next buy at ${in_.toFixed(2)}%]`;
 
     publish(`m24:algo:tracking`, {
@@ -111,7 +120,7 @@ function sell() {
 function calculateGain() {
     last.prevGain = last.gain || 0
     last.gain = last.change - last.openPercent
-    gain += last.gain
+
     last.maxGain = _.max([last.gain, last.maxGain])
     if (last.prevGain.toFixed(1) != last.gain.toFixed(1)) {
         const text = `#${log.length}gain  ${last.symbol}  ${last.gain.toFixed(2)}% 
