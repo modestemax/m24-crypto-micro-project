@@ -70,6 +70,10 @@ const SUBS_SIGNALS = gql`
                 symbol
                 change
             }
+            ALGO {
+                symbol
+                change
+            }
         }
     }
 `;

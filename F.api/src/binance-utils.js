@@ -42,7 +42,8 @@ const DEFAULT_PERIODS = {
     h12: DURATION.HOUR_12,
     h24: DURATION.HOUR_24,
     day: timeframeStartAt(DURATION.HOUR_24),
-    H4: timeframeStartAt(DURATION.HOUR_4)
+    H4: timeframeStartAt(DURATION.HOUR_4),
+    ALGO: timeframeStartAt(DURATION.HOUR_1),
 }
 
 const change = (open, close) => (close - open) / open;
@@ -187,17 +188,20 @@ function getPeriodsChanges({ candles, symbol, periods }) {
 }
 
 
-function publishPerf(allSymbolsCandles, periods = DEFAULT_PERIODS) {
+function publishPerf({ allSymbolsCandles,symbols, periods = DEFAULT_PERIODS, priceChanged }) {
     const perfs = {}
     subscribe('price', ({ symbol }) => {
+        priceChanged && priceChanged(symbol,symbols, allSymbolsCandles)
+
         const symbolPerfs = getPeriodsChanges({ candles: allSymbolsCandles[symbol], symbol, periods });
 
         perfs[symbol] = _.mapValues(symbolPerfs, (perf, period) =>
             perf || (perfs[symbol] && perfs[symbol][period] && { isDirty: true, ...perfs[symbol][period] }))
 
-        // publish.throttle('prevPerf', Object.values(perfs))
+
+        publish.throttle('prevPerf', Object.values(perfs))
         // publish.throttle2('ALL_SYMBOLS_CANDLES', allSymbolsCandles)
-        publish('prevPerf', Object.values(perfs))
+        // publish('prevPerf', Object.values(perfs))
         // publish('ALL_SYMBOLS_CANDLES', allSymbolsCandles)
     })
 }

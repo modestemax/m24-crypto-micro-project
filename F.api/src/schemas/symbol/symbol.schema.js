@@ -23,6 +23,7 @@ type Performances{
     h24:Performance!
     day:Performance!
     H4:Performance!
+    ALGO:Performance!
     
 }
 

@@ -8,7 +8,7 @@ const _ = require('lodash');
 const { publishPerf, loadCandles, listenToPriceChange } = require('./binance-utils')
 
 const binance = require('./init-binance')
-const algo = require('./algos/all/a_first')
+const {  priceChanged } = require('./algos/all/a_first')
 //startup
 binance.exchangeInfo(async function ex_info(error, data) {
 
@@ -25,7 +25,7 @@ binance.exchangeInfo(async function ex_info(error, data) {
             .filter(s => QUOTE_ASSET_REGEX.test(s.quoteAsset))
             .map(s => s.symbol));
 
-        publishPerf(allSymbolsCandles);
+        publishPerf({ allSymbolsCandles,symbols, priceChanged });
 
         (async function start(symbols) {
             const errors = [];

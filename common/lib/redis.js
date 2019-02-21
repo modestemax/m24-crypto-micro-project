@@ -43,7 +43,7 @@ function publish(event, data, { rateLimit } = {}) {
     let redis = redisPub// getRedis();
     data = data === void 0 ? {} : data;
     let json = JSON.stringify(data);
-    console.log('redis publish', event, json.length * 8 / 1024 / 1024, 'Mo')
+    // console.log('redis publish', event, (json.length * 8 / 1024 / 1024).toFixed(2), 'Mo')
     redis.publish(event, json);
 }
 
