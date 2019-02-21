@@ -417,7 +417,7 @@ module.exports = {
             buyMode: 'market',
         },
         "m24first": {
-            isActive: true,
+            // isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
