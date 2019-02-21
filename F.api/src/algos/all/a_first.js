@@ -17,7 +17,7 @@ const FAST_GROW = 2
 const STOP_LOSS = -2
 let algoStarted;
 let screener = {};
-const TARGET_GAIN = 5
+const TARGET_GAIN = 2
 const MAX_SPREAD = .6
 const SATOSHI = 1e-8
 let first_change = 0;
@@ -65,13 +65,13 @@ function init() {
 }
 
 function resetInOut() {
-    in_ = 3
+    in_ = 5
     out = in_ - stop
 }
 
 function getStartTime() {
     if (!startTime) {
-        const now = Date.now() - DURATION.HOUR_2;
+        const now = Date.now() - DURATION.HOUR_8;
         startTime = now - now % DURATION.MIN_1
         console.log('startTime', new Date(startTime))
         // startTime =  timeframeStartAt(DURATION.HOUR_1)()
@@ -128,7 +128,7 @@ function tryRestart() {
     if (Date.now() - startTime > DURATION.HOUR_6 || last.gain > TARGET_GAIN) {
         sell()
         init()
-        const text = `restart     `
+        const text = `restart   last gain ${last.gain}  `
         publish(`m24:algo:tracking`, {
             strategyName: 'm24first',
             text

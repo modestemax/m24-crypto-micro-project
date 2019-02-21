@@ -1,14 +1,14 @@
 // @flow
 //const QUOTE_ASSET="BTC";
 // const QUOTE_ASSET_REGEX = /usd|pax/i;
-// const QUOTE_ASSET_REGEX = /btc$/i;
-const QUOTE_ASSET_REGEX = /bnb$/i;
+const QUOTE_ASSET_REGEX = /btc$/i;
+// const QUOTE_ASSET_REGEX = /bnb$/i;
 // const QUOTE_ASSET="USDT";
 const _ = require('lodash');
-const { publishPerf, loadCandles, listenToPriceChange } = require('./binance-utils')
+const { publishPerf, loadCandles, listenToPriceChange, changePercent } = require('./binance-utils')
 
 const binance = require('./init-binance')
-const {  priceChanged } = require('./algos/all/a_first')
+const { priceChanged } = require('./algos/all/a_first')
 //startup
 binance.exchangeInfo(async function ex_info(error, data) {
 
@@ -20,28 +20,36 @@ binance.exchangeInfo(async function ex_info(error, data) {
         const allSymbolsCandles = {}
 
         // const symbols = ['ETHBTC', 'ADABTC'];
-        symbols.push.apply(symbols, data.symbols
+        const binanceSymbols = data.symbols
             .filter(s => s.status === "TRADING")
             .filter(s => QUOTE_ASSET_REGEX.test(s.quoteAsset))
-            .map(s => s.symbol));
+            .map(s => s.symbol);
 
-        publishPerf({ allSymbolsCandles,symbols, priceChanged });
+        binance.bookTickers((error, tickers) => {
+            if (error) process.nextTick(() => binance.exchangeInfo(ex_info))
+            symbols.push.apply(symbols,_.filter(binanceSymbols, symbol => {
+                const ticker = _.find(tickers, { symbol })
+                return (ticker && changePercent(ticker.bidPrice, ticker.askPrice) < .6)
+            }))
 
-        (async function start(symbols) {
-            const errors = [];
-            for (const symbol of symbols) {
-                try {
-                    console.log(symbol, 'loading previous candles');
-                    allSymbolsCandles[symbol] = await loadCandles(symbol);
-                    listenToPriceChange({ candles: allSymbolsCandles[symbol], symbol });
-                    console.log(symbol + " candlestick started");
-                } catch (e) {
-                    console.log(symbol, e.message);
-                    errors.push(symbol);
+            publishPerf({ allSymbolsCandles, symbols, priceChanged });
+
+            (async function start(symbols) {
+                const errors = [];
+                for (const symbol of symbols) {
+                    try {
+                        console.log(symbol, 'loading previous candles');
+                        allSymbolsCandles[symbol] = await loadCandles(symbol);
+                        listenToPriceChange({ candles: allSymbolsCandles[symbol], symbol });
+                        console.log(symbol + " candlestick started");
+                    } catch (e) {
+                        console.log(symbol, e.message);
+                        errors.push(symbol);
+                    }
                 }
-            }
-            setTimeout(() => start(errors), 30 * 1e3)
-        }(symbols))
+                setTimeout(() => start(errors), 30 * 1e3)
+            }(symbols))
+        });
     }
 });
 
