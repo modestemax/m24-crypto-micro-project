@@ -6,7 +6,7 @@ const { publish, subscribe } = require('common/redis');
 const { getSymbolsChanges, getChangeFrom, changePercent, timeframeStartAt, DURATION, DEFAULT_PERIODS } = require('../../binance-utils');
 const prices = require('../../progress/prices');
 console.log.throttle = _.throttle(console.log, 1e3 * 60)
-const strategyName = 'm24first_a'
+const strategyName = 'm24first_c'
 
 
 let timeRef = 'day';
@@ -48,9 +48,9 @@ function run(screener) {
     if (first) {
         logFirst()
         if (!last) {
-            if (first.change > in_) {
-                buy()
-            }
+            // if (first.change > in_) {
+            buy()
+            // }
         } else {
             Object.assign(last, screener[last.symbol])
             calculateGain()
@@ -250,7 +250,7 @@ function logLoading(count, symbols) {
 module.exports = {
     priceChanged(symbol, symbols, allSymbolsCandles) {
         DEFAULT_PERIODS.ALGO = getStartTime
-        screener = getSymbolsChanges({ allSymbolsCandles, period: getStartTime, timeframeName: 'algo' })
+        screener = getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' })
         // m1first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
         // m2first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m2, timeframeName: 'algo' }))
         // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
