@@ -76,7 +76,7 @@ function init() {
 }
 
 function resetInOut() {
-    in_ = 3.5
+    in_ = 5
     out = in_ - stop
 }
 
@@ -218,7 +218,7 @@ module.exports = {
         if (!algoStarted) {
             first = getFirst(screener)
             if (!first) return
-            if (first.change > in_) {
+            if (first.change > in_ - Math.abs(-STOP_LOSS)) {
                 startTime += DURATION.MIN_15
                 if (startTime > Date.now() - DURATION.MIN_15) {
                     startTime = timeframeStartAt(DURATION.MIN_1)()
