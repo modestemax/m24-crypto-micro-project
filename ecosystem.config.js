@@ -81,7 +81,8 @@ module.exports = {
         {
             name: 'f_api',
             script: 'F.api/src/index.js',
-            "exec_mode": "cluster",
+            "exec_mode": "fork",
+            "node_args": "--inspect=0.0.0.0:5856",
             env: {
                 APP_NAME: 'GraphQL API',
                 // "DEBUG": "*"

@@ -138,7 +138,7 @@ function sell(sellReason) {
         text
     });
     console.log(text)
-
+    in_ += .3
     last = null;
     if (sellReason === SELL_REASON.STOP_LOSS) {
         init()
