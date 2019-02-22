@@ -133,7 +133,7 @@ function sell(sellReason) {
     gainLogs[last.symbol] = (gainLogs[last.symbol] || 0) + last.gain
 
     logSell(sellReason)
-    in_ += .3
+    // in_ += .3
     last = null;
     // if (sellReason === SELL_REASON.STOP_LOSS) {
     //     init()
