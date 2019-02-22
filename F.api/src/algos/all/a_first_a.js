@@ -200,13 +200,32 @@ function collectProfit() {
     }
 }
 
+
 function logFirst() {
     if (first) {
         if (first.change.toFixed(1) != first_change.toFixed(1)) {
-            console.log(`first ${first.symbol} ${first.change.toFixed(2)}%`)
+            let text = `first ${first.symbol} ${first.change.toFixed(2)}%`
+            publish(`m24:algo:tracking`, {
+                id: 'first',
+                message_id: tme_message_ids['first'],
+                strategyName,
+                text
+            });
+            console.log(text)
             first_change = first.change
         }
     }
+}
+
+const logLoadingOnce = _.once(logLoading)
+
+function logLoading() {
+    publish(`m24:algo:tracking`, {
+        id: 'start',
+        message_id: tme_message_ids['start'],
+        strategyName,
+        text: `loading ${(count / symbols.length * 100).toFixed(2)}%`
+    });
 }
 
 // console.log('listen to ALL_SYMBOLS_CANDLES')
@@ -233,17 +252,12 @@ module.exports = {
         // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
 
         let count = _.values(screener).filter(v => v).length
-        if (count === symbols.length)
+        if (count === symbols.length) {
+            logLoadingOnce()
             run(screener)
-        else {
-            publish(`m24:algo:tracking`, {
-                id: 'start',
-                message_id: tme_message_ids['start'],
-                strategyName,
-                text: `loading ${(count / symbols.length * 100).toFixed(2)}%`
-            });
+        } else {
+            logLoading()
         }
-
     }
 }
 
@@ -256,3 +270,5 @@ publish(`m24:algo:tracking`, {
     strategyName,
     text: `${strategyName} loaded`
 });
+
+setInterval(() => delete tme_message_ids['first'], 1e3 * 60 * 20)
