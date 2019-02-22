@@ -8,6 +8,11 @@ const prices = require('../../progress/prices');
 console.log.throttle = _.throttle(console.log, 1e3 * 60)
 const strategyName = 'm24first_a'
 
+publish(`m24:algo:tracking`, {
+    strategyName,
+    text: `${strategyName} loaded`
+});
+
 let timeRef = 'day';
 
 let in_;
