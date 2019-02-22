@@ -6,6 +6,8 @@ const { publish, subscribe } = require('common/redis');
 const { getSymbolsChanges, getChangeFrom, changePercent, timeframeStartAt, DURATION, DEFAULT_PERIODS } = require('../../binance-utils');
 const prices = require('../../progress/prices');
 console.log.throttle = _.throttle(console.log, 1e3 * 60)
+const strategyName = 'm24first_a'
+
 let timeRef = 'day';
 
 let in_;
@@ -91,7 +93,7 @@ function getStartTime() {
 
         const text = `#newframe started at ${new Date(startTime)}`
         publish(`m24:algo:tracking`, {
-            strategyName: 'm24first',
+            strategyName,
             text
         });
         console.log(text)
@@ -117,7 +119,7 @@ function buy() {
         last.openPercent = last.change;
         const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
         publish(`m24:algo:tracking`, {
-            strategyName: 'm24first',
+            strategyName,
             text
         });
         console.log(text)
@@ -153,7 +155,7 @@ function logSell(sellReason) {
         [${last.change.toFixed(2)}%] [next buy at ${in_.toFixed(2)}%]`;
 
     publish(`m24:algo:tracking`, {
-        strategyName: 'm24first',
+        strategyName,
         text
     });
     console.log(text)
@@ -172,7 +174,7 @@ function calculateGain() {
         publish(`m24:algo:tracking`, {
             id,
             message_id: tme_message_ids[id],
-            strategyName: 'm24first',
+            strategyName,
             text
         });
     }
@@ -184,7 +186,7 @@ function tryRestart() {
         init()
         const text = `restart   last gain ${last.gain}  `
         publish(`m24:algo:tracking`, {
-            strategyName: 'm24first',
+            strategyName,
             text
         });
         console.log(text)
@@ -229,7 +231,17 @@ module.exports = {
         // m2first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m2, timeframeName: 'algo' }))
         // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
 
-        _.values(screener).filter(v => v).length === symbols.length && run(screener)
+        let count = _.values(screener).filter(v => v).length
+        if (count === symbols.length)
+            run(screener)
+        else {
+            publish(`m24:algo:tracking`, {
+                id: 'start',
+                message_id: tme_message_ids['start'],
+                strategyName,
+                text: `loading ${(count / symbols.length * 100).toFixed(2)}%`
+            });
+        }
 
     }
 }

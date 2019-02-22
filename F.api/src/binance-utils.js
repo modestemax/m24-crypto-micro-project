@@ -10,7 +10,7 @@ const { publish, subscribe } = require('common/redis');
 const binance = require('./init-binance')
 publish.throttle = _.throttle(publish, 1e3);
 publish.throttle2 = _.throttle(publish, 1e3);
-console.log.throttle = _.throttle(console.log, 1e3 * 60*10)
+console.log.throttle = _.throttle(console.log, 1e3 * 20)
 
 // const _1MIN = 1e3 * 60;
 // const _1H = _1MIN * 60;
