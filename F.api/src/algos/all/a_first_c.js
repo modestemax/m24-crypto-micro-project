@@ -57,7 +57,7 @@ function run(screener) {
             Object.assign(last, screener[last.symbol])
             calculateGain()
             if (
-                (last.gain < in_ && (sellReason = SELL_REASON.STOP_LOSS))
+                (last.change < in_ && (sellReason = SELL_REASON.STOP_LOSS))
                 || (last.symbol !== first.symbol && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
             ) {
                 sell(sellReason)
