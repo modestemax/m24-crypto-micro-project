@@ -230,7 +230,7 @@ module.exports = {
         m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
 
         // init()
-        algoStarted=true
+        // algoStarted=true
         if (!algoStarted) {
             first = getFirst(screener)
             if (!first) return
