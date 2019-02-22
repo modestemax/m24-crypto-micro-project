@@ -1,4 +1,5 @@
 const debug = require('debug')('F:index');
+const { publish, subscribe } = require('common/redis');
 
 const { bot, tme, M24_LOG_CHAT_ID, M24_FATAL_CHAT_ID, M24_CHAT_ID, MODESTE_MAX } = require('./bot');
 
@@ -7,7 +8,7 @@ const { redisSet } = require('common/redis');
 const { humanizeDuration } = require('common');
 
 module.exports = {
-    'm24:*': function (data, channel) {
+    'm24:*': async function (data, channel) {
         let text;
         switch (channel) {
             case "m24:fatal":
@@ -49,11 +50,22 @@ module.exports = {
                 text = text.join('\n');
                 break;
         }
-        tme.sendMessage({ chat_id: data.chat_id || M24_LOG_CHAT_ID, text });
-        /#m24/.test(text) && tme.sendMessage({ chat_id: MODESTE_MAX, text });
+        tme.sendMessage({ chat_id: data.chat_id || M24_LOG_CHAT_ID, message_id: data.message_id, text });
+
+        if (/#m24/.test(text)) {
+            let sendOrEditMessage = tme.sendMessage.bind(tme)
+            if (data.message_id) {
+                sendOrEditMessage = tme.editMessageText.bind(tme)
+            }
+            let { message_id } = await sendOrEditMessage({ chat_id: MODESTE_MAX, message_id: data.message_id, text });
+            if (message_id) publish('tme_message_id', { id: data.id, message_id })
+        }
+
 
     },
-    'm24sync:*': function (text) {
-        tme.sendMessage({ chat_id: M24_LOG_CHAT_ID, text });
-    }
+    'm24sync:*':
+
+        function (text) {
+            tme.sendMessage({ chat_id: M24_LOG_CHAT_ID, text });
+        }
 }
