@@ -17,6 +17,7 @@ let m1first = null
 let m2first = null
 let m3first = null
 let log = []
+const gainLogs = {}
 const FAST_GROW = 2
 const STOP_LOSS = -2
 let algoStarted;
@@ -113,7 +114,7 @@ function buy() {
         last = first;
         log.push(last);
         last.openPercent = last.change;
-        const text = `#${log.length}buy #buy ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
+        const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
         publish(`m24:algo:tracking`, {
             strategyName: 'm24first',
             text
@@ -126,18 +127,9 @@ function sell(sellReason) {
     last.closePercent = last.change
     calculateGain()
     gain += last.gain
-    const text = `#${log.length}sell #sell ${last.symbol} at ${last.close}
-         sell reason #${sellReason || '#sell_reason_unknow'}   
-         gain ${last.gain.toFixed(2)}%  #${last.gain > 0 ? 'win' : 'lost'}
-         Max gain ${last.maxGain.toFixed(2)}% 
-          All time gain ${gain.toFixed(2)}%
-        [${last.change.toFixed(2)}%] [next buy at ${in_.toFixed(2)}%]`;
+    gainLogs[last.symbol] = (gainLogs[last.symbol] || 0) + last.gain
 
-    publish(`m24:algo:tracking`, {
-        strategyName: 'm24first',
-        text
-    });
-    console.log(text)
+    logSell(sellReason)
     in_ += .3
     last = null;
     if (sellReason === SELL_REASON.STOP_LOSS) {
@@ -145,6 +137,26 @@ function sell(sellReason) {
     }
 }
 
+function logSell(sellReason) {
+    let gainners = _.orderBy(Object.entries(gainLogs), gain => gain[1], 'desc');
+    let gainner = _.first(gainners)
+    let looser = _.last(gainners)
+
+    const text = `#${log.length}sell #sell #sell_${last.symbol} #${last.symbol} at ${last.close}
+         sell reason #${sellReason || '#sell_reason_unknow'}   
+         gain ${last.gain.toFixed(2)}%  #${last.gain > 0 ? 'win' : 'lost'}
+         Max gain ${last.maxGain.toFixed(2)}% 
+          All time gain ${gain.toFixed(2)}%
+          gainner ${gainner[0]} ${gainner[1].toFixed(2)}%
+          looser ${looser[0]} ${looser[1].toFixed(2)}%
+        [${last.change.toFixed(2)}%] [next buy at ${in_.toFixed(2)}%]`;
+
+    publish(`m24:algo:tracking`, {
+        strategyName: 'm24first',
+        text
+    });
+    console.log(text)
+}
 
 function calculateGain() {
     last.prevGain = last.gain || 0
