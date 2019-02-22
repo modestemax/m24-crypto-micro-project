@@ -1,1 +1,1 @@
-require('./a_first_a')
+module.exports = require('./a_first_a')

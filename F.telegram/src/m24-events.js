@@ -6,7 +6,7 @@ const { bot, tme, M24_LOG_CHAT_ID, M24_FATAL_CHAT_ID, M24_CHAT_ID, MODESTE_MAX }
 const _ = require('lodash')
 const { redisSet } = require('common/redis');
 const { humanizeDuration } = require('common');
-const message_ids = {}
+// const message_ids = {}
 module.exports = {
     'm24:*': async function (data, channel) {
         let text;
@@ -54,12 +54,11 @@ module.exports = {
 
         if (/#m24/.test(text)) {
             let sendOrEditMessage = tme.sendMessage.bind(tme)
-            if (data.message_id || (data.id && message_ids[data.id])) {
+            if (data.message_id) {
                 sendOrEditMessage = tme.editMessageText.bind(tme)
             }
             let { message_id } = await sendOrEditMessage({ chat_id: MODESTE_MAX, message_id: data.message_id, text });
             if (message_id) publish('tme_message_id', { id: data.id, message_id })
-            message_ids[data.id] = message_id
         }
 
 

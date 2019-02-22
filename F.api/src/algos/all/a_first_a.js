@@ -8,10 +8,6 @@ const prices = require('../../progress/prices');
 console.log.throttle = _.throttle(console.log, 1e3 * 60)
 const strategyName = 'm24first_a'
 
-publish(`m24:algo:tracking`, {
-    strategyName,
-    text: `${strategyName} loaded`
-});
 
 let timeRef = 'day';
 
@@ -254,3 +250,9 @@ module.exports = {
 subscribe('tme_message_id', ({ id, message_id }) => {
     id && (tme_message_ids[id] = message_id)
 })
+
+
+publish(`m24:algo:tracking`, {
+    strategyName,
+    text: `${strategyName} loaded`
+});
