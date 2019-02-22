@@ -57,13 +57,15 @@ function run(screener) {
             // collectProfit()
             // tryRestart()
             if (last)
-                if (last.gain > out && last.symbol === first.symbol) {
-                    in_ = _.max([in_, last.change]);
-                    out = in_ + STOP_LOSS
+            // if (last.gain > out && last.symbol === first.symbol) {
+                if (last.symbol === first.symbol) {
+                    // in_ = _.max([in_, last.change]);
+                    // out = in_ + STOP_LOSS
                 } else if (
-                    (last.gain <= out && (sellReason = SELL_REASON.STOP_LOSS))
-                    || (first.change - last.change > 1 && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
-                // || (last.gain < 0 && last.symbol !== first.symbol && (sellReason = "#Lossing_switch_to_first"))
+                    // (last.gain <= out && (sellReason = SELL_REASON.STOP_LOSS))
+                // || (first.change - last.change > 1 && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
+                // ||
+                    (last.symbol !== first.symbol && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
                 ) {
                     // resetInOut()
                     sell(sellReason)
@@ -219,7 +221,7 @@ function logFirst() {
 
 const logLoadingOnce = _.once(logLoading)
 
-function logLoading() {
+function logLoading(count, symbols) {
     publish(`m24:algo:tracking`, {
         id: 'start',
         message_id: tme_message_ids['start'],
@@ -253,10 +255,10 @@ module.exports = {
 
         let count = _.values(screener).filter(v => v).length
         if (count === symbols.length) {
-            logLoadingOnce()
+            logLoadingOnce(count, symbols)
             run(screener)
         } else {
-            logLoading()
+            logLoading(count, symbols)
         }
     }
 }
