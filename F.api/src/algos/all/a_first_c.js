@@ -42,12 +42,15 @@ const getFirst = (perfByTime) => _.first(_.orderBy(perfByTime, perf => perf ? pe
 
 init()
 
-function run(screener) {
+function run(screener, screenerM1, screenerM2) {
 
     first = getFirst(screener)
+
     if (first) {
         logFirst()
         if (!last) {
+            const m1first = screenerM1[first.symbol]
+            const m2first = screenerM2[first.symbol]
             if (first.change > in_)
                 if (m1first.change > 0)
                     if (m2first.change > 0) {
@@ -55,11 +58,11 @@ function run(screener) {
                     }
         } else {
             Object.assign(last, screener[last.symbol])
+            const m1last = screenerM1[last.symbol]
+            const m2last = screenerM2[last.symbol]
             calculateGain()
-            if (
-                (last.change < in_ && (sellReason = SELL_REASON.STOP_LOSS))
-                || (last.symbol !== first.symbol && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
-            ) {
+
+            if ((m1last.change < 0 && m2last.change < 0 && (sellReason = SELL_REASON.STOP_LOSS))) {
                 sell(sellReason)
             }
         }
@@ -111,8 +114,8 @@ function buy() {
     if (true || buyCondition()) {
         last = first;
         log.push(last);
-        last.openPercent = last.change;
-        const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
+        last.openPrice = last.close;
+        const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close}`
         publish(`m24:algo:tracking`, {
             strategyName,
             text
@@ -122,7 +125,7 @@ function buy() {
 }
 
 function sell(sellReason) {
-    last.closePercent = last.change
+    last.closePrice = last.close
     calculateGain()
     gain += last.gain
     gainLogs[last.symbol] = (gainLogs[last.symbol] || 0) + last.gain
@@ -158,7 +161,7 @@ function logSell(sellReason) {
 
 function calculateGain() {
     last.prevGain = last.gain || 0
-    last.gain = last.change - last.openPercent
+    last.gain = changePercent(last.openPrice, last.close)
 
     last.maxGain = _.max([last.gain, last.maxGain])
     if (last.prevGain.toFixed(1) != last.gain.toFixed(1)) {
@@ -243,14 +246,15 @@ module.exports = {
     priceChanged(symbol, symbols, allSymbolsCandles) {
         DEFAULT_PERIODS.ALGO = getStartTime
         screener = getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' })
-        m1first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
-        m2first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m2, timeframeName: 'algo' }))
+        const screenerM1 = getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' })
+        const screenerM2 = getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m2, timeframeName: 'algo' })
+
         // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
 
         let count = _.values(screener).filter(v => v).length
         if (count === symbols.length) {
             logLoadingOnce(count, symbols)
-            run(screener)
+            run(screener, screenerM1, screenerM2)
         } else {
             logLoading(count, symbols)
         }
