@@ -48,28 +48,20 @@ function run(screener) {
     if (first) {
         logFirst()
         if (!last) {
-            // if (first.change > in_) {
-            buy()
-            // }
+            if (first.change > in_)
+                if (m1first.change > 0)
+                    if (m2first.change > 0) {
+                        buy()
+                    }
         } else {
             Object.assign(last, screener[last.symbol])
             calculateGain()
-            // collectProfit()
-            // tryRestart()
-            if (last)
-            // if (last.gain > out && last.symbol === first.symbol) {
-                if (last.symbol === first.symbol) {
-                    // in_ = _.max([in_, last.change]);
-                    // out = in_ + STOP_LOSS
-                } else if (
-                    // (last.gain <= out && (sellReason = SELL_REASON.STOP_LOSS))
-                // || (first.change - last.change > 1 && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
-                // ||
-                    (last.symbol !== first.symbol && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
-                ) {
-                    // resetInOut()
-                    sell(sellReason)
-                }
+            if (
+                (last.gain < in_ && (sellReason = SELL_REASON.STOP_LOSS))
+                || (last.symbol !== first.symbol && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
+            ) {
+                sell(sellReason)
+            }
         }
     }
 }
@@ -83,7 +75,7 @@ function init() {
 }
 
 function resetInOut() {
-    in_ = 3
+    in_ = 1
     out = in_ - stop
 }
 
@@ -251,8 +243,8 @@ module.exports = {
     priceChanged(symbol, symbols, allSymbolsCandles) {
         DEFAULT_PERIODS.ALGO = getStartTime
         screener = getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' })
-        // m1first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
-        // m2first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m2, timeframeName: 'algo' }))
+        m1first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
+        m2first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m2, timeframeName: 'algo' }))
         // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
 
         let count = _.values(screener).filter(v => v).length
