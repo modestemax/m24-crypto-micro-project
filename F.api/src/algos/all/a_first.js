@@ -28,6 +28,7 @@ const SATOSHI = 1e-8
 let first_change = 0;
 let gain = 0
 let sellReason;
+const tme_message_ids = {}
 const processStartTime = Date.now()
 let startTime
 const SELL_REASON = {
@@ -167,9 +168,10 @@ function calculateGain() {
         const text = `#${log.length}gain  ${last.symbol}  ${last.gain.toFixed(2)}% 
          Max gain ${last.maxGain.toFixed(2)}%
          All time gain ${gain.toFixed(2)}%`
+        const id = 'trk' + log.length
         publish(`m24:algo:tracking`, {
-            id: log.length,
-            message_id: log.message_id,
+            id,
+            message_id: tme_message_ids[id],
             strategyName: 'm24first',
             text
         });
@@ -247,5 +249,5 @@ module.exports = {
 }
 
 subscribe('tme_message_id', ({ id, message_id }) => {
-    log[id - 1] && Object.assign(log[id - 1], { id, message_id })
+    tme_message_ids[id] = message_id
 })
