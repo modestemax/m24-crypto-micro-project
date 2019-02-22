@@ -228,7 +228,9 @@ module.exports = {
         m1first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
         m2first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m2, timeframeName: 'algo' }))
         m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
+
         // init()
+        algoStarted=true
         if (!algoStarted) {
             first = getFirst(screener)
             if (!first) return
@@ -249,5 +251,5 @@ module.exports = {
 }
 
 subscribe('tme_message_id', ({ id, message_id }) => {
-    tme_message_ids[id] = message_id
+    id && (tme_message_ids[id] = message_id)
 })
