@@ -54,7 +54,7 @@ module.exports = {
 
         if (/#m24/.test(text)) {
             let sendOrEditMessage = tme.sendMessage.bind(tme)
-            if (data.message_id || message_ids[data.id]) {
+            if (data.message_id || (data.id && message_ids[data.id])) {
                 sendOrEditMessage = tme.editMessageText.bind(tme)
             }
             let { message_id } = await sendOrEditMessage({ chat_id: MODESTE_MAX, message_id: data.message_id, text });
