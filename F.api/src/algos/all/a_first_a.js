@@ -16,6 +16,7 @@ let out;
 let stop;
 let last = null;
 let first = null;
+let second = null;
 let m1first = null
 let m2first = null
 let m3first = null
@@ -80,7 +81,7 @@ function init() {
 }
 
 function resetInOut() {
-    in_ = 2
+    in_ = 5
     out = in_ - stop
 }
 
@@ -170,7 +171,9 @@ function calculateGain() {
         const text = `#${log.length}gain #${strategyName}gain  ${last.symbol}  ${last.gain.toFixed(2)}% 
          Max gain ${last.maxGain.toFixed(2)}%
          Potential gain ${potentialGain().toFixed(2)}%
-         All time gain ${allTimeGain().toFixed(2)}%`
+         All time gain ${allTimeGain().toFixed(2)}%
+         First ${first.symbol} ${first.change.toFixed(2)}%
+         Second ${second.symbol} ${second.change.toFixed(2)}%`
         const id = strategyName + 'trk' + log.length
         publish(`m24:algo:tracking`, {
             id,
@@ -207,8 +210,11 @@ function tryChangeOrigin() {
     last.originChangedCount = last.gain - last.gain % TARGET_GAIN_1
 
     if (last.originChangedCountPrev !== last.originChangedCount) {
+        last.originChangedCountPrev = last.originChangedCount
+
         getStartTime(last.startTime)
-        const text = `#${strategyName}_Origin_Changed gain ${allTimeGain().toFixed(2)}%  `
+        const text = `#${strategyName}_Origin_Changed gain ${allTimeGain().toFixed(2)}% 
+         to ${last.originChangedCountPrev} to ${last.originChangedCount}`
         publish(`m24:algo:tracking`, {
             strategyName,
             text
@@ -227,7 +233,9 @@ function collectProfit() {
 function logFirst() {
     if (first) {
         if (first.change.toFixed(1) != first_change.toFixed(1)) {
-            let text = `first ${first.symbol} ${first.change.toFixed(2)}%`
+            let text = `first ${first.symbol} ${first.change.toFixed(2)}%
+            second ${second.symbol} ${second.change.toFixed(2)}%`
+
             let id = strategyName + 'first'
             publish(`m24:algo:tracking`, {
                 id,
@@ -275,6 +283,8 @@ module.exports = {
         // m1first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
         // m2first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m2, timeframeName: 'algo' }))
         // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
+        const first = _.nth(screener, 0)
+        const second = _.nth(screener, 1)
 
         let count = _.values(screener).filter(v => v).length
         if (count === symbols.length) {
