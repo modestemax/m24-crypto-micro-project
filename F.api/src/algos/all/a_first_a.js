@@ -203,7 +203,10 @@ function tryRestart() {
 }
 
 function tryChangeOrigin() {
-    if (last.gain > TARGET_GAIN_1) {
+    last.originChangedCountPrev = last.originChangedCount || 0
+    last.originChangedCount = last.gain - last.gain % TARGET_GAIN_1
+
+    if (last.originChangedCountPrev !== last.originChangedCount) {
         getStartTime(last.startTime)
         const text = `#${strategyName}_Origin_Changed gain ${allTimeGain().toFixed(2)}%  `
         publish(`m24:algo:tracking`, {
