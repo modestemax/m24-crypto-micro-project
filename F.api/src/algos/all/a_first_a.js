@@ -42,7 +42,8 @@ const SELL_REASON = {
     SWITCH_TO_FIRST: 'switch_to_first',
     TARGET: 'target',
 }
-const getFirst = (perfByTime) => _.first(_.orderBy(perfByTime, perf => perf ? perf.change : 0, 'desc'))
+const orderScreener = (screener) => _.orderBy(screener, perf => perf ? perf.change : 0, 'desc')
+const getFirst = (screener) => _.first(orderScreener(screener))
 
 init()
 
@@ -283,8 +284,9 @@ module.exports = {
         // m1first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
         // m2first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m2, timeframeName: 'algo' }))
         // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
-        first = _.nth(screener, 0)
-        second = _.nth(screener, 1) || {}
+        const orderedScreener = orderScreener(screener)
+        first = _.nth(orderedScreener, 0)
+        second = _.nth(orderedScreener, 1) || {}
 
         let count = _.values(screener).filter(v => v).length
         if (count === symbols.length) {
