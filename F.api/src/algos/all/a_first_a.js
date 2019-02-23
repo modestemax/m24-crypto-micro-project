@@ -25,18 +25,21 @@ const FAST_GROW = 2
 const STOP_LOSS = -2
 let algoStarted;
 let screener = {};
-const TARGET_GAIN = 1.2
+const TARGET_GAIN = 5
+const TARGET_GAIN_1 = 2
 const MAX_SPREAD = .6
 const SATOSHI = 1e-8
 let first_change = 0;
 let gain = 0
+
 let sellReason;
 const tme_message_ids = {}
 const processStartTime = Date.now()
 let startTime
 const SELL_REASON = {
     STOP_LOSS: 'stop_loss',
-    SWITCH_TO_FIRST: 'switch_to_first'
+    SWITCH_TO_FIRST: 'switch_to_first',
+    TARGET: 'target',
 }
 const getFirst = (perfByTime) => _.first(_.orderBy(perfByTime, perf => perf ? perf.change : 0, 'desc'))
 
@@ -49,24 +52,18 @@ function run(screener) {
         logFirst()
         if (!last) {
             if (first.change > in_) {
+                in_ = 0
                 buy()
             }
         } else {
             Object.assign(last, screener[last.symbol])
             calculateGain()
             // collectProfit()
-            // tryRestart()
+            tryRestart()
+            tryChangeOrigin()
             if (last)
             // if (last.gain > out && last.symbol === first.symbol) {
-                if (last.symbol === first.symbol) {
-                    // in_ = _.max([in_, last.change]);
-                    // out = in_ + STOP_LOSS
-                } else if (
-                    // (last.gain <= out && (sellReason = SELL_REASON.STOP_LOSS))
-                // || (first.change - last.change > 1 && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
-                // ||
-                    (last.symbol !== first.symbol && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
-                ) {
+                if ((last.symbol !== first.symbol && first.change - last.change > .2 && (sellReason = SELL_REASON.SWITCH_TO_FIRST))) {
                     // resetInOut()
                     sell(sellReason)
                 }
@@ -76,7 +73,7 @@ function run(screener) {
 
 function init() {
     last = null;
-    stop = 4
+    gain = 0
     resetInOut()
     startTime = null
     algoStarted = false
@@ -87,9 +84,9 @@ function resetInOut() {
     out = in_ - stop
 }
 
-function getStartTime() {
+function getStartTime(now) {
     if (!startTime) {
-        const now = Date.now() //- DURATION.HOUR_2;
+        now = now || Date.now() //- DURATION.HOUR_2;
         startTime = now - now % DURATION.MIN_1
         // console.log('startTime', new Date(startTime))
         // startTime =  timeframeStartAt(DURATION.HOUR_1)()
@@ -118,8 +115,9 @@ function buyCondition() {
 function buy() {
     if (true || buyCondition()) {
         last = first;
+        last.startTime = Date.now()
         log.push(last);
-        last.openPercent = last.change;
+        last.openPrice = last.close;
         const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
         publish(`m24:algo:tracking`, {
             strategyName,
@@ -130,10 +128,9 @@ function buy() {
 }
 
 function sell(sellReason) {
-    last.closePercent = last.change
+    last.closePrice = last.close
     calculateGain()
     gain += last.gain
-    gainLogs[last.symbol] = (gainLogs[last.symbol] || 0) + last.gain
 
     logSell(sellReason)
     // in_ += .3
@@ -144,18 +141,18 @@ function sell(sellReason) {
 }
 
 function logSell(sellReason) {
-    let gainners = _.orderBy(Object.entries(gainLogs), gain => gain[1], 'desc');
-    let gainner = _.first(gainners)
-    let looser = _.last(gainners)
+    // let gainers = _.orderBy(Object.entries(gainLogs), gain => gain[1], 'desc');
+    // let gainer = _.first(gainers)
+    // let looser = _.last(gainers)
 
-    const text = `#${log.length}sell #sell #sell_${last.symbol} #${last.symbol} at ${last.close}
+    const text = `#${log.length}sell #${strategyName}_sell #sell_${last.symbol} #${last.symbol} at ${last.close}
          sell reason #${sellReason || '#sell_reason_unknow'}   
          gain ${last.gain.toFixed(2)}%  #${last.gain > 0 ? 'win' : 'lost'}
          Max gain ${last.maxGain.toFixed(2)}% 
-          All time gain ${gain.toFixed(2)}%
-          gainner ${gainner[0]} ${gainner[1].toFixed(2)}%
-          looser ${looser[0]} ${looser[1].toFixed(2)}%
-        [${last.change.toFixed(2)}%] [next buy at ${in_.toFixed(2)}%]`;
+         All time gain ${allTimeGain().toFixed(2)}%\n` +
+        // gainer ${gainer[0]} ${gainer[1].toFixed(2)}%
+        // looser ${looser[0]} ${looser[1].toFixed(2)}%
+        `[${last.change.toFixed(2)}%]`;
 
     publish(`m24:algo:tracking`, {
         strategyName,
@@ -166,13 +163,14 @@ function logSell(sellReason) {
 
 function calculateGain() {
     last.prevGain = last.gain || 0
-    last.gain = last.change - last.openPercent
+    last.gain = changePercent(last.openPrice, last.close)
 
     last.maxGain = _.max([last.gain, last.maxGain])
     if (last.prevGain.toFixed(1) != last.gain.toFixed(1)) {
-        const text = `#${log.length}gain  ${last.symbol}  ${last.gain.toFixed(2)}% 
+        const text = `#${log.length}gain #${strategyName}gain  ${last.symbol}  ${last.gain.toFixed(2)}% 
          Max gain ${last.maxGain.toFixed(2)}%
-         All time gain ${gain.toFixed(2)}%`
+         Potential gain ${potentialGain().toFixed(2)}%
+         All time gain ${allTimeGain().toFixed(2)}%`
         const id = strategyName + 'trk' + log.length
         publish(`m24:algo:tracking`, {
             id,
@@ -183,11 +181,31 @@ function calculateGain() {
     }
 }
 
+function allTimeGain() {
+    return _.sumBy(log, 'gain')
+}
+
+function potentialGain() {
+    return gain + last.gain
+}
+
 function tryRestart() {
-    if ((Date.now() - startTime > DURATION.HOUR_6 && (sellReason = "#la_session_a_trop_durée"))) {
-        sell(sellReason)
+    if (potentialGain() > TARGET_GAIN) {
+        sell(SELL_REASON.TARGET)
         init()
-        const text = `restart   last gain ${last.gain}  `
+        const text = `#${strategyName}_Target_Rich gain ${allTimeGain().toFixed(2)}%  `
+        publish(`m24:algo:tracking`, {
+            strategyName,
+            text
+        });
+        console.log(text)
+    }
+}
+
+function tryChangeOrigin() {
+    if (last.change > TARGET_GAIN_1) {
+        getStartTime(last.startTime)
+        const text = `#${strategyName}_Origin_Changed gain ${allTimeGain().toFixed(2)}%  `
         publish(`m24:algo:tracking`, {
             strategyName,
             text
@@ -197,9 +215,9 @@ function tryRestart() {
 }
 
 function collectProfit() {
-    if ((last.gain > TARGET_GAIN && (sellReason = "#target_atteint"))) {
-        sell(sellReason)
-    }
+    // if ((potentialGain > TARGET_GAIN && (sellReason = "#target_atteint"))) {
+    //     sell(sellReason)
+    // }
 }
 
 
