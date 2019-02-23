@@ -80,7 +80,7 @@ function init() {
 }
 
 function resetInOut() {
-    in_ = 3
+    in_ = 2
     out = in_ - stop
 }
 
@@ -203,7 +203,7 @@ function tryRestart() {
 }
 
 function tryChangeOrigin() {
-    if (last.change > TARGET_GAIN_1) {
+    if (last.gain > TARGET_GAIN_1) {
         getStartTime(last.startTime)
         const text = `#${strategyName}_Origin_Changed gain ${allTimeGain().toFixed(2)}%  `
         publish(`m24:algo:tracking`, {
