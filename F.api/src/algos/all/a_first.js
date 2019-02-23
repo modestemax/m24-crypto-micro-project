@@ -3,7 +3,7 @@ let { priceChanged: priceChangedC } = require('./a_first_c')
 
 module.exports = {
     priceChanged() {
-        [priceChangedA, priceChangedC]
+        [priceChangedA, /*priceChangedC*/]
             .forEach(priceChanged =>
                 priceChanged.apply(null, arguments))
     }
