@@ -283,8 +283,8 @@ module.exports = {
         // m1first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
         // m2first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m2, timeframeName: 'algo' }))
         // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
-        const first = _.nth(screener, 0)
-        const second = _.nth(screener, 1)
+        first = _.nth(screener, 0)
+        second = _.nth(screener, 1) || {}
 
         let count = _.values(screener).filter(v => v).length
         if (count === symbols.length) {
