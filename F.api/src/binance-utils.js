@@ -192,13 +192,14 @@ function getPeriodsChanges({ candles, symbol, periods }) {
 function publishPerf({ allSymbolsCandles,symbols, periods = DEFAULT_PERIODS, priceChanged }) {
     const perfs = {}
     subscribe('price', ({ symbol }) => {
-        priceChanged && priceChanged(symbol,symbols, allSymbolsCandles)
+
 
         const symbolPerfs = getPeriodsChanges({ candles: allSymbolsCandles[symbol], symbol, periods });
 
         perfs[symbol] = _.mapValues(symbolPerfs, (perf, period) =>
             perf || (perfs[symbol] && perfs[symbol][period] && { isDirty: true, ...perfs[symbol][period] }))
 
+        priceChanged && priceChanged(symbol, symbols, allSymbolsCandles,perfs)
 
         publish.throttle('prevPerf', Object.values(perfs))
         // publish.throttle2('ALL_SYMBOLS_CANDLES', allSymbolsCandles)

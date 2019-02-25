@@ -6,7 +6,7 @@ const { publish, subscribe } = require('common/redis');
 const { getSymbolsChanges, getChangeFrom, changePercent, timeframeStartAt, DURATION, DEFAULT_PERIODS } = require('../../binance-utils');
 const prices = require('../../progress/prices');
 console.log.throttle = _.throttle(console.log, 1e3 * 60)
-const strategyName = 'm24first_a'
+const strategyName = 'm24first_d'
 
 
 let timeRef = 'day';
@@ -47,29 +47,17 @@ const getFirst = (screener) => _.first(orderScreener(screener))
 
 init()
 
-function run(screener) {
-
-    first = getFirst(screener)
-    if (first) {
-        logFirst()
-        if (!last) {
-            if (first.change - second.change > 3) {
-                // in_ = 0
-                buy()
-            }
-        } else {
-            Object.assign(last, screener[last.symbol])
-            calculateGain()
-            collectProfit()
-            // tryRestart()
-            // tryChangeOrigin()
-            // if (last)
-            // // if (last.gain > out && last.symbol === first.symbol) {
-            //     if ((first.change - last.change > 3 && (sellReason = SELL_REASON.SWITCH_TO_FIRST))) {
-            //         // resetInOut()
-            //         sell(sellReason)
-            //     }
-        }
+function run(changes) {
+    if (!last && first.change > 1)
+        if (_.min([changes.m1.change, changes.m2.change, changes.m3.change] > 1.5))
+            if (_.min([changes.m5.change, changes.m15.change, changes.m30.change] > 2))
+                if (_.min([changes.h1.change, changes.h2.change, changes.h4.change] > 2.5))
+                    if (_.min([changes.h6.change, changes.h8.change, changes.h12.change] > 3))
+                        if (_.min([changes.h24.change, changes.day.change] > 3.5))
+                            buy()
+    if (last) {
+        calculateGain()
+        collectProfit()
     }
 }
 
@@ -173,8 +161,7 @@ function calculateGain() {
          Max gain ${last.maxGain.toFixed(2)}%
          Potential gain ${potentialGain().toFixed(2)}%
          All time gain ${allTimeGain().toFixed(2)}%
-         First ${first.symbol} ${first.change.toFixed(2)}%
-         Second ${second.symbol} ${second.change.toFixed(2)}%`
+         `
         const id = strategyName + 'trk' + log.length
         publish(`m24:algo:tracking`, {
             id,
@@ -279,22 +266,18 @@ function logLoading(count, symbols) {
 //     }
 // });
 module.exports = {
-    priceChanged(symbol, symbols, allSymbolsCandles) {
+    priceChanged(symbol, symbols, allSymbolsCandles, perfs) {
         DEFAULT_PERIODS.ALGO = getStartTime
-        screener = getSymbolsChanges({ allSymbolsCandles, period: getStartTime, timeframeName: 'algo' })
-        // m1first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
-        // m2first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m2, timeframeName: 'algo' }))
-        // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
-        const orderedScreener = orderScreener(screener)
-        first = _.nth(orderedScreener, 0)
-        second = _.nth(orderedScreener, 1) || {}
+        first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
+        if (first.change > 1) {
+            const changes = ['m2', 'm2', 'm3', 'm5', 'm15', 'm30', 'h1', 'h1', 'h2', 'h4', 'h6', 'h8', 'h12', 'h24', 'day']
+                .reduce((changes, period) => {
+                    return { ...changes, [period]: perfs[m1first.symbol][period] }
+                }, {})
+            // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
 
-        let count = _.values(screener).filter(v => v).length
-        if (count === symbols.length) {
-            logLoadingOnce(count, symbols)
-            run(screener)
-        } else {
-            logLoading(count, symbols)
+            run(changes)
+
         }
     }
 }
