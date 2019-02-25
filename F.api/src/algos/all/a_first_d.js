@@ -55,6 +55,7 @@ function run(changes) {
                     if (_.min([changes.h6.change, changes.h8.change, changes.h12.change] > 3))
                         if (_.min([changes.h24.change, changes.day.change] > 3.5))
                             buy()
+    logFirst(changes)
     if (last) {
         calculateGain()
         collectProfit()
@@ -140,9 +141,9 @@ function logSell(sellReason) {
          gain ${last.gain.toFixed(2)}%  #${last.gain > 0 ? 'win' : 'lost'}
          Max gain ${last.maxGain.toFixed(2)}% 
          All time gain ${allTimeGain().toFixed(2)}%\n`
-        // gainer ${gainer[0]} ${gainer[1].toFixed(2)}%
-        // looser ${looser[0]} ${looser[1].toFixed(2)}%
-        // + `[${last.change.toFixed(2)}%]`
+    // gainer ${gainer[0]} ${gainer[1].toFixed(2)}%
+    // looser ${looser[0]} ${looser[1].toFixed(2)}%
+    // + `[${last.change.toFixed(2)}%]`
 
 
     publish(`m24:algo:tracking`, {
@@ -219,12 +220,10 @@ function collectProfit() {
 }
 
 
-function logFirst() {
+function logFirst(changes) {
     if (first) {
         if (first.change.toFixed(1) != first_change.toFixed(1)) {
-            let text = `first ${first.symbol} ${first.change.toFixed(2)}%
-second ${second.symbol} ${second.change.toFixed(2)}%
-diff ${(first.change - second.change).toFixed(2)}%`
+            let text = `first ${first.symbol} ${_.map(changes, ({ change }, period) => `${period}:  ${change.toFixed(2)}%`).join('\n')}`
 
             let id = strategyName + 'first'
             publish(`m24:algo:tracking`, {
@@ -271,7 +270,7 @@ module.exports = {
         DEFAULT_PERIODS.ALGO = getStartTime
         first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
         if (first.change > 1) {
-            const changes = ['m1','m2', 'm2', 'm3', 'm5', 'm15', 'm30', 'h1', 'h1', 'h2', 'h4', 'h6', 'h8', 'h12', 'h24', 'day']
+            const changes = ['m1', 'm2', 'm2', 'm3', 'm5', 'm15', 'm30', 'h1', 'h1', 'h2', 'h4', 'h6', 'h8', 'h12', 'h24', 'day']
                 .reduce((changes, period) => {
                     return { ...changes, [period]: perfs[first.symbol] ? perfs[first.symbol][period] : {} }
                 }, {})
