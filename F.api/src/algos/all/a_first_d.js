@@ -139,10 +139,11 @@ function logSell(sellReason) {
          sell reason #${sellReason || '#sell_reason_unknow'}   
          gain ${last.gain.toFixed(2)}%  #${last.gain > 0 ? 'win' : 'lost'}
          Max gain ${last.maxGain.toFixed(2)}% 
-         All time gain ${allTimeGain().toFixed(2)}%\n` +
+         All time gain ${allTimeGain().toFixed(2)}%\n`
         // gainer ${gainer[0]} ${gainer[1].toFixed(2)}%
         // looser ${looser[0]} ${looser[1].toFixed(2)}%
-        `[${last.change.toFixed(2)}%]`;
+        // + `[${last.change.toFixed(2)}%]`
+
 
     publish(`m24:algo:tracking`, {
         strategyName,
@@ -272,7 +273,7 @@ module.exports = {
         if (first.change > 1) {
             const changes = ['m2', 'm2', 'm3', 'm5', 'm15', 'm30', 'h1', 'h1', 'h2', 'h4', 'h6', 'h8', 'h12', 'h24', 'day']
                 .reduce((changes, period) => {
-                    return { ...changes, [period]: perfs[m1first.symbol][period] }
+                    return { ...changes, [period]: perfs[first.symbol] ? perfs[first.symbol][period] : {} }
                 }, {})
             // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
 
