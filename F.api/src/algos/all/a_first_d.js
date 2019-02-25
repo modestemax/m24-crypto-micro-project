@@ -271,7 +271,7 @@ module.exports = {
         DEFAULT_PERIODS.ALGO = getStartTime
         first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
         if (first.change > 1) {
-            const changes = ['m2', 'm2', 'm3', 'm5', 'm15', 'm30', 'h1', 'h1', 'h2', 'h4', 'h6', 'h8', 'h12', 'h24', 'day']
+            const changes = ['m1','m2', 'm2', 'm3', 'm5', 'm15', 'm30', 'h1', 'h1', 'h2', 'h4', 'h6', 'h8', 'h12', 'h24', 'day']
                 .reduce((changes, period) => {
                     return { ...changes, [period]: perfs[first.symbol] ? perfs[first.symbol][period] : {} }
                 }, {})
