@@ -53,7 +53,7 @@ function run(screener) {
     if (first) {
         logFirst()
         if (!last) {
-            if (first.change > in_) {
+            if (first.change - second.change > 3) {
                 in_ = 0
                 buy()
             }
@@ -61,11 +61,11 @@ function run(screener) {
             Object.assign(last, screener[last.symbol])
             calculateGain()
             // collectProfit()
-            tryRestart()
-            tryChangeOrigin()
+            // tryRestart()
+            // tryChangeOrigin()
             if (last)
             // if (last.gain > out && last.symbol === first.symbol) {
-                if ((last.symbol !== first.symbol && first.change - last.change > .2 && (sellReason = SELL_REASON.SWITCH_TO_FIRST))) {
+                if ((first.change - last.change > 3 && (sellReason = SELL_REASON.SWITCH_TO_FIRST))) {
                     // resetInOut()
                     sell(sellReason)
                 }
@@ -235,7 +235,8 @@ function logFirst() {
     if (first) {
         if (first.change.toFixed(1) != first_change.toFixed(1)) {
             let text = `first ${first.symbol} ${first.change.toFixed(2)}%
-            second ${second.symbol} ${second.change.toFixed(2)}%`
+second ${second.symbol} ${second.change.toFixed(2)}%
+diff ${(first.change - second.change).toFixed(2)}%`
 
             let id = strategyName + 'first'
             publish(`m24:algo:tracking`, {
