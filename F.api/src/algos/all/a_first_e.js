@@ -14,6 +14,7 @@ let out;
 let stop;
 let last = null;
 let first = null;
+let second = null;
 let m1first = null
 let m2first = null
 let m3first = null
@@ -36,7 +37,10 @@ const SELL_REASON = {
     STOP_LOSS: 'stop_loss',
     SWITCH_TO_FIRST: 'switch_to_first'
 }
-const getFirst = (perfByTime) => _.first(_.orderBy(perfByTime, perf => perf ? perf.change : 0, 'desc'))
+
+const orderScreener = (screener) => _.orderBy(screener, perf => perf ? perf.change : 0, 'desc')
+const getFirst = (screener) => _.first(orderScreener(screener))
+
 
 init()
 
@@ -202,7 +206,18 @@ function collectProfit() {
 function logFirst() {
     if (first) {
         if (first.change.toFixed(1) != first_change.toFixed(1)) {
-            console.log(`first ${first.symbol} ${first.change.toFixed(2)}%`)
+            let text = `first ${first.symbol} ${first.change.toFixed(2)}%
+second ${second.symbol} ${second.change.toFixed(2)}%
+diff ${(first.change - second.change).toFixed(2)}%`
+
+            let id = strategyName + 'first'
+            publish(`m24:algo:tracking`, {
+                id,
+                message_id: tme_message_ids[id],
+                strategyName,
+                text
+            });
+            console.log(text)
             first_change = first.change
         }
     }
@@ -226,15 +241,18 @@ function logFirst() {
 
 
 function logLoading(count, symbols) {
-    let id = strategyName + 'start'
-    let text = `loading ${(count / symbols.length * 100).toFixed(2)}%`
-    publish(`m24:algo:tracking`, {
-        id,
-        message_id: tme_message_ids[id],
-        strategyName,
-        text
-    });
-    console.log(text)
+    if (logLoading.count !== count) {
+        logLoading.count = count
+        let id = strategyName + 'start'
+        let text = `loading ${(count / symbols.length * 100).toFixed(2)}%`
+        publish(`m24:algo:tracking`, {
+            id,
+            message_id: tme_message_ids[id],
+            strategyName,
+            text
+        });
+        console.log(text)
+    }
 }
 
 module.exports = {
@@ -248,6 +266,9 @@ module.exports = {
         if (!algoStarted) {
             first = getFirst(screener)
             if (!first) return
+            const orderedScreener = orderScreener(screener)
+            second = _.nth(orderedScreener, 1) || {}
+
             // if (first.change > in_ - Math.abs(-STOP_LOSS)) {
             if (first.change > out) {
                 startTime += DURATION.MIN_15
@@ -266,6 +287,7 @@ module.exports = {
                 symbol: first.symbol,
                 period: DEFAULT_PERIODS[period]
             }))
+
             run(screener)
         }
 
