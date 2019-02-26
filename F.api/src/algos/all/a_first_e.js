@@ -276,7 +276,7 @@ module.exports = {
                     startTime = timeframeStartAt(DURATION.MIN_1)()
                 }
             } else {
-                algoStarted = count === symbols.length
+                algoStarted = count ===5|| symbols.length
                 algoStarted && console.log('algoStarted ')
             }
         } else {
