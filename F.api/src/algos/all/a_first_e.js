@@ -137,9 +137,9 @@ function sell(sellReason) {
     logSell(sellReason)
     in_ += .3
     last = null;
-    if (sellReason === SELL_REASON.STOP_LOSS) {
-        init()
-    }
+    // if (sellReason === SELL_REASON.STOP_LOSS) {
+    //     init()
+    // }
 }
 
 function logSell(sellReason) {
