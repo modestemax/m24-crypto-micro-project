@@ -227,11 +227,12 @@ function logFirst() {
 
 function logLoading(count, symbols) {
     let id = strategyName + 'start'
+    let text = `loading ${(count / symbols.length * 100).toFixed(2)}%`
     publish(`m24:algo:tracking`, {
         id,
         message_id: tme_message_ids[id],
         strategyName,
-        text: `loading ${(count / symbols.length * 100).toFixed(2)}%`
+        text
     });
     console.log(text)
 }
