@@ -50,7 +50,7 @@ function run(screener) {
     if (first) {
         logFirst()
         if (!last) {
-            if (first.change > in_) {
+            if (first.change > in_*0) {
                 buy()
             }
         } else {
@@ -167,8 +167,8 @@ function logSell(sellReason) {
 function calculateGain() {
     last.prevGain = last.gain || 0
     last.gain = changePercent(last.openPrice - last.close)
-
     last.maxGain = _.max([last.gain, last.maxGain])
+
     if (last.prevGain.toFixed(1) != last.gain.toFixed(1)) {
         const text = `#${log.length}gain 
          ${last.symbol}  ${last.gain.toFixed(2)}% 
