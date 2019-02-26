@@ -3,7 +3,7 @@ const sorted = require('is-sorted')
 const { publish, subscribe } = require('common/redis');
 
 // const algo = require('..');
-const { getSymbolsChanges, getChangeFrom, changePercent, timeframeStartAt, DURATION, DEFAULT_PERIODS } = require('../../binance-utils');
+const { getSymbolsChanges, getPeriodsChanges, getChangeFrom, changePercent, timeframeStartAt, DURATION, DEFAULT_PERIODS } = require('../../binance-utils');
 const prices = require('../../progress/prices');
 console.log.throttle = _.throttle(console.log, 1e3 * 60)
 const strategyName = 'm24first_d'
@@ -49,11 +49,11 @@ init()
 
 function run(changes) {
     if (!last && first.change > 1)
-        if (_.min([changes.m1.change, changes.m2.change, changes.m3.change] > 1.5))
-            if (_.min([changes.m5.change, changes.m15.change, changes.m30.change] > 2))
-                if (_.min([changes.h1.change, changes.h2.change, changes.h4.change] > 2.5))
-                    if (_.min([changes.h6.change, changes.h8.change, changes.h12.change] > 3))
-                        if (_.min([changes.h24.change, changes.day.change] > 3.5))
+        if (_.min([changes.m1.change, changes.m2.change, changes.m3.change]) > 1.5)
+            if (_.min([changes.m5.change, changes.m15.change, changes.m30.change]) > 2)
+                if (_.min([changes.h1.change, changes.h2.change, changes.h4.change]) > 2.5)
+                    if (_.min([changes.h6.change, changes.h8.change, changes.h12.change]) > 3)
+                        if (_.min([changes.h24.change, changes.day.change]) > 3.5)
                             buy()
     logFirst(changes)
     if (last) {
@@ -268,19 +268,28 @@ function logLoading(count, symbols) {
 module.exports = {
     priceChanged(symbol, symbols, allSymbolsCandles, perfs) {
         DEFAULT_PERIODS.ALGO = getStartTime
-        // first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
-        // if (first.change > 1) {
-        const changes = ['m1', 'm2', 'm2', 'm3', 'm5', 'm15', 'm30', 'h1', 'h1', 'h2', 'h4', 'h6', 'h8', 'h12', 'h24', 'day']
-            .reduce((changes, period) => {
-                return { ...changes, [period]: perfs[first.symbol] ? perfs[first.symbol][period] : {} }
-            }, {})
+        first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
+
+        const changes = getPeriodsChanges({
+            candles: allSymbolsCandles[first.symbol],
+            symbol: first.symbol,
+            periods: DEFAULT_PERIODS
+        });
+
+        // if (first.change > 1 && perfs[first.symbol]) {
+        // // const changes = ['m1', 'm2', 'm2', 'm3', 'm5', 'm15', 'm30', 'h1', 'h1', 'h2', 'h4', 'h6', 'h8', 'h12', 'h24', 'day']
+        // //     .reduce((changes, period) => {
+        // //         return { ...changes, [period]:  perfs[first.symbol][period]  }
+        //     }, {})
         // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
-        first = changes.m1
+        // if (first.change != changes.m1.change) {
+        //     debugger
+        // }
         first.change > 1 && run(changes)
 
-        // }
     }
 }
+
 
 subscribe('tme_message_id', ({ id, message_id }) => {
     id && (tme_message_ids[id] = message_id)

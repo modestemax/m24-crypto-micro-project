@@ -107,7 +107,6 @@ function listenToPriceChange({ candles, symbol }) {
             assetVolume, n: trades,/*V: buyBaseVolume,q: buyAssetVolume, ignored*/
         } = ticks;
         // console.log(symbol + " " + interval + " candlestick update");
-        publish('price', { symbol, close });
 
         // if (changePercent(close, +close + SATOSHI) < MAX_SPREAD) {
         //     prevPerf[symbol] = getPrevPerformance({ candles, symbol, ticks });
@@ -116,11 +115,13 @@ function listenToPriceChange({ candles, symbol }) {
             candles,
             symbol, startTime, candle: {
                 isFinal, interval,
-                open, high, low, close, volume, startTime, closeTime,
+                open, high, low, close, volume, startTime, closeTime, time: Date.now(),
                 assetVolume, trades,/*V: buyBaseVolume,q: buyAssetVolume, ignored*/
                 // change:changePercent(open,close)
             }
         })
+
+        publish('price', { symbol, close });
 
         if (isFinal) {
             console.log.throttle(symbol + ' final');
@@ -157,7 +158,10 @@ function getChangeFrom({ candles, symbol, period, from, timeframeName }) {
             return {
                 symbol, timeframeName,
                 open, close,
-                change: changePercent(open, close)
+                change: changePercent(open, close),
+                // time:lastCandle.time,
+                // openTime:lastCandle.openTime,
+                // closeTime:lastCandle.closeTime
             }
         }
         !startCandle && console.log(`${symbol} startCandle not found at [${startTime}] ${new Date(startTime)}`)
@@ -189,7 +193,7 @@ function getPeriodsChanges({ candles, symbol, periods }) {
 }
 
 
-function publishPerf({ allSymbolsCandles,symbols, periods = DEFAULT_PERIODS, priceChanged }) {
+function publishPerf({ allSymbolsCandles, symbols, periods = DEFAULT_PERIODS, priceChanged }) {
     const perfs = {}
     subscribe('price', ({ symbol }) => {
 
@@ -199,7 +203,7 @@ function publishPerf({ allSymbolsCandles,symbols, periods = DEFAULT_PERIODS, pri
         perfs[symbol] = _.mapValues(symbolPerfs, (perf, period) =>
             perf || (perfs[symbol] && perfs[symbol][period] && { isDirty: true, ...perfs[symbol][period] }))
 
-        priceChanged && priceChanged(symbol, symbols, allSymbolsCandles,perfs)
+        priceChanged && priceChanged(symbol, symbols, allSymbolsCandles, perfs)
 
         publish.throttle('prevPerf', Object.values(perfs))
         // publish.throttle2('ALL_SYMBOLS_CANDLES', allSymbolsCandles)
