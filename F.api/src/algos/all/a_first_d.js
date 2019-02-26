@@ -49,14 +49,15 @@ init()
 
 function run(changes) {
     if (!last && first.change > 1)
-        // if (_.min([changes.m1.change, changes.m2.change, changes.m3.change]) > 1.5)
-        //     if (_.min([changes.m5.change, changes.m15.change, changes.m30.change]) > 2)
-        //         if (_.min([changes.h1.change, changes.h2.change, changes.h4.change]) > 2.5)
-        //             if (_.min([changes.h6.change, changes.h8.change, changes.h12.change]) > 3)
-        //                 if (_.min([changes.h24.change, changes.day.change]) > 3.5)
+        if (_.min([changes.m1.change, changes.m2.change, changes.m3.change]) > 1.5)
+            if (_.min([changes.m5.change, changes.m15.change, changes.m30.change]) > 2)
+                if (_.min([changes.h1.change, changes.h2.change, changes.h4.change]) > 2.5)
+                    if (_.min([changes.h6.change, changes.h8.change, changes.h12.change]) > 3)
+                        if (_.min([changes.h24.change, changes.day.change]) > 3.5)
                             buy()
     logFirst(changes)
     if (last) {
+
         calculateGain()
         collectProfit()
     }
@@ -158,11 +159,11 @@ function calculateGain() {
     last.gain = changePercent(last.openPrice, last.close)
 
     last.maxGain = _.max([last.gain, last.maxGain])
-    if (last.prevGain.toFixed(1) != last.gain.toFixed(1)) {
+    if (last.gain === 0 || last.prevGain.toFixed(1) != last.gain.toFixed(1)) {
         const text = `#${log.length}gain #${strategyName}gain  ${last.symbol}  ${last.gain.toFixed(2)}% 
          Max gain ${last.maxGain.toFixed(2)}%
          Potential gain ${potentialGain().toFixed(2)}%
-         All time gain ${allTimeGain().toFixed(2)}%
+         All time gain ${gain.toFixed(2)}%
          `
         const id = strategyName + 'trk' + log.length
         publish(`m24:algo:tracking`, {
@@ -171,6 +172,7 @@ function calculateGain() {
             strategyName,
             text
         });
+        console.log(text)
     }
 }
 
@@ -275,6 +277,14 @@ module.exports = {
                 symbol: first.symbol,
                 periods: DEFAULT_PERIODS
             });
+            if (last) {
+                let newLast = getChangeFrom({
+                    candles: allSymbolsCandles[last.symbol],
+                    symbol: last.symbol,
+                    period: DEFAULT_PERIODS.m1
+                })
+                Object.assign(last, newLast)
+            }
 
             // if (first.change > 1 && perfs[first.symbol]) {
             // // const changes = ['m1', 'm2', 'm2', 'm3', 'm5', 'm15', 'm30', 'h1', 'h1', 'h2', 'h4', 'h6', 'h8', 'h12', 'h24', 'day']
@@ -285,7 +295,7 @@ module.exports = {
             // if (first.change != changes.m1.change) {
             //     debugger
             // }
-            first.change > 1 && run(changes)
+            run(changes)
         }
     }
 }
