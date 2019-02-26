@@ -109,7 +109,7 @@ function buy() {
         last.startTime = Date.now()
         log.push(last);
         last.openPrice = last.close;
-        const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
+        const text = `#${log.length}buy #buy_${strategyName} #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
         publish(`m24:algo:tracking`, {
             strategyName,
             text
@@ -136,7 +136,7 @@ function logSell(sellReason) {
     // let gainer = _.first(gainers)
     // let looser = _.last(gainers)
 
-    const text = `#${log.length}sell #${strategyName}_sell #sell_${last.symbol} #${last.symbol} at ${last.close}
+    const text = `#${log.length}sell #sell_${strategyName} #sell_${last.symbol} #${last.symbol} at ${last.close}
          sell reason #${sellReason || '#sell_reason_unknow'}   
          gain ${last.gain.toFixed(2)}%  #${last.gain > 0 ? 'win' : 'lost'}
          Max gain ${last.maxGain.toFixed(2)}% 
