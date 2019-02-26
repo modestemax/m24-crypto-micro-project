@@ -223,7 +223,7 @@ function collectProfit() {
 function logFirst(changes) {
     if (first) {
         if (first.change.toFixed(1) != first_change.toFixed(1)) {
-            let text = `first ${first.symbol} ${_.map(changes, ({ change }, period) => `${period}:  ${change.toFixed(2)}%`).join('\n')}`
+            let text = `first ${first.symbol} \n${_.map(changes, ({ change }, period) => `${period}:  ${change.toFixed(2)}%`).join('\n')}`
 
             let id = strategyName + 'first'
             publish(`m24:algo:tracking`, {
@@ -268,17 +268,17 @@ function logLoading(count, symbols) {
 module.exports = {
     priceChanged(symbol, symbols, allSymbolsCandles, perfs) {
         DEFAULT_PERIODS.ALGO = getStartTime
-        first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
-        if (first.change > 1) {
-            const changes = ['m1', 'm2', 'm2', 'm3', 'm5', 'm15', 'm30', 'h1', 'h1', 'h2', 'h4', 'h6', 'h8', 'h12', 'h24', 'day']
-                .reduce((changes, period) => {
-                    return { ...changes, [period]: perfs[first.symbol] ? perfs[first.symbol][period] : {} }
-                }, {})
-            // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
+        // first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m1, timeframeName: 'algo' }))
+        // if (first.change > 1) {
+        const changes = ['m1', 'm2', 'm2', 'm3', 'm5', 'm15', 'm30', 'h1', 'h1', 'h2', 'h4', 'h6', 'h8', 'h12', 'h24', 'day']
+            .reduce((changes, period) => {
+                return { ...changes, [period]: perfs[first.symbol] ? perfs[first.symbol][period] : {} }
+            }, {})
+        // m3first = getFirst(getSymbolsChanges({ allSymbolsCandles, period: DEFAULT_PERIODS.m3, timeframeName: 'algo' }))
+        first = changes.m1
+        first.change > 1 && run(changes)
 
-            run(changes)
-
-        }
+        // }
     }
 }
 
