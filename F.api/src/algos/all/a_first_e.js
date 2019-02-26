@@ -89,7 +89,7 @@ function resetInOut() {
 
 function getStartTime() {
     if (!startTime) {
-        const now = Date.now() - DURATION.HOUR_2;
+        const now = Date.now() - DURATION.HOUR_6;
         startTime = now - now % DURATION.MIN_1
         console.log('startTime', new Date(startTime))
         // startTime =  timeframeStartAt(DURATION.HOUR_1)()
@@ -259,16 +259,16 @@ module.exports = {
     priceChanged(symbol, symbols, allSymbolsCandles) {
         DEFAULT_PERIODS.ALGO = getStartTime
         screener = getSymbolsChanges({ allSymbolsCandles, period: getStartTime, timeframeName: 'algo' })
-
+        const orderedScreener = orderScreener(screener)
+        first = getFirst(screener)
+        second = _.nth(orderedScreener, 1) || {}
 
         // init()
         // algoStarted=true
         if (!algoStarted) {
-            first = getFirst(screener)
             if (!first) return
-            const orderedScreener = orderScreener(screener)
-            second = _.nth(orderedScreener, 1) || {}
-
+            let count = _.values(screener).filter(v => v).length
+            logLoading(count, symbols)
             // if (first.change > in_ - Math.abs(-STOP_LOSS)) {
             if (first.change > out) {
                 startTime += DURATION.MIN_15
@@ -276,10 +276,8 @@ module.exports = {
                     startTime = timeframeStartAt(DURATION.MIN_1)()
                 }
             } else {
-                let count = _.values(screener).filter(v => v).length
                 algoStarted = count === symbols.length
                 algoStarted && console.log('algoStarted ')
-                logLoading(count, symbols)
             }
         } else {
             [m1first, m2first, m3first] = ['m1', 'm2', 'm3',].map(period => getChangeFrom({
