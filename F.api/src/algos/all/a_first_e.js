@@ -45,12 +45,11 @@ const getFirst = (screener) => _.first(orderScreener(screener))
 init()
 
 function run(screener) {
-
     first = getFirst(screener)
     if (first) {
         logFirst()
         if (!last) {
-            if (first.change > in_*0) {
+            if (first.change > in_) {
                 buy()
             }
         } else {
@@ -176,8 +175,8 @@ function calculateGain() {
          All time gain ${gain.toFixed(2)}%
          -----------------------------------
          first ${first.symbol} ${first.change.toFixed(2)}%
-second ${second.symbol} ${second.change.toFixed(2)}%
-diff ${(first.change - second.change).toFixed(2)}%
+         second ${second.symbol} ${second.change.toFixed(2)}%
+         diff ${(first.change - second.change).toFixed(2)}%
          
          `
         const id = 'trk' + log.length
@@ -187,6 +186,7 @@ diff ${(first.change - second.change).toFixed(2)}%
             strategyName,
             text
         });
+        console.log(text)
     }
 }
 
@@ -282,7 +282,7 @@ module.exports = {
                     startTime = timeframeStartAt(DURATION.MIN_1)()
                 }
             } else {
-                algoStarted = count ===5|| symbols.length
+                algoStarted = count === symbols.length
                 algoStarted && console.log('algoStarted ')
             }
         } else {
