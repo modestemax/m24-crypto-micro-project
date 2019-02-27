@@ -92,7 +92,7 @@ function run(screener) {
 
 function init() {
     last = null;
-    stop = 2
+    stop = 3
     resetInOut()
     startTime = null
     algoStarted = false
@@ -123,7 +123,7 @@ function getStartTime() {
 function buyCondition() {
     const changes = [m1first.change, m2first.change, m3first.change]
     if (_.min(changes) > 0) {
-        if (sorted(changes)) {
+        if (true || sorted(changes)) {
             if (first.change - _.max(changes) > 1) {
                 return true
             }
