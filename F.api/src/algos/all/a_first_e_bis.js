@@ -121,10 +121,10 @@ function getStartTime() {
 }
 
 function buyCondition() {
-    const changes = [m1first.change, m2first.change, m3first.change]
+    const changes = [m1first.change, m2first.change/*, m3first.change*/]
     if (_.min(changes) > 0) {
         if (true || sorted(changes)) {
-            if (first.change - _.max(changes) > 1) {
+            if (true || (first.change - _.max(changes)) > 1) {
                 return true
             }
         }
