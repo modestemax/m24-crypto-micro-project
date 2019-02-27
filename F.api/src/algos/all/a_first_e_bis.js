@@ -18,6 +18,9 @@ let second = null;
 let m1first = null
 let m2first = null
 let m3first = null
+let m1last = null
+let m2last = null
+let m3last = null
 let log = []
 const gainLogs = {}
 const FAST_GROW = 2
@@ -34,7 +37,8 @@ const processStartTime = Date.now()
 let startTime
 const SELL_REASON = {
     STOP_LOSS: 'stop_loss',
-    SWITCH_TO_FIRST: 'switch_to_first'
+    SWITCH_TO_FIRST: 'switch_to_first',
+    DROPPING: 'dropping',
 }
 
 const orderScreener = (screener) => _.orderBy(screener, perf => perf ? perf.change : 0, 'desc')
@@ -73,6 +77,11 @@ function run(screener) {
                 // || (last.gain < 0 && last.symbol !== first.symbol && (sellReason = "#Lossing_switch_to_first"))
                 ) {
                     last.in_ = last.change;
+                    last.out = last.in_ - stop
+                    // resetInOut()
+                    sell(sellReason)
+                } else if ((_.max([m1last.change, m2last.change, m3last.change]) < 0 && (sellReason = SELL_REASON.DROPPING))) {
+                    last.in_ = last.change + 1;
                     last.out = last.in_ - stop
                     // resetInOut()
                     sell(sellReason)
@@ -301,7 +310,12 @@ module.exports = {
                 candles: allSymbolsCandles[first.symbol],
                 symbol: first.symbol,
                 period: DEFAULT_PERIODS[period]
-            }))
+            }));
+            last && ([m1last, m2last, m3last] = ['m1', 'm2', 'm3',].map(period => getChangeFrom({
+                candles: allSymbolsCandles[last.symbol],
+                symbol: last.symbol,
+                period: DEFAULT_PERIODS[period]
+            })))
 
             run(screener)
         }
