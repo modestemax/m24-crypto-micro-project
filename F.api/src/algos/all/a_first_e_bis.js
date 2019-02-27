@@ -50,8 +50,7 @@ const getFirst = (screener) => _.first(orderScreener(screener))
 init()
 
 function getIn_ForSymbol(symbol) {
-    return _.maxBy(_.filter(log, { symbol }).concat({ in_ }), 'in_')
-        ;
+    return _.maxBy(_.filter(log, { symbol }).concat({ in_ }), 'in_').in_
 }
 
 function run(screener) {
