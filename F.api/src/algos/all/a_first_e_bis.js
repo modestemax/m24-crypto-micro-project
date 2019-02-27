@@ -1,4 +1,6 @@
 const _ = require('lodash');
+const moment = require('moment-timezone');
+const TIME_ZONE = 'Africa/Douala'
 const sorted = require('is-sorted')
 const { publish, subscribe } = require('common/redis');
 
@@ -107,10 +109,10 @@ function getStartTime() {
     if (!startTime) {
         const now = Date.now() - DURATION.HOUR_6;
         startTime = now - now % DURATION.MIN_1
-        console.log('startTime', new Date(startTime))
-        // startTime =  timeframeStartAt(DURATION.HOUR_1)()
 
-        const text = `#newframe started at ${new Date(startTime)}`
+        const time = moment(new Date(startTime)).tz(TIME_ZONE).format('HH:mm - DD MMM')
+        console.log('startTime', time)
+        const text = `#newframe started at ${time}`
         publish(`m24:algo:tracking`, {
             strategyName,
             text
