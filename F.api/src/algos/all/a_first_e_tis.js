@@ -41,6 +41,7 @@ const SELL_REASON = {
     STOP_LOSS: 'stop_loss',
     SWITCH_TO_FIRST: 'switch_to_first',
     DROPPING: 'dropping',
+    TARGET: 'target',
 }
 
 const orderScreener = (screener) => _.orderBy(screener, perf => perf ? perf.change : 0, 'desc')
@@ -73,9 +74,8 @@ function run(screener) {
                     last.in_ = _.max([last.in_, last.change]);
                     last.out = last.in_ - stop
                 } else if (
-                    // (last.gain <= last.out && (sellReason = SELL_REASON.STOP_LOSS))
-                //||
-                    (first.change - last.change > 2 && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
+                    (last.gain <= last.out && (sellReason = SELL_REASON.STOP_LOSS))
+                    || (first.change - last.change > 2 && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
                 // || (last.gain < 0 && last.symbol !== first.symbol && (sellReason = "#Lossing_switch_to_first"))
                 ) {
                     last.in_ = last.change;
@@ -87,6 +87,9 @@ function run(screener) {
                     last.out = last.in_ - stop
                     // resetInOut()
                     sell(sellReason)
+                } else if (last.gain > 1) {
+                    sell(SELL_REASON.TARGET)
+                    algoStarted = false;
                 }
         }
     }
@@ -194,15 +197,15 @@ function calculateGain() {
          ${last.symbol}  ${last.gain.toFixed(2)}% 
          Max gain ${last.maxGain.toFixed(2)}%
          All time gain ${gain.toFixed(2)}%
-         -----------------------------------
+         -------
          stop ${last.out.toFixed(2)}%
          from ${moment(last.startTime).fromNow()}
-         _____________________________________
+         ______
          first ${first.symbol} ${first.change.toFixed(2)}%
          second ${second.symbol} ${second.change.toFixed(2)}%
          diff ${(first.change - second.change).toFixed(2)}%
-         -----------------------------------
-         ${[m1last.change, m2last.change, m3last.change].map((change, i) => `m${i + 1} ${change.toFixed(2)}%`).join(' - ')}
+         --------\n
+         ${[m1last.change, m2last.change, m3last.change].map((change, i) => `m${i + 1}:${change.toFixed(2)}%`).join('\n')}
          `
         const id = 'trk' + log.length
         publish(`m24:algo:tracking`, {

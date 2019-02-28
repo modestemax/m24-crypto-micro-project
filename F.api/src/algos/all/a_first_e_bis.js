@@ -41,6 +41,7 @@ const SELL_REASON = {
     STOP_LOSS: 'stop_loss',
     SWITCH_TO_FIRST: 'switch_to_first',
     DROPPING: 'dropping',
+    TARGET: 'target',
 }
 
 const orderScreener = (screener) => _.orderBy(screener, perf => perf ? perf.change : 0, 'desc')
@@ -193,15 +194,15 @@ function calculateGain() {
          ${last.symbol}  ${last.gain.toFixed(2)}% 
          Max gain ${last.maxGain.toFixed(2)}%
          All time gain ${gain.toFixed(2)}%
-         -----------------------------------
+         -------
          stop ${last.out.toFixed(2)}%
          from ${moment(last.startTime).fromNow()}
-         _____________________________________
+         _______
          first ${first.symbol} ${first.change.toFixed(2)}%
          second ${second.symbol} ${second.change.toFixed(2)}%
          diff ${(first.change - second.change).toFixed(2)}%
-         -----------------------------------
-         ${[m1last.change, m2last.change, m3last.change].map((change,i)=>`m${i+1} ${change.toFixed(2)}%`).join(' - ')}
+         ----------\n
+         ${[m1last.change, m2last.change, m3last.change].map((change,i)=>`m${i+1}:${change.toFixed(2)}%`).join('\n')}
          `
         const id = 'trk' + log.length
         publish(`m24:algo:tracking`, {
