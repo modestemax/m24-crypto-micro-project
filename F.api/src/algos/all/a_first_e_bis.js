@@ -137,6 +137,7 @@ function buy() {
         last = first;
         log.push(last);
         last.openPrice = last.close;
+        last.startTime = Date.now()
         const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
         publish(`m24:algo:tracking`, {
             strategyName,
@@ -148,6 +149,7 @@ function buy() {
 
 function sell(sellReason) {
     last.closePercent = last.change
+    last.endTime = Date.now()
     calculateGain()
     gain += last.gain
     gainLogs[last.symbol] = (gainLogs[last.symbol] || 0) + last.gain
@@ -193,6 +195,7 @@ function calculateGain() {
          All time gain ${gain.toFixed(2)}%
          -----------------------------------
          stop ${last.out.toFixed(2)}%
+         from ${moment(last.startTime).fromNow()}
          _____________________________________
          first ${first.symbol} ${first.change.toFixed(2)}%
          second ${second.symbol} ${second.change.toFixed(2)}%
@@ -237,6 +240,7 @@ function logFirst() {
             let text = `first ${first.symbol} ${first.change.toFixed(2)}%
 second ${second.symbol} ${second.change.toFixed(2)}%
 diff ${(first.change - second.change).toFixed(2)}%
+from ${moment(startTime).fromNow()}
 [next buy at ${getIn_ForSymbol(first.symbol).toFixed(2)}%]
 `
 
@@ -301,7 +305,7 @@ module.exports = {
             logLoading(count, symbols)
             // if (first.change > in_ - Math.abs(-STOP_LOSS)) {
             if (first.change > out) {
-                startTime += DURATION.MIN_15
+                startTime += DURATION.MIN_5
                 if (startTime > Date.now() - DURATION.MIN_15) {
                     startTime = timeframeStartAt(DURATION.MIN_1)()
                 }

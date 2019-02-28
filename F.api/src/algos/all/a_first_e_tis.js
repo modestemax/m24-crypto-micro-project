@@ -107,7 +107,7 @@ function resetInOut() {
 
 function getStartTime() {
     if (!startTime) {
-        const now = Date.now() - DURATION.HOUR_2;
+        const now = Date.now() - DURATION.HOUR_4;
         startTime = now - now % DURATION.MIN_1
 
         const time = moment(new Date(startTime)).tz(TIME_ZONE).format('HH:mm - DD MMM')
@@ -306,7 +306,7 @@ module.exports = {
             logLoading(count, symbols)
             // if (first.change > in_ - Math.abs(-STOP_LOSS)) {
             if (first.change > out) {
-                startTime += DURATION.MIN_15
+                startTime += DURATION.MIN_5
                 if (startTime > Date.now() - DURATION.MIN_15) {
                     startTime = timeframeStartAt(DURATION.MIN_1)()
                 }
