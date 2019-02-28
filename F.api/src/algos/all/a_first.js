@@ -4,6 +4,7 @@ let { priceChanged: priceChangedD } = require('./a_first_d')
 let { priceChanged: priceChangedE } = require('./a_first_e')
 let { priceChanged: priceChangedEBIS } = require('./a_first_e_bis')
 let { priceChanged: priceChangedETIS } = require('./a_first_e_tis')
+let { priceChanged: priceChangedF } = require('./a_first_f')
 
 module.exports = {
     priceChanged() {
@@ -12,8 +13,9 @@ module.exports = {
             // priceChangedC,
             // priceChangedD,
             // priceChangedE,
-            priceChangedEBIS,
-            priceChangedETIS,
+            // priceChangedEBIS,
+            // priceChangedETIS,
+            priceChangedF,
         ]
             .forEach(priceChanged =>
                 priceChanged.apply(null, arguments))
