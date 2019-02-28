@@ -12,7 +12,7 @@ module.exports = {
             // priceChangedC,
             // priceChangedD,
             // priceChangedE,
-            // priceChangedEBIS,
+            priceChangedEBIS,
             priceChangedETIS,
         ]
             .forEach(priceChanged =>
