@@ -202,7 +202,7 @@ function publishPerf({ allSymbolsCandles, symbols, periods = DEFAULT_PERIODS, pr
 
         perfs[symbol] = _.mapValues(symbolPerfs, (perf, period) =>
             perf || (perfs[symbol] && perfs[symbol][period] ? { isDirty: true, ...perfs[symbol][period] }
-                : { symbol, period, change: '-' }
+                : { symbol, period, change: -1000 }
             ))
 
         priceChanged && priceChanged(symbol, symbols, allSymbolsCandles, perfs)
