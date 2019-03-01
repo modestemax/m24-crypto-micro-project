@@ -10,11 +10,10 @@ module.exports = class extends Template {
     async canBuy({ symbolId, timeframe }, last, prev, signal) {
         let current = signal.candle;
         if (last && prev && current) {
-
-            if ((current.close < current.ema10) && (current.ema10 > current.ema20) && (current.ema20 >= current.bbb20))
+            if ((current.close <= current.ema10) && (current.close > current.open) && (current.ema10 > current.ema20) && (current.ema20 >= current.bbb20))
                 if ((current.ema200 <= current.bbb20) && (current.ema100 <= current.bbb20) && (current.ema50 <= current.ema30))
                     if ((current.bbu20 >= last.bbu20) && (current.ema30 <= current.ema20))
-                        if ((current.bbu20 / current.ema10) * 100 >= 0.7) {
+                        if ((current.bbu20 / current.ema10) * 100 >= 0.5) {
                             return true;
                         }
         }

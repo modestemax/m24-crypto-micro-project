@@ -146,6 +146,11 @@ function forgetOldCandles({ candles }) {
 }
 
 function getChangeFrom({ candles, symbol, period, from, timeframeName }) {
+    const prevChanges = getChangeFrom.prevChanges || new Map();
+    getChangeFrom.prevChanges = prevChanges
+    let prevChangeSymbols = prevChanges.get(period) || {}
+    let prevChange = prevChangeSymbols[symbol] || {}
+
     const now = Date.now()
     const now_0 = now - now % DURATION.MIN_1;
     const now_1 = now_0 - DURATION.MIN_1
@@ -155,14 +160,20 @@ function getChangeFrom({ candles, symbol, period, from, timeframeName }) {
         const lastCandle = candles[now_0] || candles[now_1];
         if (startCandle && lastCandle) {
             const [open, close] = [+startCandle.open, +lastCandle.close]
-            return {
+            const change = changePercent(open, close)
+            prevChange = {
                 symbol, timeframeName,
                 open, close,
-                change: changePercent(open, close),
+                change,
+                openChange: prevChange.openChange || change,
+                highChange: _.max([prevChange.highChange, change]),
+                lowChange: _.min([prevChange.minChange, change])
                 // time:lastCandle.time,
                 // openTime:lastCandle.openTime,
                 // closeTime:lastCandle.closeTime
             }
+            prevChanges.set(period, { ...prevChangeSymbols, [symbol]: prevChange })
+            return prevChange
         }
         !startCandle && console.log(`${symbol} startCandle not found at [${startTime}] ${new Date(startTime)}`)
         !lastCandle && console.log(`${symbol} lastCandle not found at [${now_0}] ${new Date(now_0)}`)

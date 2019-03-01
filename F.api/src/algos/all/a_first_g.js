@@ -300,39 +300,21 @@ module.exports = {
         const orderedScreener = orderScreener(screener)
         first = getFirst(screener)
         second = _.nth(orderedScreener, 1) || {}
-
-        // init()
-        // algoStarted=true
-        if (!algoStarted) {
-            if (!first) return
-            let count = _.values(screener).filter(v => v).length
-            logLoading(count, symbols)
-            // if (first.change > in_ - Math.abs(-STOP_LOSS)) {
-            if (first.change > out) {
-                startTime += DURATION.MIN_5
-                if (startTime > Date.now() - DURATION.MIN_15) {
-                    startTime = timeframeStartAt(DURATION.MIN_1)()
+        //     [m1last, m2last, m3last] = ['m1', 'm2', 'm3',].map(period => getChangeFrom({
+        //     candles: allSymbolsCandles[last.symbol],
+        //     symbol: last.symbol,
+        //     period: DEFAULT_PERIODS[period]
+        // }))
+        symbols = {
+            symbol: {
+                m1: {
+                    min: 1, max: 1
                 }
-            } else {
-                algoStarted = count === symbols.length
-                algoStarted && console.log('algoStarted ')
             }
-        } else {
-            [m1first, m2first, m3first] = ['m1', 'm2', 'm3',].map(period => getChangeFrom({
-                candles: allSymbolsCandles[first.symbol],
-                symbol: first.symbol,
-                period: DEFAULT_PERIODS[period]
-            }));
-            last && ([m1last, m2last, m3last] = ['m1', 'm2', 'm3',].map(period => getChangeFrom({
-                candles: allSymbolsCandles[last.symbol],
-                symbol: last.symbol,
-                period: DEFAULT_PERIODS[period]
-            })))
-
-            run(screener)
         }
-
     }
+
+}
 }
 
 subscribe('tme_message_id', ({ id, message_id }) => {

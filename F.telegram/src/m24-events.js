@@ -50,7 +50,6 @@ module.exports = {
                 text = text.join('\n');
                 break;
         }
-        tme.sendMessage({ chat_id: data.chat_id || M24_LOG_CHAT_ID, message_id: data.message_id, text });
 
         if (/#m24/.test(text)) {
             let sendOrEditMessage = tme.sendMessage.bind(tme)
@@ -59,6 +58,8 @@ module.exports = {
             }
             let { message_id } = await sendOrEditMessage({ chat_id: MODESTE_MAX, message_id: data.message_id, text });
             if (message_id) publish('tme_message_id', { id: data.id, message_id })
+        } else {
+            tme.sendMessage({ chat_id: data.chat_id || M24_LOG_CHAT_ID, message_id: data.message_id, text });
         }
 
 

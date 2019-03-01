@@ -5,7 +5,7 @@ const sorted = require('is-sorted')
 const { publish, subscribe } = require('common/redis');
 
 // const algo = require('..');
-const { getSymbolsChanges, getChangeFrom, changePercent, timeframeStartAt, DURATION, DEFAULT_PERIODS } = require('../../binance-utils');
+const { getSymbolsChanges, getChangeFrom, getPeriodsChanges, changePercent, timeframeStartAt, DURATION, DEFAULT_PERIODS } = require('../../binance-utils');
 // const prices = require('../../progress/prices');
 console.log.throttle = _.throttle(console.log, 1e3 * 60)
 // let timeRef = 'day';
@@ -16,7 +16,9 @@ let out;
 let stop;
 let last = null;
 let first = null;
+let firstInOtherPeriods = null;
 let second = null;
+let secondInOtherPeriods = null;
 let m1first = null
 let m2first = null
 let m3first = null
@@ -50,18 +52,16 @@ const getFirst = (screener) => _.first(orderScreener(screener))
 
 init()
 
-function getIn_ForSymbol(symbol) {
-    return _.maxBy(_.filter(log, { symbol }).concat({ in_ }), 'in_').in_
-}
 
 function run(screener) {
     first = getFirst(screener)
     if (first) {
         logFirst()
         if (!last) {
-            first.in_ = getIn_ForSymbol(first.symbol)
-            if (first.change > first.in_) {
-                first.out = first.in_ - stop
+            const min = _.minBy(_.values(firstInOtherPeriods), 'lowChange')
+            first.in_ = first.highChange + min
+            if (min<-1&& first.change >= first.in_) {
+                first.out = first.change +min
                 buy()
             }
         } else {
@@ -90,7 +90,7 @@ function run(screener) {
                 } else if (last.gain > 1) {
                     sell(SELL_REASON.TARGET)
                     algoStarted = false;
-                    startTime=null
+                    startTime = null
                 }
         }
     }
@@ -301,11 +301,10 @@ module.exports = {
         const orderedScreener = orderScreener(screener)
         first = getFirst(screener)
         second = _.nth(orderedScreener, 1) || {}
-
         // init()
         // algoStarted=true
         if (!algoStarted) {
-            if (!first) return
+            if (!(first && second)) return
             let count = _.values(screener).filter(v => v).length
             logLoading(count, symbols)
             // if (first.change > in_ - Math.abs(-STOP_LOSS)) {
@@ -329,6 +328,17 @@ module.exports = {
                 symbol: last.symbol,
                 period: DEFAULT_PERIODS[period]
             })))
+
+            firstInOtherPeriods = getPeriodsChanges({
+                candles: allSymbolsCandles[first.symbol],
+                symbol: first.symbol,
+                periods: DEFAULT_PERIODS
+            })
+            secondInOtherPeriods = getPeriodsChanges({
+                candles: allSymbolsCandles[second.symbol],
+                symbol: second.symbol,
+                periods: DEFAULT_PERIODS
+            })
 
             run(screener)
         }
