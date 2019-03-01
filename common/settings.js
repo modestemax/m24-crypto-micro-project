@@ -313,7 +313,7 @@ module.exports = {
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
         "K3B2SPIRITOM5": {
-            isActive: true,
+            // isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
@@ -335,7 +335,7 @@ module.exports = {
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
         "K3B2SPIRITOM15": {
-            // isActive: true,
+            isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
