@@ -246,7 +246,6 @@ function logFirst() {
 second ${second.symbol} ${second.change.toFixed(2)}%
 diff ${(first.change - second.change).toFixed(2)}%
 from ${moment(startTime).fromNow()}
-[next buy at ${getIn_ForSymbol(first.symbol).toFixed(2)}%]
 `
 
             let id = strategyName + 'first' + log.length
