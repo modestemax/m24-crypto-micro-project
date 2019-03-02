@@ -70,8 +70,8 @@ module.exports = {
                 // SYMBOLS_FILTER: '(eth|xrp|bcc|ltc|eos|ada|xlm|miota|trx|neo|tusd|bcn|xmr|dash|xem|ven|bnb|etc|qtum|ont)btc$',
                 // TIMEFRAMES: '60,240,1440,10080'
                 // TIMEFRAMES: '5,15,60,240,1440'
-                // TIMEFRAMES: '1,5,15,60,240,1440'
-                TIMEFRAMES: '60,15,1440'
+                TIMEFRAMES: '15,60,240,1440'
+                // TIMEFRAMES: '60,15,1440'
                 // TIMEFRAMES: '240,1440,60'
             },
             env_production: {
