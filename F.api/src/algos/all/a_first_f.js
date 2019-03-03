@@ -15,25 +15,17 @@ let in_;
 let out;
 let stop;
 let last = null;
+let lastInOtherPeriods = null;
 let first = null;
 let firstInOtherPeriods = null;
 let second = null;
 let secondInOtherPeriods = null;
-let m1first = null
-let m2first = null
-let m3first = null
-let m1last = null
-let m2last = null
-let m3last = null
 let log = []
 const gainLogs = {}
-const FAST_GROW = 2
 const STOP_LOSS = -2
 let algoStarted;
 let screener = {};
 const TARGET_GAIN = 1.2
-const MAX_SPREAD = .6
-const SATOSHI = 1e-8
 let gain = 0
 let sellReason;
 const tme_message_ids = {}
@@ -57,41 +49,37 @@ function run(screener) {
     first = getFirst(screener)
     if (first) {
         logFirst()
-        if (!last) {
-            const min = _.minBy(_.values(firstInOtherPeriods), 'lowChange')
-            first.in_ = first.highChange + min
-            if (min<-1&& first.change >= first.in_) {
-                first.out = first.change +min
-                buy()
-            }
-        } else {
+        buy()
+        if (last) {
             Object.assign(last, screener[last.symbol])
             calculateGain()
             // collectProfit()
             // tryRestart()
-            if (last)
-                if (last.change > last.out && last.symbol === first.symbol) {
-                    last.in_ = _.max([last.in_, last.change]);
-                    last.out = last.in_ - stop
-                } else if (
-                    (last.gain <= last.out && (sellReason = SELL_REASON.STOP_LOSS))
-                    || (first.change - last.change > 2 && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
-                // || (last.gain < 0 && last.symbol !== first.symbol && (sellReason = "#Lossing_switch_to_first"))
-                ) {
-                    last.in_ = last.change;
-                    last.out = last.in_ - stop
-                    // resetInOut()
-                    sell(sellReason)
-                } else if ((_.max([m1last.change, m2last.change, m3last.change]) < 0 && (sellReason = SELL_REASON.DROPPING))) {
-                    last.in_ = last.change + 1;
-                    last.out = last.in_ - stop
-                    // resetInOut()
-                    sell(sellReason)
-                } else if (last.gain > 1) {
-                    sell(SELL_REASON.TARGET)
-                    algoStarted = false;
-                    startTime = null
-                }
+
+
+            // if (last)
+            //     if (last.change > last.out && last.symbol === first.symbol) {
+            //         last.in_ = _.max([last.in_, last.change]);
+            //         last.out = last.in_ - stop
+            //     } else if (
+            //         (last.gain <= last.out && (sellReason = SELL_REASON.STOP_LOSS))
+            //         || (first.change - last.change > 2 && (sellReason = SELL_REASON.SWITCH_TO_FIRST))
+            //     // || (last.gain < 0 && last.symbol !== first.symbol && (sellReason = "#Lossing_switch_to_first"))
+            //     ) {
+            //         last.in_ = last.change;
+            //         last.out = last.in_ - stop
+            //         // resetInOut()
+            //         sell(sellReason)
+            //     } else if ((_.max([lastInOtherPeriods.m1.change, lastInOtherPeriods.m2.change, lastInOtherPeriods.m3.change]) < 0 && (sellReason = SELL_REASON.DROPPING))) {
+            //         last.in_ = last.change + 1;
+            //         last.out = last.in_ - stop
+            //         // resetInOut()
+            //         sell(sellReason)
+            //     } else if (last.gain > 1) {
+            //         sell(SELL_REASON.TARGET)
+            //         algoStarted = false;
+            //         startTime = null
+            //     }
         }
     }
 }
@@ -127,7 +115,7 @@ function getStartTime() {
 }
 
 function buyCondition() {
-    const changes = [m1first.change, m2first.change/*, m3first.change*/]
+    const changes = [firstInOtherPeriods.m1.change, firstInOtherPeriods.m2.change/*, m3first.change*/]
     if (_.min(changes) > 0) {
         if (true || sorted(changes)) {
             if (true || (first.change - _.max(changes)) > 1) {
@@ -138,17 +126,50 @@ function buyCondition() {
 }
 
 function buy() {
+    function getBuyCandle(symbol) {
+        buy.candles = buy.candles || {}
+        return buy.candles[symbol];
+    }
+
+    function setBuyCandle(buyCandle) {
+        buy.candles[buyCandle.symbol] = buyCandle
+    }
+
     if (buyCondition()) {
-        last = first;
-        log.push(last);
-        last.openPrice = last.close;
-        last.startTime = Date.now()
-        const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
-        publish(`m24:algo:tracking`, {
-            strategyName,
-            text
-        });
-        console.log(text)
+        let buyCandle = getBuyCandle(first.symbol)
+        if (!buyCandle) {
+            buyCandle = {
+                symbol: first.symbol,
+                open: first.close,
+                close: first.close,
+                high: first.close,
+                low: first.close,
+            }
+            setBuyCandle(buyCandle)
+        } else {
+            buyCandle.close = first.close
+            buyCandle.high = _.max([buyCandle.high, buyCandle.close])
+            buyCandle.low = _.min([buyCandle.low, buyCandle.close])
+            if (changePercent(buyCandle.high, buyCandle.close) < -3) {
+                //stop loss atteint
+                if (changePercent(buyCandle.low, buyCandle.close) > 1) {
+                    last && sell(SELL_REASON.SWITCH_TO_FIRST)
+                    last = first;
+                    log.push(last);
+                    last.openPrice = last.close;
+                    last.startTime = Date.now()
+                    const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
+                    publish(`m24:algo:tracking`, {
+                        strategyName,
+                        text
+                    });
+                    console.log(text)
+
+                }
+            }
+        }
+
+
     }
 }
 
@@ -195,18 +216,17 @@ function calculateGain() {
 
     if (last.prevGain.toFixed(1) != last.gain.toFixed(1)) {
         const text = `#${log.length}gain 
-         ${last.symbol}  ${last.gain.toFixed(2)}% 
-         Max gain ${last.maxGain.toFixed(2)}%
-         All time gain ${gain.toFixed(2)}%
-         -------
-         stop ${last.out.toFixed(2)}%
-         from ${moment(last.startTime).fromNow()}
-         ______
-         first ${first.symbol} ${first.change.toFixed(2)}%
-         second ${second.symbol} ${second.change.toFixed(2)}%
-         diff ${(first.change - second.change).toFixed(2)}%
-         --------\n
-         ${[m1last.change, m2last.change, m3last.change].map((change, i) => `m${i + 1}:${change.toFixed(2)}%`).join('\n')}
+${last.symbol}  ${last.gain.toFixed(2)}% 
+Max gain ${last.maxGain.toFixed(2)}%
+All time gain ${gain.toFixed(2)}%
+-------
+trade duration ${moment(last.startTime).fromNow()}
+______
+first ${first.symbol} ${first.change.toFixed(2)}%
+second ${second.symbol} ${second.change.toFixed(2)}%
+diff ${(first.change - second.change).toFixed(2)}%
+--------\n
+${[/*m1last.change, m2last.change, m3last.change*/].map((change, i) => `m${i + 1}:${change.toFixed(2)}%`).join('\n')}
          `
         const id = 'trk' + log.length
         publish(`m24:algo:tracking`, {
@@ -300,51 +320,33 @@ module.exports = {
         const orderedScreener = orderScreener(screener)
         first = getFirst(screener)
         second = _.nth(orderedScreener, 1) || {}
-        // init()
-        // algoStarted=true
-        if (!algoStarted) {
-            if (!(first && second)) return
-            let count = _.values(screener).filter(v => v).length
-            logLoading(count, symbols)
-            // if (first.change > in_ - Math.abs(-STOP_LOSS)) {
-            if (first.change > out) {
-                startTime += DURATION.MIN_5
-                if (startTime > Date.now() - DURATION.MIN_15) {
-                    startTime = timeframeStartAt(DURATION.MIN_1)()
-                }
-            } else {
-                algoStarted = count === symbols.length
-                algoStarted && console.log('algoStarted ')
-            }
-        } else {
-            [m1first, m2first, m3first] = ['m1', 'm2', 'm3',].map(period => getChangeFrom({
-                candles: allSymbolsCandles[first.symbol],
-                symbol: first.symbol,
-                period: DEFAULT_PERIODS[period]
-            }));
-            last && ([m1last, m2last, m3last] = ['m1', 'm2', 'm3',].map(period => getChangeFrom({
-                candles: allSymbolsCandles[last.symbol],
-                symbol: last.symbol,
-                period: DEFAULT_PERIODS[period]
-            })))
 
-            firstInOtherPeriods = getPeriodsChanges({
-                candles: allSymbolsCandles[first.symbol],
-                symbol: first.symbol,
-                periods: DEFAULT_PERIODS
-            })
-            secondInOtherPeriods = getPeriodsChanges({
-                candles: allSymbolsCandles[second.symbol],
-                symbol: second.symbol,
-                periods: DEFAULT_PERIODS
-            })
+        let count = _.values(screener).filter(v => v).length
+        logLoading(count, symbols)
 
-            run(screener)
-        }
 
+        first && (firstInOtherPeriods = getPeriodsChanges({
+            candles: allSymbolsCandles[first.symbol],
+            symbol: first.symbol,
+            periods: DEFAULT_PERIODS
+        }))
+        second && (secondInOtherPeriods = getPeriodsChanges({
+            candles: allSymbolsCandles[second.symbol],
+            symbol: second.symbol,
+            periods: DEFAULT_PERIODS
+        }))
+        last && (lastInOtherPeriods = getPeriodsChanges({
+            candles: allSymbolsCandles[last.symbol],
+            symbol: last.symbol,
+            periods: DEFAULT_PERIODS
+        }))
+
+        run(screener)
     }
+
 }
 
 subscribe('tme_message_id', ({ id, message_id }) => {
-    id && (tme_message_ids[id] = message_id)
-})
+        id && (tme_message_ids[id] = message_id)
+    }
+)
