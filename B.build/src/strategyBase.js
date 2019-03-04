@@ -167,7 +167,8 @@ module.exports = class Strategy {
     logPairFound({ side, symbolId, price, test }) {
         publish(`m24:simulate`, {
             strategy: this.name,
-            symbol:symbolId
+            symbol: symbolId,
+            open: +price
         });
     }
 

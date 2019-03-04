@@ -13,14 +13,14 @@ function getId(strategy, symbol) {
     return strategy + symbol
 }
 
-subscribe('m24:simulate', ({ symbol, strategy }) => {
+subscribe('m24:simulate', ({ symbol, strategy, open }) => {
     trades[symbol] = trades[symbol] || {}
     let id = getId(strategy, symbol)
     if (!trades[symbol][id]) {
         let text = `pair found ${strategy} ${symbol}`
         publish(`m24:algo:simulate`, { id: id, text });
         console.log(text)
-        trades[symbol][id] = { id, symbol, strategy, time: Date.now() }
+        trades[symbol][id] = { id, open, symbol, strategy, time: Date.now() }
     }
 })
 
@@ -41,7 +41,7 @@ subscribe('price', ({ symbol, close }) => {
 change ${trade.change.toFixed(2)}%
 max ${changePercent(trade.open, trade.high).toFixed(2)}%
 min ${changePercent(trade.open, trade.low).toFixed(2)}%
-duration  ${moment(trade.time).fromNow()}
+duration  ${moment(trade.time).fromNow()} [${moment().tz(TIME_ZONE).format('H:mm')}]
 state #${trade.high >= 1 ? 'win' : 'lost'}
 open ${trade.open}
 close ${trade.close}
