@@ -327,6 +327,7 @@ function logLoading(count, symbols) {
         let text = `loading ${(count / symbols.length * 100).toFixed(2)}%`
         publish(`m24:algo:tracking`, {
             id,
+            max: true,
             message_id: tme_message_ids[id],
             strategyName,
             text
