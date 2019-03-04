@@ -185,10 +185,9 @@ function buy() {
                 });
             }
         }
-        let text = `
-first ${buyCandle.symbol} has lost 3? ${!!buyCandle.buy}
-${!buyCandle.buy ? 'lost ' + changePercent(buyCandle.close, buyCandle.high).toFixed(2) +'%': ''}
-${buyCandle.buy ? 'grow ' + changePercent(buyCandle.open, buyCandle.close).toFixed(2) +'%': ''}`
+        let text = `first ${buyCandle.symbol} has lost 3? ${!!buyCandle.buy}
+${!buyCandle.buy ? 'lost ' + changePercent(buyCandle.close, buyCandle.high).toFixed(2) + '%' : ''}
+${buyCandle.buy ? 'grow ' + changePercent(buyCandle.open, buyCandle.close).toFixed(2) + '%' : ''}`
         publish(`m24:algo:tracking`, {
             id: 'buyCandle',
             max: true,
@@ -240,9 +239,11 @@ function logSell(sellReason) {
 }
 
 function calculateGain() {
+
     last.prevGain = last.gain || 0
     last.gain = changePercent(last.openPrice, last.close)
     last.maxGain = _.max([last.gain, last.maxGain])
+    let gain = _.sumBy(log, 'gain');
 
     if (last.prevGain.toFixed(1) != last.gain.toFixed(1)) {
         const text = `#${log.length}gain 
