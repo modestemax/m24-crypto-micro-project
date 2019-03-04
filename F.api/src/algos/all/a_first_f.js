@@ -185,12 +185,14 @@ function buy() {
                 });
             }
         }
-        let text = `first ${buyCandle.symbol} has lost 3? ${!!buyCandle.buy}
-        ${!buyCandle.buy ? 'lost' + changePercent(buyCandle.close, buyCandle.high).toFixed(2) : ''}%
-        ${buyCandle.buy ? 'grow' + changePercent(buyCandle.open, buyCandle.close).toFixed(2) : ''}%`
+        let text = `
+first ${buyCandle.symbol} has lost 3? ${!!buyCandle.buy}
+${!buyCandle.buy ? 'lost ' + changePercent(buyCandle.close, buyCandle.high).toFixed(2) +'%': ''}
+${buyCandle.buy ? 'grow ' + changePercent(buyCandle.open, buyCandle.close).toFixed(2) +'%': ''}`
         publish(`m24:algo:tracking`, {
             id: 'buyCandle',
             max: true,
+            message_id: tme_message_ids['buyCandle'],
             strategyName,
             text
         });
