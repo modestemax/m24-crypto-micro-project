@@ -105,6 +105,7 @@ function getStartTime() {
         console.log('startTime', time)
         const text = `#newframe started at ${time}`
         publish(`m24:algo:tracking`, {
+            max: true,
             strategyName,
             text
         });
@@ -171,6 +172,7 @@ function buy() {
                 last.startTime = Date.now()
                 const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
                 publish(`m24:algo:tracking`, {
+                    max: true,
                     strategyName,
                     text
                 });
@@ -219,6 +221,7 @@ function logSell(sellReason) {
         [${last.change.toFixed(2)}%] [next buy at ${last.in_.toFixed(2)}%]`;
 
     publish(`m24:algo:tracking`, {
+        max:true,
         strategyName,
         text
     });
@@ -247,6 +250,7 @@ ${[/*m1last.change, m2last.change, m3last.change*/].map((change, i) => `m${i + 1
         const id = 'trk' + log.length
         publish(`m24:algo:tracking`, {
             id,
+            max: true,
             message_id: tme_message_ids[id],
             strategyName,
             text
@@ -261,6 +265,7 @@ function tryRestart() {
         init()
         const text = `restart   last gain ${last.gain}  `
         publish(`m24:algo:tracking`, {
+            max: true,
             strategyName,
             text
         });
@@ -287,6 +292,7 @@ from ${moment(startTime).fromNow()}
             let id = strategyName + 'first' + log.length
             publish(`m24:algo:tracking`, {
                 id,
+                max: true,
                 message_id: tme_message_ids[id],
                 strategyName,
                 text
