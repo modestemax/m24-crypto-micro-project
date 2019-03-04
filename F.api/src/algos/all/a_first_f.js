@@ -185,7 +185,16 @@ function buy() {
                 });
             }
         }
-
+        let text = `first ${buyCandle.symbol} has lost 3? ${!!buyCandle.buy}
+        ${!buyCandle.buy ? 'lost' + changePercent(buyCandle.close, buyCandle.high).toFixed(2) : ''}%
+        ${buyCandle.buy ? 'grow' + changePercent(buyCandle.open, buyCandle.close).toFixed(2) : ''}%`
+        publish(`m24:algo:tracking`, {
+            id: 'buyCandle',
+            max: true,
+            strategyName,
+            text
+        });
+        console.log(text)
 
     }
 }
@@ -221,7 +230,7 @@ function logSell(sellReason) {
         [${last.change.toFixed(2)}%] [next buy at ${last.in_.toFixed(2)}%]`;
 
     publish(`m24:algo:tracking`, {
-        max:true,
+        max: true,
         strategyName,
         text
     });

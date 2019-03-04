@@ -10,7 +10,9 @@ const changePercent = (open, close) => change(open, close) * 100;
 const tme_message_ids = {}
 
 function getId(strategy, symbol) {
-    return strategy + symbol
+    let id = strategy + symbol
+    let trade = trades[symbol][id]
+    return trade && trade.win ? _.uniqueId(id) : id;
 }
 
 subscribe('m24:simulate', ({ symbol, strategy, open }) => {
@@ -39,7 +41,7 @@ subscribe('price', ({ symbol, close }) => {
             let highChange = changePercent(trade.open, trade.high)
             let lowChange = changePercent(trade.open, trade.low)
 
-            const win = highChange >= TARGET
+            const win = trade.win = highChange >= TARGET
             trade.timeEnd = trade.timeEnd || (win && Date.now()) || void 0
             trade.minEnd = trade.minEnd || (win && trade.low) || void 0
             let winDuration = win && moment.duration(moment(trade.timeEnd).diff(moment(trade.time))).humanize()
