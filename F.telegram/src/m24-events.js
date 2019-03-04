@@ -54,6 +54,7 @@ module.exports = {
         [M24_LOG_CHAT_ID, MODESTE_MAX].forEach(async CHAT_ID => {
             //
             if (CHAT_ID === MODESTE_MAX && (!(/#m24/.test(text) && data.max))) return;
+            if (CHAT_ID === M24_LOG_CHAT_ID && data.max) return;
 
             let sendOrEditMessage = tme.sendMessage.bind(tme)
             if (data.message_id) {
