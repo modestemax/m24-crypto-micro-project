@@ -26,7 +26,6 @@ const STOP_LOSS = -2
 let algoStarted;
 let screener = {};
 const TARGET_GAIN = 1.2
-let gain = 0
 let sellReason;
 const tme_message_ids = {}
 const processStartTime = Date.now()
@@ -127,15 +126,15 @@ function buyCondition() {
 
 function buy() {
     function getBuyCandle(symbol) {
-        buy.candles = buy.candles || {}
-        return buy.candles[symbol];
+        return buy.candle && buy.candle.symbol === symbol && buy.candle
     }
 
     function setBuyCandle(buyCandle) {
-        buy.candles[buyCandle.symbol] = buyCandle
+        buy.candle = buyCandle
     }
 
-    if (buyCondition()) {
+    // if (true || buyCondition()) {
+    if (!last || last.symbol !== first.symbol) {
         let buyCandle = getBuyCandle(first.symbol)
         if (!buyCandle) {
             buyCandle = {
@@ -146,26 +145,42 @@ function buy() {
                 low: first.close,
             }
             setBuyCandle(buyCandle)
-        } else {
+        } else if (!buyCandle.buy) {
             buyCandle.close = first.close
             buyCandle.high = _.max([buyCandle.high, buyCandle.close])
             buyCandle.low = _.min([buyCandle.low, buyCandle.close])
-            if (changePercent(buyCandle.high, buyCandle.close) < -3) {
+            if (changePercent(buyCandle.close, buyCandle.high) > 3) {
                 //stop loss atteint
-                if (changePercent(buyCandle.low, buyCandle.close) > 1) {
-                    last && sell(SELL_REASON.SWITCH_TO_FIRST)
-                    last = first;
-                    log.push(last);
-                    last.openPrice = last.close;
-                    last.startTime = Date.now()
-                    const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
-                    publish(`m24:algo:tracking`, {
-                        strategyName,
-                        text
-                    });
-                    console.log(text)
-
+                buyCandle = {
+                    buy: true,
+                    symbol: first.symbol,
+                    open: first.close,
+                    close: first.close,
+                    high: first.close,
+                    low: first.close,
                 }
+                setBuyCandle(buyCandle)
+            }
+        } else {
+            buyCandle.close = first.close
+            if (changePercent(buyCandle.open, buyCandle.close) > 1) {
+                last && sell(SELL_REASON.SWITCH_TO_FIRST)
+                last = first;
+                log.push(last);
+                last.openPrice = last.close;
+                last.startTime = Date.now()
+                const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
+                publish(`m24:algo:tracking`, {
+                    strategyName,
+                    text
+                });
+                console.log(text)
+                //-----------------------
+                publish(`m24:simulate`, {
+                    strategy: strategyName,
+                    symbol: first.symbol,
+                    open: +first.close
+                });
             }
         }
 
@@ -177,7 +192,7 @@ function sell(sellReason) {
     last.closePercent = last.change
     last.endTime = Date.now()
     calculateGain()
-    gain += last.gain
+
     gainLogs[last.symbol] = (gainLogs[last.symbol] || 0) + last.gain
 
     logSell(sellReason)
@@ -189,6 +204,7 @@ function sell(sellReason) {
 }
 
 function logSell(sellReason) {
+    let gain = _.sumBy(log, 'gain');
     let gainners = _.orderBy(Object.entries(gainLogs), gain => gain[1], 'desc');
     let gainner = _.first(gainners)
     let looser = _.last(gainners)

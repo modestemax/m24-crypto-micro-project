@@ -17,7 +17,7 @@ subscribe('m24:simulate', ({ symbol, strategy, open }) => {
     trades[symbol] = trades[symbol] || {}
     let id = getId(strategy, symbol)
     if (!trades[symbol][id]) {
-        let text = `pair found ${strategy} ${symbol}`
+        let text = `pair found ${strategy} ${symbol} ${open}`
         publish(`m24:algo:simulate`, { id: id, text });
         console.log(text)
         trades[symbol][id] = { id, open, symbol, strategy, time: Date.now() }
