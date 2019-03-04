@@ -43,7 +43,7 @@ subscribe('price', ({ symbol, close }) => {
 change ${trade.change.toFixed(2)}%
 max ${highChange.toFixed(2)}%
 min ${lowChange.toFixed(2)}%
-duration  ${moment(trade.time).fromNow()} [${moment().tz(TIME_ZONE).format('Hh:mm')}]
+duration  ${moment(trade.time).fromNow()} [${moment().tz(TIME_ZONE).format('H\\h:mm')}]
 state #${highChange >= 1 ? 'win' : 'lost'}
 open ${trade.open}
 close ${trade.close}
