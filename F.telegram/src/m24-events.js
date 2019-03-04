@@ -9,7 +9,7 @@ const { humanizeDuration } = require('common');
 // const message_ids = {}
 module.exports = {
     'm24:*': async function (data, channel) {
-        let text;
+        let text = data.text;
         switch (channel) {
             case "m24:fatal":
                 text = ["#JUDE_ACTION", data].join('\n');
@@ -51,16 +51,18 @@ module.exports = {
                 break;
         }
 
-        if (/#m24/.test(text)) {
+        [M24_LOG_CHAT_ID, MODESTE_MAX].forEach(async CHAT_ID => {
+            //
+            if (CHAT_ID === MODESTE_MAX && !/#m24/.test(text)) return;
+
             let sendOrEditMessage = tme.sendMessage.bind(tme)
             if (data.message_id) {
                 sendOrEditMessage = tme.editMessageText.bind(tme)
             }
-            let { message_id } = await sendOrEditMessage({ chat_id: MODESTE_MAX, message_id: data.message_id, text });
-            if (message_id) publish('tme_message_id', { id: data.id, message_id })
-        } else {
-            tme.sendMessage({ chat_id: data.chat_id || M24_LOG_CHAT_ID, message_id: data.message_id, text });
-        }
+            let { message_id } = await sendOrEditMessage({ chat_id: CHAT_ID, message_id: data.message_id, text });
+            if (data.id && message_id) publish('tme_message_id', { id: data.id, message_id })
+
+        })
 
 
     },

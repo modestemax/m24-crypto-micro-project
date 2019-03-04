@@ -8,6 +8,7 @@ const _ = require('lodash');
 const { publishPerf, loadCandles, listenToPriceChange, changePercent } = require('./binance-utils')
 
 const binance = require('./init-binance')
+require('./progress/viewProgess')
 const { priceChanged } = require('./algos/all/a_first')
 //startup
 binance.exchangeInfo(async function ex_info(error, data) {
@@ -27,7 +28,7 @@ binance.exchangeInfo(async function ex_info(error, data) {
 
         binance.bookTickers((error, tickers) => {
             if (error) process.nextTick(() => binance.exchangeInfo(ex_info))
-            symbols.push.apply(symbols,_.filter(binanceSymbols, symbol => {
+            symbols.push.apply(symbols, _.filter(binanceSymbols, symbol => {
                 const ticker = _.find(tickers, { symbol })
                 return (ticker && changePercent(ticker.bidPrice, ticker.askPrice) < .6)
             }))
