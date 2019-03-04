@@ -35,14 +35,16 @@ subscribe('price', ({ symbol, close }) => {
         if (trade.change < -5) delete trade[symbol][trade.id]
         else {
             if (trade.change.toFixed(1) !== trade.oldChange.toFixed(1)) {
+                let highChange = changePercent(trade.open, trade.high)
+                let lowChange = changePercent(trade.open, trade.low)
                 let text = `
 #${moment().tz(TIME_ZONE).format('DDMMM')}
 #${trade.strategy} #${trade.strategy}_${trade.symbol}
 change ${trade.change.toFixed(2)}%
-max ${changePercent(trade.open, trade.high).toFixed(2)}%
-min ${changePercent(trade.open, trade.low).toFixed(2)}%
-duration  ${moment(trade.time).fromNow()} [${moment().tz(TIME_ZONE).format('H:mm')}]
-state #${trade.high >= 1 ? 'win' : 'lost'}
+max ${highChange.toFixed(2)}%
+min ${lowChange.toFixed(2)}%
+duration  ${moment(trade.time).fromNow()} [${moment().tz(TIME_ZONE).format('Hh:mm')}]
+state #${highChange >= 1 ? 'win' : 'lost'}
 open ${trade.open}
 close ${trade.close}
 `
