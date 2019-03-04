@@ -56,6 +56,7 @@ duration  ${moment(trade.time).fromNow()} [${moment(trade.time).tz(TIME_ZONE).fo
 state #${win ? `win [${moment(trade.timeEnd).fromNow()}] [${minEndChange.toFixed(2)}%]` : 'lost'} 
 open  ${trade.open}
 close ${trade.close}
+${win ? '#closed' : ''}
 `
                 tme_message_ids[trade.id] && publish(`m24:algo:simulate`, {
                     id: trade.id,
