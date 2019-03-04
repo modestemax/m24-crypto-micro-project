@@ -47,7 +47,7 @@ subscribe('price', ({ symbol, close }) => {
             let minEndChange = changePercent(trade.open, trade.minEnd)
             let date = moment().tz(TIME_ZONE)
             // let quarter = Math.trunc(date.hour() / 6) + 1
-            let quarter = Math.trunc(date.format('h') / 6) + 1
+            let quarter = Math.trunc(date.format('H') / 6) + 1
             let text = `
 #${date.format('DDMMM')} #${date.format('DDMMM')}_${quarter}
 #${trade.strategy} #${trade.strategy}_${trade.symbol}
