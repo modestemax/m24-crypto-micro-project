@@ -32,40 +32,40 @@ subscribe('price', ({ symbol, close }) => {
         trade.low = _.min([trade.low, close])
         trade.oldChange = isNaN(trade.change) ? -Infinity : trade.change
         trade.change = changePercent(trade.open, trade.close)
+        let lost;
+        if (trade.change < -5) lost = delete trade[symbol][trade.id]
 
-        if (trade.change < -5) delete trade[symbol][trade.id]
-        else {
-            if (trade.change.toFixed(1) !== trade.oldChange.toFixed(1)) {
-                let highChange = changePercent(trade.open, trade.high)
-                let lowChange = changePercent(trade.open, trade.low)
+        if (trade.change.toFixed(1) !== trade.oldChange.toFixed(1)) {
+            let highChange = changePercent(trade.open, trade.high)
+            let lowChange = changePercent(trade.open, trade.low)
 
-                const win = highChange >= TARGET
-                trade.timeEnd = trade.timeEnd || (win && Date.now()) || void 0
-                trade.minEnd = trade.minEnd || (win && trade.low) || void 0
+            const win = highChange >= TARGET
+            trade.timeEnd = trade.timeEnd || (win && Date.now()) || void 0
+            trade.minEnd = trade.minEnd || (win && trade.low) || void 0
+            let winDuration = win && moment.duration(moment(trade.timeEnd).diff(moment(trade.time))).humanize()
 
-                let minEndChange = changePercent(trade.open, trade.minEnd)
-                let date = moment().tz(TIME_ZONE)
-                // let quarter = Math.trunc(date.hour() / 6) + 1
-                let quarter = Math.trunc(date.format('h') / 6) + 1
-                let text = `
+            let minEndChange = changePercent(trade.open, trade.minEnd)
+            let date = moment().tz(TIME_ZONE)
+            // let quarter = Math.trunc(date.hour() / 6) + 1
+            let quarter = Math.trunc(date.format('h') / 6) + 1
+            let text = `
 #${date.format('DDMMM')} #${date.format('DDMMM')}_${quarter}
 #${trade.strategy} #${trade.strategy}_${trade.symbol}
 change ${trade.change.toFixed(2)}%
 max ${highChange.toFixed(2)}%
 min ${lowChange.toFixed(2)}%
 duration  ${moment(trade.time).fromNow()} [${moment(trade.time).tz(TIME_ZONE).format('H\\h:mm')}]
-state #${win ? `win [${moment(trade.timeEnd).fromNow()}] [${minEndChange.toFixed(2)}%]` : 'lost'} 
+state #${win ? `win [${winDuration}] [${minEndChange.toFixed(2)}%]` : 'lost'} 
 open ${trade.open}
 close ${trade.close}
-${win ? '#closed' : ''}
+${win || lost ? '#closed' : ''}
 `
-                tme_message_ids[trade.id] && publish(`m24:algo:simulate`, {
-                    id: trade.id,
-                    message_id: tme_message_ids[trade.id],
-                    text
-                });
-                console.log(text)
-            }
+            tme_message_ids[trade.id] && publish(`m24:algo:simulate`, {
+                id: trade.id,
+                message_id: tme_message_ids[trade.id],
+                text
+            });
+            console.log(text)
         }
 
 
