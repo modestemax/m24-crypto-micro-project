@@ -5,6 +5,7 @@ const TIME_ZONE = 'Africa/Douala'
 const trades = {};
 const ONE_MIN = 1e3 * 60
 const TARGET = 2
+const LOSS = -5
 const change = (open, close) => (close - open) / open;
 const changePercent = (open, close) => change(open, close) * 100;
 const tme_message_ids = {}
@@ -12,7 +13,11 @@ const tme_message_ids = {}
 function getId(strategy, symbol) {
     let id = strategy + symbol
     let trade = trades[symbol][id]
-    return trade && trade.win ? _.uniqueId(id) : id;
+    if (trade && (trade.win || trade.lost)) {
+        delete tme_message_ids[id]
+        delete trades[symbol][id]
+    }
+    return id;
 }
 
 subscribe('m24:simulate', ({ symbol, strategy, open }) => {
@@ -34,13 +39,14 @@ subscribe('price', ({ symbol, close }) => {
         trade.low = _.min([trade.low, close])
         trade.oldChange = isNaN(trade.change) ? -Infinity : trade.change
         trade.change = changePercent(trade.open, trade.close)
-        let lost;
-        if (trade.change < -5) lost = delete trade[symbol][trade.id]
+        // let lost;
+        // if (trade.change < -5) lost = delete trade[symbol][trade.id]
 
         if (trade.change.toFixed(1) !== trade.oldChange.toFixed(1)) {
-            let highChange = changePercent(trade.open, trade.high)
-            let lowChange = changePercent(trade.open, trade.low)
+            let highChange = trade.highChange = changePercent(trade.open, trade.high)
+            let lowChange = trade.lowChange = changePercent(trade.open, trade.low)
 
+            const lost = trade.lost = lowChange <= LOSS
             const win = trade.win = highChange >= TARGET
             trade.timeEnd = trade.timeEnd || (win && Date.now()) || void 0
             trade.minEnd = trade.minEnd || (win && trade.low) || void 0
