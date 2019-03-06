@@ -25,7 +25,7 @@ subscribe('m24:simulate', ({ symbol, strategy, open }) => {
     let id = getId(strategy, symbol)
     if (!trades[symbol][id]) {
         let text = `pair found ${strategy} ${symbol} ${open}`
-        publish(`m24:algo:simulate`, { id: id, text });
+        publish(`m24:algo:simulate`, { id, text });
         console.log(text)
         trades[symbol][id] = { id, open, symbol, strategy, time: Date.now() }
     }
@@ -51,19 +51,22 @@ subscribe('price', ({ symbol, close }) => {
             trade.timeEnd = trade.timeEnd || (win && Date.now()) || void 0
             trade.minEnd = trade.minEnd || (win && trade.low) || void 0
             let winDuration = win && moment.duration(moment(trade.timeEnd).diff(moment(trade.time))).humanize()
-
             let minEndChange = changePercent(trade.open, trade.minEnd)
+            let state = win ? `win [${winDuration}] [${minEndChange.toFixed(2)}%]` : 'lost'
+
             let date = moment().tz(TIME_ZONE)
             // let quarter = Math.trunc(date.hour() / 6) + 1
             let quarter = Math.trunc(date.format('H') / 6) + 1
+            let day = `${date.format('DDMMM')}`
+            let dayCode = `${day}_${quarter}`
             let text = `
-#${date.format('DDMMM')} #${date.format('DDMMM')}_${quarter}
+#${day} #${dayCode}
 #${trade.strategy} #${trade.strategy}_${trade.symbol}
 change ${trade.change.toFixed(2)}%
 max ${highChange.toFixed(2)}%
 min ${lowChange.toFixed(2)}%
 duration  ${moment(trade.time).fromNow()} [${moment(trade.time).tz(TIME_ZONE).format('H\\h:mm')}]
-state #${win ? `win [${winDuration}] [${minEndChange.toFixed(2)}%]` : 'lost'} 
+state #${state} ${state}_${dayCode}
 open ${trade.open}
 close ${trade.close}
 ${win || lost ? '#closed' : ''}
