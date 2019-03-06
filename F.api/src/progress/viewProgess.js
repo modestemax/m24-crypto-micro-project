@@ -24,7 +24,9 @@ subscribe('m24:simulate', ({ symbol, strategy, open, stop, limit }) => {
     trades[symbol] = trades[symbol] || {}
     let id = getId(strategy, symbol)
     if (!trades[symbol][id]) {
-        let text = `pair found ${strategy} ${symbol} ${open ? open : ''} ${stop ? `stop ${stop.toFixed(8)}` : ''} ${limit ? `limit ${limit.toFixed(8)}` : ''}`
+        let text = `pair found ${strategy} ${symbol} ${open ? open : ''} 
+        ${stop ? `stop ${stop.toFixed(8)}` : ''} 
+        ${limit ? `limit ${limit.toFixed(8)}` : ''}`
         publish(`m24:algo:simulate`, { id, text });
         console.log(text)
         trades[symbol][id] = { id, open, stop, limit, symbol, strategy, time: Date.now() }
@@ -38,14 +40,21 @@ subscribe('price', ({ symbol, close }) => {
                 if (Math.abs(changePercent(trade.stop, close)) < .3) {
                     trade.stop = null
                 }
-                return
-            }
-            if (trade.limit) {
+            } else if (trade.limit) {
                 if (Math.abs(changePercent(trade.limit, close)) < .3) {
                     trade.limit = null
                     trade.open = close
+                    trade.time = Date.now()
                 }
             }
+            let { strategy, open, stop, limit, id } = trade
+            let text = `pair found ${strategy} ${symbol} ${open ? open : ''} 
+        ${stop ? `stop ${stop.toFixed(8)}` : ''} 
+        ${limit ? `limit ${limit.toFixed(8)}` : ''}`
+            publish(`m24:algo:simulate`, {
+                id, text, message_id: tme_message_ids[trade.id],
+            });
+            console.log(text)
             return
         }
         trade.open = trade.open || close
