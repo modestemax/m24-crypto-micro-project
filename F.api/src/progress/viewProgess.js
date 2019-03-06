@@ -10,6 +10,12 @@ const change = (open, close) => (close - open) / open;
 const changePercent = (open, close) => change(open, close) * 100;
 const tme_message_ids = {}
 
+
+subscribe('tme_message_id', ({ id, message_id }) => {
+        id && (tme_message_ids[id] = message_id)
+    }
+)
+
 function getId(strategy, symbol) {
     let id = strategy + symbol
     let trade = trades[symbol][id]
@@ -110,8 +116,3 @@ ${win || lost ? '#closed' : ''}
     })
 })
 
-
-subscribe('tme_message_id', ({ id, message_id }) => {
-        id && (tme_message_ids[id] = message_id)
-    }
-)
