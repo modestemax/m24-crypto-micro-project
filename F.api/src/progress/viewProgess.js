@@ -49,10 +49,12 @@ subscribe('price', ({ symbol, close }) => {
             }
             let { strategy, open, stop, limit, id } = trade
             let text = `pair found ${strategy} ${symbol} ${open ? open : ''} 
-        ${stop ? `stop ${stop.toFixed(8)}` : ''} 
-        ${limit ? `limit ${limit.toFixed(8)}` : ''}`
-            publish(`m24:algo:simulate`, {
-                id, text, message_id: tme_message_ids[trade.id],
+${`close ${stop.toFixed(8)}`} 
+${stop ? `stop ${stop.toFixed(8)}` : ''} 
+${limit ? `limit ${limit.toFixed(8)}` : ''}`
+
+            tme_message_ids[id] && publish(`m24:algo:simulate`, {
+                id, text, message_id: tme_message_ids[id],
             });
             console.log(text)
             return
