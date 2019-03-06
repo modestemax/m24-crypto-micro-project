@@ -53,6 +53,7 @@ subscribe('price', ({ symbol, close }) => {
             let winDuration = win && moment.duration(moment(trade.timeEnd).diff(moment(trade.time))).humanize()
             let minEndChange = changePercent(trade.open, trade.minEnd)
             let state = win ? `win [${winDuration}] [${minEndChange.toFixed(2)}%]` : 'lost'
+            let state2 = win ? `win` : 'lost'
 
             let date = moment().tz(TIME_ZONE)
             // let quarter = Math.trunc(date.hour() / 6) + 1
@@ -66,7 +67,7 @@ change ${trade.change.toFixed(2)}%
 max ${highChange.toFixed(2)}%
 min ${lowChange.toFixed(2)}%
 duration  ${moment(trade.time).fromNow()} [${moment(trade.time).tz(TIME_ZONE).format('H\\h:mm')}]
-state #${state} #${state}_${dayCode}
+state #${state} #${state2}_${dayCode}
 open ${trade.open}
 close ${trade.close}
 ${win || lost ? '#closed' : ''}

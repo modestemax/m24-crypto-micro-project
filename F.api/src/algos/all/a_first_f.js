@@ -185,25 +185,29 @@ function buy() {
                 });
             }
         }
-
-        // log first change
-        buy.first_change = buy.first_change || 0
-        if (first.change.toFixed(1) !== buy.first_change.toFixed(1)) {
-            let text = `first ${buyCandle.symbol} has lost 3? ${!!buyCandle.buy}
-${!buyCandle.buy ? 'lost ' + changePercent(buyCandle.close, buyCandle.high).toFixed(2) + '%' : ''}
-${buyCandle.buy ? 'grow ' + changePercent(buyCandle.open, buyCandle.close).toFixed(2) + '%' : ''}`
-            publish(`m24:algo:tracking`, {
-                id: 'buyCandle',
-                max: true,
-                message_id: tme_message_ids['buyCandle'],
-                strategyName,
-                text
-            });
-            console.log(text)
-        }
-        buy.first_change = first.change
+    } else if (last) {
 
     }
+
+
+    // log first change
+    buy.first_change = buy.first_change || 0
+    if (first.change.toFixed(1) !== buy.first_change.toFixed(1)) {
+        let text = `first ${buyCandle.symbol} has lost 3? ${!!buyCandle.buy}
+${!buyCandle.buy ? 'lost ' + changePercent(buyCandle.close, buyCandle.high).toFixed(2) + '%' : ''}
+${buyCandle.buy ? 'grow ' + changePercent(buyCandle.open, buyCandle.close).toFixed(2) + '%' : ''}`
+        publish(`m24:algo:tracking`, {
+            id: 'buyCandle',
+            max: true,
+            message_id: tme_message_ids['buyCandle'],
+            strategyName,
+            text
+        });
+        console.log(text)
+    }
+    buy.first_change = first.change
+
+
 }
 
 function sell(sellReason) {
