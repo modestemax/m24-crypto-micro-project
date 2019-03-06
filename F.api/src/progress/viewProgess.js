@@ -20,19 +20,34 @@ function getId(strategy, symbol) {
     return id;
 }
 
-subscribe('m24:simulate', ({ symbol, strategy, open }) => {
+subscribe('m24:simulate', ({ symbol, strategy, open, stop, limit }) => {
     trades[symbol] = trades[symbol] || {}
     let id = getId(strategy, symbol)
     if (!trades[symbol][id]) {
-        let text = `pair found ${strategy} ${symbol} ${open}`
+        let text = `pair found ${strategy} ${symbol} ${open} ${stop ? `stop ${stop.toFixed(8)}` : ''} ${limit ? `limit ${limit.toFixed(8)}` : ''}`
         publish(`m24:algo:simulate`, { id, text });
         console.log(text)
-        trades[symbol][id] = { id, open, symbol, strategy, time: Date.now() }
+        trades[symbol][id] = { id, open, stop, limit, symbol, strategy, time: Date.now() }
     }
 })
 
 subscribe('price', ({ symbol, close }) => {
     _.values(trades[symbol]).forEach((trade) => {
+        if (!trade.open) {
+            if (trade.stop) {
+                if (Math.abs(changePercent(trade.stop, close)) < .3) {
+                    trade.stop = null
+                }
+                return
+            }
+            if (trade.limit) {
+                if (Math.abs(changePercent(trade.limit, close)) < .3) {
+                    trade.limit = null
+                    trade.open = close
+                }
+            }
+            return
+        }
         trade.open = trade.open || close
         trade.close = close
         trade.high = _.max([trade.high, close])
