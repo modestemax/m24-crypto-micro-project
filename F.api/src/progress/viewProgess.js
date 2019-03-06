@@ -66,7 +66,7 @@ change ${trade.change.toFixed(2)}%
 max ${highChange.toFixed(2)}%
 min ${lowChange.toFixed(2)}%
 duration  ${moment(trade.time).fromNow()} [${moment(trade.time).tz(TIME_ZONE).format('H\\h:mm')}]
-state #${state} ${state}_${dayCode}
+state #${state} #${state}_${dayCode}
 open ${trade.open}
 close ${trade.close}
 ${win || lost ? '#closed' : ''}
