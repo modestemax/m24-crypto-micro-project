@@ -49,7 +49,7 @@ subscribe('price', ({ symbol, close }) => {
             }
             let { strategy, open, stop, limit, id } = trade
             let text = `pair found ${strategy} ${symbol} ${open ? open : ''} 
-${`close ${stop.toFixed(8)}`} 
+${`close ${close.toFixed(8)}`} 
 ${stop ? `stop ${stop.toFixed(8)}` : ''} 
 ${limit ? `limit ${limit.toFixed(8)}` : ''}`
 
