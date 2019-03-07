@@ -142,10 +142,10 @@ function sell(sellReason) {
 function logSell(sellReason) {
 
     const text = `#${log.length}sell #sell #sell_${last.symbol} #${last.symbol} at ${last.close}
-         sell reason #${sellReason || '#sell_reason_unknow'}   
-         gain ${last.gain.toFixed(2)}%  #${last.gain > 0 ? 'win' : 'lost'}
-         Max gain ${last.maxGain.toFixed(2)}% 
-        [${last.change.toFixed(2)}%]`;
+sell reason #${sellReason || '#sell_reason_unknow'}   
+gain ${last.gain.toFixed(2)}%  #${last.gain > 0 ? 'win' : 'lost'}
+Max gain ${last.maxGain.toFixed(2)}% 
+[${last.change.toFixed(2)}%]`;
 
     publish(`m24:algo:tracking`, {
         max: true,
@@ -162,12 +162,12 @@ function calculateGain() {
 
     if (last.prevGain.toFixed(1) != last.gain.toFixed(1)) {
         const text = `#${log.length}gain 
-         ${last.symbol}  ${last.gain.toFixed(2)}% 
-         Max gain ${last.maxGain.toFixed(2)}%
-         -----------------------------------
-         first ${first.symbol} ${first.change.toFixed(2)}%
-         second ${second.symbol} ${second.change.toFixed(2)}%
-         diff ${(first.change - second.change).toFixed(2)}%
+${last.symbol}  ${last.gain.toFixed(2)}% 
+Max gain ${last.maxGain.toFixed(2)}%
+-----------------------------------
+first ${first.symbol} ${first.change.toFixed(2)}%
+second ${second.symbol} ${second.change.toFixed(2)}%
+diff ${(first.change - second.change).toFixed(2)}%
          
          `
         const id = 'trk' + log.length
