@@ -145,7 +145,7 @@ function logSell(sellReason) {
          sell reason #${sellReason || '#sell_reason_unknow'}   
          gain ${last.gain.toFixed(2)}%  #${last.gain > 0 ? 'win' : 'lost'}
          Max gain ${last.maxGain.toFixed(2)}% 
-        [${last.change.toFixed(2)}%] [next buy at ${in_.toFixed(2)}%]`;
+        [${last.change.toFixed(2)}%]`;
 
     publish(`m24:algo:tracking`, {
         max: true,
@@ -164,7 +164,6 @@ function calculateGain() {
         const text = `#${log.length}gain 
          ${last.symbol}  ${last.gain.toFixed(2)}% 
          Max gain ${last.maxGain.toFixed(2)}%
-         All time gain ${gain.toFixed(2)}%
          -----------------------------------
          first ${first.symbol} ${first.change.toFixed(2)}%
          second ${second.symbol} ${second.change.toFixed(2)}%
