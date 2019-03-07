@@ -57,7 +57,7 @@ function run(screener) {
             if (last)
                 if (last.symbol !== first.symbol && (sellReason = SELL_REASON.SWITCH_TO_FIRST)) {
                     sell(sellReason)
-                } else if (last.gain > 5) {
+                } else if (last.gain > 5 && first.change - second.change > 2) {
                     publish(`m24:simulate`, {
                         strategy: strategyName,
                         symbol: last.symbol,
@@ -248,7 +248,7 @@ function logLoading(count, symbols) {
         let text = `loading ${(count / symbols.length * 100).toFixed(2)}%`
         publish(`m24:algo:tracking`, {
             id,
-            max:true,
+            max: true,
             message_id: tme_message_ids[id],
             strategyName,
             text
