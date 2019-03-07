@@ -8,26 +8,16 @@ const Template = require('./strategyBase');
 module.exports = class extends Template {
 
     async canBuy({ symbolId, timeframe }, last, prev, signal) {
-        const [currentX, lastX, prevX] = (await loadPoints({ symbolId, timeframe: this.options.timeframeX }));
-        const [candle, candle_1, candle_2, candle_3, candle_4] = (await loadPoints({ symbolId, timeframe: this.options.timeframe }));
-        let current = signal.candle;
-        if (last && prev && current && currentX && lastX && candle_3) {
 
-            if ((last.ema20 >= last.bbb20) && (last.ema10 >= last.ema20))
-                if ((current.ema100 >= current.bbb20) && (current.ema200 >= current.ema20) && (current.ema50 >= current.bbb20))
-                    if ((current.ema20 > current.ema30) && (last.ema20 >= last.ema30))
-                        if ((last.ema100 <= last.bbu20) && (current.ema100 <= current.bbu20))
-                            if ((current.ema200 > current.ema10) && (last.ema200 > last.ema10))
-                                if ((current.bbu20 / current.bbl20 >= 1.01) && (current.bbu20 / current.bbl20 <= 1.05))
-                                    if (/*(last.bbl20 < prev.bbl20) &&*/ (current.bbl20 < candle_3.bbl20))
-                                        if ((last.bbu20 > prev.bbu20) && (prev.bbu20 > candle_3.bbu20))
-                                            if ((last.plus_di > last.minus_di) && (current.plus_di > 20))
-                                                //if((last.plus_di > 20) && (last.minus_di < 20) && (current.plus_di > 20))
-                                                if ((current.ema10 > last.ema10) && (current.ema10 >= current.ema20))
-                                                    if ((current.macd_distance >= last.macd_distance) && (last.macd_distance >= prev.macd_distance) && (prev.macd_distance >= candle_3.macd_distance))
-                                                        if ((current.close <= current.bbu20) /*&& (currentX.close > currentX.open)*/) {
-                                                            return true;
-                                                        }
+        let current = signal.candle;
+        if (last && current) {
+
+            if ((current.close <= current.bbl20) && (current.close > current.low))
+                if ((current.ema200 <= current.ema100))
+                    if ((current.ema50 < current.ema10) && (current.ema30 < current.ema20))
+                        if (((current.bbu20 / current.bbl20) - 1) * 100 >= 1) {
+                            return true;
+                        }
         }
     }
 
