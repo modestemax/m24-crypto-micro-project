@@ -85,7 +85,7 @@ function resetInOut() {
 
 function getStartTime() {
     if (!startTime) {
-        const now = Date.now() - DURATION.HOUR_6;
+        const now = Date.now() //- DURATION.HOUR_6;
         startTime = now - now % DURATION.MIN_1
         console.log('startTime', new Date(startTime))
         // startTime =  timeframeStartAt(DURATION.HOUR_1)()

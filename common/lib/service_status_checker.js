@@ -75,5 +75,5 @@ process.on('uncaughtException', (err) => {
 });
 
 function autoRestart(APP) {
-  schedule.scheduleJob('0 0 0 * * *', restartBot);
+  // schedule.scheduleJob('0 0 0 * * *', restartBot);
 }
