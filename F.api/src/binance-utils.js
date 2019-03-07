@@ -28,6 +28,21 @@ const timeframeStartAt = (timeframe) => () => {
     return now - now % timeframe
 }
 
+const FRAMES = {
+    '1m': DURATION.MIN_1,
+    '2m': DURATION.MIN_2,
+    '3m': DURATION.MIN_3,
+    '5m': DURATION.MIN_5,
+    '15m': DURATION.MIN_15,
+    '30m': DURATION.MIN_30,
+    '1h': DURATION.HOUR_1,
+    '2h': DURATION.HOUR_2,
+    '4h': DURATION.HOUR_4,
+    '6h': DURATION.HOUR_6,
+    '8h': DURATION.HOUR_8,
+    '12h': DURATION.HOUR_12,
+    '24h': DURATION.HOUR_24,
+}
 const DEFAULT_PERIODS = {
     m1: DURATION.MIN_1,
     m2: DURATION.MIN_2,
@@ -73,7 +88,7 @@ const indexTicksByTime = ticks => ticks.reduce((ticks, tick) => {
 async function loadCandles(symbol, interval = '1m', limit = 1440 + 15) {
     // $FlowFixMe
     let { ticks: ticks1, closeTime } = await getCandlesticksFromBinance({
-        symbol, interval, startTime: Date.now() - limit * 60 * 1e3
+        symbol, interval, startTime: Date.now() - limit * FRAMES[interval]
     });
     // $FlowFixMe
     let { ticks: ticks2 } = closeTime ? await getCandlesticksFromBinance({
@@ -99,9 +114,10 @@ async function loadCandles(symbol, interval = '1m', limit = 1440 + 15) {
  * real time price listening
  * @param symbol
  * @param candles
+ * @param interval
  */
-function listenToPriceChange({ candles, symbol }) {
-    binance.websockets.candlesticks(symbol, '1m', ({ k: ticks }) => {
+function listenToPriceChange({ candles, symbol, interval }) {
+    binance.websockets.candlesticks(symbol, interval, ({ k: ticks }) => {
         let {
             t: startTime, x: isFinal, i: interval, o: open, h: high, l: low, c: close, v: volume, T: closeTime,
             assetVolume, n: trades,/*V: buyBaseVolume,q: buyAssetVolume, ignored*/
@@ -175,8 +191,8 @@ function getChangeFrom({ candles, symbol, period, from, timeframeName }) {
             prevChanges.set(period, { ...prevChangeSymbols, [symbol]: prevChange })
             return prevChange
         }
-        !startCandle && console.log(`${symbol} startCandle not found at [${startTime}] ${new Date(startTime)}`)
-        !lastCandle && console.log(`${symbol} lastCandle not found at [${now_0}] ${new Date(now_0)}`)
+    //     !startCandle && console.log(`${symbol} startCandle not found at [${startTime}] ${new Date(startTime)}`)
+    //     !lastCandle && console.log(`${symbol} lastCandle not found at [${now_0}] ${new Date(now_0)}`)
     }
 }
 

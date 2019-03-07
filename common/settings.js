@@ -246,7 +246,7 @@ module.exports = {
             stopLoss: -.5,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },       
-        "K3B2SPIRITH1": {
+        "torpilloH1": {
             isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
@@ -257,7 +257,7 @@ module.exports = {
             stopLoss: -2,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
-        "K3B2SPIRITM15": {
+        "torpilloM15": {
             isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
@@ -268,7 +268,7 @@ module.exports = {
             stopLoss: -2,
             cancelBidAfterSecond: 60 * 10,//5 min,
         },
-        "K3B2SPIRITD1": {
+        "torpilloD1": {
             // isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',
@@ -279,7 +279,7 @@ module.exports = {
             stopLoss: -2,
             cancelBidAfterSecond: 60 * 10,//5 min,
         }, 
-        "K3B2SPIRITH4": {
+        "torpilloH4": {
             // isActive: true,
             // doTrade: true,
             timeInForce: 'GTC',

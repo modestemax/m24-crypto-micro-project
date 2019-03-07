@@ -9,7 +9,7 @@ const { publishPerf, loadCandles, listenToPriceChange, changePercent } = require
 
 const binance = require('./init-binance')
 require('./progress/viewProgess')
-const { priceChanged } = require('./algos/all/a_first')
+const { priceChanged ,interval,limit} = require('./algos/a_topten')
 //startup
 binance.exchangeInfo(async function ex_info(error, data) {
 
@@ -39,10 +39,10 @@ binance.exchangeInfo(async function ex_info(error, data) {
                 const errors = [];
                 for (const symbol of symbols) {
                     try {
-                        console.log(symbol, 'loading previous candles');
-                        allSymbolsCandles[symbol] = await loadCandles(symbol);
-                        listenToPriceChange({ candles: allSymbolsCandles[symbol], symbol });
-                        console.log(symbol + " candlestick started");
+                        // console.log(symbol, 'loading previous candles');
+                        allSymbolsCandles[symbol] = await loadCandles(symbol, interval,limit);
+                        listenToPriceChange({ candles: allSymbolsCandles[symbol], symbol ,interval});
+                        // console.log(symbol + " candlestick started");
                     } catch (e) {
                         console.log(symbol, e.message);
                         errors.push(symbol);
