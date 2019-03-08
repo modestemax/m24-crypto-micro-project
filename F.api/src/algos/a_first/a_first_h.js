@@ -117,6 +117,10 @@ function buyCondition() {
 function buy() {
     if (true || buyCondition()) {
         last = first;
+        let change = (first.change - second.change) % 5
+        last.close = (last.close * (1 - change / 100)).toFixed(8)
+        last.change -= change
+
         log.push(last);
         last.openPrice = last.close;
         const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
