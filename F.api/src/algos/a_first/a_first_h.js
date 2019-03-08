@@ -57,6 +57,8 @@ function run(screener) {
             if (last)
                 if (last.symbol !== first.symbol && (sellReason = SELL_REASON.SWITCH_TO_FIRST)) {
                     sell(sellReason)
+                } else if (last.gain < -1 && (sellReason = SELL_REASON.STOP_LOSS)) {
+                    sell(sellReason)
                 } else if (last.gain > 5 && first.change - second.change > 2) {
                     publish(`m24:simulate`, {
                         strategy: strategyName,
@@ -86,7 +88,7 @@ function resetInOut() {
 function getStartTime() {
     if (!startTime) {
         const now = Date.now() //- DURATION.HOUR_6;
-        startTime = now - now % DURATION.MIN_1
+        startTime = now - now % DURATION.HOUR_24
         console.log('startTime', new Date(startTime))
         // startTime =  timeframeStartAt(DURATION.HOUR_1)()
 
