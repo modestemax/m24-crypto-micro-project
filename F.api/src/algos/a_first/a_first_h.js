@@ -15,9 +15,6 @@ let stop;
 let last = null;
 let first = null;
 let second = null;
-let m1first = null
-let m2first = null
-let m3first = null
 let log = []
 let algoStarted;
 let screener = {};
@@ -26,6 +23,7 @@ let first_change = 0;
 let sellReason;
 const tme_message_ids = {}
 let startTime
+let originTime
 const SELL_REASON = {
     STOP_LOSS: 'stop_loss',
     SWITCH_TO_FIRST: 'switch_to_first'
@@ -46,7 +44,7 @@ function run(screener) {
         } else {
             Object.assign(last, screener[last.symbol])
             calculateGain()
-             if (last)
+            if (last)
                 if (last.symbol !== first.symbol && (sellReason = SELL_REASON.SWITCH_TO_FIRST)) {
                     sell(sellReason)
                 } else if (last.gain < -1 && (sellReason = SELL_REASON.STOP_LOSS)) {
@@ -56,7 +54,7 @@ function run(screener) {
                         strategy: strategyName,
                         symbol: last.symbol,
                         open: last.close,
-                        target:20
+                        target: 20
                     });
                 }
 
@@ -80,8 +78,12 @@ function resetInOut() {
 
 function getStartTime() {
     if (!startTime) {
-        const now = Date.now() //- DURATION.HOUR_6;
-        startTime = now - now % DURATION.HOUR_24
+        if (originTime) {
+            startTime = originTime
+        } else {
+            let now = Date.now() //- DURATION.HOUR_6;
+            startTime = now - now % DURATION.HOUR_24
+        }
         console.log('startTime', new Date(startTime))
         // startTime =  timeframeStartAt(DURATION.HOUR_1)()
 
@@ -97,14 +99,7 @@ function getStartTime() {
 }
 
 function buyCondition() {
-    const changes = [m1first.change, m2first.change, m3first.change]
-    if (_.min(changes) > 0) {
-        if (sorted(changes)) {
-            if (first.change - _.max(changes) > 1) {
-                return true
-            }
-        }
-    }
+
 }
 
 function buy() {
@@ -256,9 +251,10 @@ function logLoading(count, symbols) {
 }
 
 module.exports = {
-    priceChanged(symbol, symbols, allSymbolsCandles) {
+    priceChanged(symbol, symbols, allSymbolsCandles, fromTime, nowTime) {
+        originTime = fromTime
         DEFAULT_PERIODS.ALGO = getStartTime
-        screener = getSymbolsChanges({ allSymbolsCandles, period: getStartTime, timeframeName: 'algo' })
+        screener = getSymbolsChanges({ allSymbolsCandles, period: getStartTime, nowTime, timeframeName: 'algo' })
         const orderedScreener = orderScreener(screener)
         first = getFirst(screener)
         second = _.nth(orderedScreener, 1) || {}
@@ -270,22 +266,11 @@ module.exports = {
             let count = _.values(screener).filter(v => v).length
             logLoading(count, symbols)
             // if (first.change > in_ - Math.abs(-STOP_LOSS)) {
-            if (first.change > out) {
-                startTime += DURATION.MIN_15
-                if (startTime > Date.now() - DURATION.MIN_15) {
-                    startTime = timeframeStartAt(DURATION.MIN_1)()
-                }
-            } else {
-                algoStarted = count === symbols.length
-                algoStarted && console.log('algoStarted ')
-            }
-        } else {
-            [m1first, m2first, m3first] = ['m1', 'm2', 'm3',].map(period => getChangeFrom({
-                candles: allSymbolsCandles[first.symbol],
-                symbol: first.symbol,
-                period: DEFAULT_PERIODS[period]
-            }))
 
+            algoStarted = count === symbols.length
+            algoStarted && console.log('algoStarted ')
+
+        } else {
             run(screener)
         }
 

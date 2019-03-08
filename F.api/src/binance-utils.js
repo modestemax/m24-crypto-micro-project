@@ -162,7 +162,7 @@ function forgetOldCandles({ candles }) {
 
 }
 
-function getChangeFrom({ candles, symbol, period, from, timeframeName }) {
+function getChangeFrom({ candles, symbol, period, nowTime, from, timeframeName }) {
     const prevChanges = getChangeFrom.prevChanges || new Map();
     getChangeFrom.prevChanges = prevChanges
     let prevChangeSymbols = prevChanges.get(period) || {}
@@ -174,7 +174,7 @@ function getChangeFrom({ candles, symbol, period, from, timeframeName }) {
     const startTime = from || (typeof period === 'function' ? period() : now_0 - period)
     if (startTime && candles) {
         const startCandle = candles[startTime];
-        const lastCandle = candles[now_0] || candles[now_1];
+        const lastCandle = candles[nowTime] || candles[now_0] || candles[now_1];
         if (startCandle && lastCandle) {
             const [open, close] = [+startCandle.open, +lastCandle.close]
             const change = changePercent(open, close)
@@ -205,8 +205,11 @@ function getChangeFrom({ candles, symbol, period, from, timeframeName }) {
  * @param timeframeName
  * @returns {{}}
  */
-function getSymbolsChanges({ allSymbolsCandles, period, from, timeframeName }) {
-    return _.mapValues(allSymbolsCandles, (candles, symbol) => getChangeFrom({ candles, symbol, period, from, timeframeName }))
+function getSymbolsChanges({ allSymbolsCandles, period, nowTime, from, timeframeName }) {
+    return _.mapValues(allSymbolsCandles, (candles, symbol) => getChangeFrom({
+        candles, symbol, period,
+        nowTime, from, timeframeName
+    }))
 }
 
 /**

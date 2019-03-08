@@ -32,7 +32,7 @@ binance.exchangeInfo(async function ex_info(error, data) {
                 const ticker = _.find(tickers, { symbol })
                 return (ticker && changePercent(ticker.bidPrice, ticker.askPrice) < .6)
             }));
-            await redisSet('symbols', symbols)
+            await redisSet({ key: 'symbols', data: symbols })
             await (async () => {
                 for (let j = 1; j < 8; j++) {
                     await (async function start(symbols, date) {
