@@ -83,16 +83,17 @@ const indexTicksByTime = ticks => ticks.reduce((ticks, tick) => {
  * @param symbol
  * @param interval
  * @param limit
+ * @param startTime
  * @returns {Promise<*>}
  */
-async function loadCandles(symbol, interval = '1m', limit = 1440 + 15) {
+async function loadCandles(symbol, interval = '1m', limit = 1440 + 15, startTime) {
     // $FlowFixMe
     let { ticks: ticks1, closeTime } = await getCandlesticksFromBinance({
-        symbol, interval, startTime: Date.now() - limit * FRAMES[interval]
+        symbol, interval, startTime: startTime || (Date.now() - limit * FRAMES[interval])
     });
     // $FlowFixMe
     let { ticks: ticks2 } = closeTime ? await getCandlesticksFromBinance({
-        symbol, interval, startTime: closeTime
+        symbol, interval, startTime: closeTime, limit: limit - ticks1.length
     }) : { ticks: [] };
 
     return indexTicksByTime([...ticks1, ...ticks2]);
@@ -191,8 +192,8 @@ function getChangeFrom({ candles, symbol, period, from, timeframeName }) {
             prevChanges.set(period, { ...prevChangeSymbols, [symbol]: prevChange })
             return prevChange
         }
-    //     !startCandle && console.log(`${symbol} startCandle not found at [${startTime}] ${new Date(startTime)}`)
-    //     !lastCandle && console.log(`${symbol} lastCandle not found at [${now_0}] ${new Date(now_0)}`)
+        //     !startCandle && console.log(`${symbol} startCandle not found at [${startTime}] ${new Date(startTime)}`)
+        //     !lastCandle && console.log(`${symbol} lastCandle not found at [${now_0}] ${new Date(now_0)}`)
     }
 }
 

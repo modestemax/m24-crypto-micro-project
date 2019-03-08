@@ -29,7 +29,7 @@ process.nextTick(() => {
         return id;
     }
 
-    subscribe('m24:simulate', ({ symbol, strategy, open, stop, limit }) => {
+    subscribe('m24:simulate', ({ symbol, strategy, open, stop, limit, target }) => {
         trades[symbol] = trades[symbol] || {}
         let id = getId(strategy, symbol)
         if (!trades[symbol][id]) {
@@ -38,7 +38,10 @@ process.nextTick(() => {
         ${limit ? `limit ${limit.toFixed(8)}` : ''}`
             publish(`m24:algo:simulate`, { id, text });
             console.log(text)
-            trades[symbol][id] = { id, open, stop, limit, symbol, strategy, time: Date.now() }
+            trades[symbol][id] = {
+                id, open, stop, limit, symbol, strategy, time: Date.now(),
+                target: target || TARGET
+            }
         }
     })
 
@@ -87,13 +90,13 @@ ${limit ? `limit  ${limit.toFixed(8)}` : ''}`
                 let lowChange = trade.lowChange = changePercent(trade.open, trade.low)
 
                 const lost = trade.lost = lowChange <= LOSS
-                const win = trade.win = highChange >= TARGET
+                const win = trade.win = highChange >= trade.target
                 trade.timeEnd = trade.timeEnd || (win && Date.now()) || void 0
                 trade.minEnd = trade.minEnd || (win && trade.low) || void 0
                 let winDuration = win && moment.duration(moment(trade.timeEnd).diff(moment(trade.time))).humanize()
                 let minEndChange = changePercent(trade.open, trade.minEnd)
-                let state = win ? `win [${winDuration}] [${minEndChange.toFixed(2)}%]` : 'lost'
-                let state2 = win ? `win` : 'lost'
+                let state2 = win ? `win` : highChange > 2 ? '' : 'lost'
+                let state = win ? `${state2} [${winDuration}] [${minEndChange.toFixed(2)}%]` : state2
 
                 let date = moment().tz(TIME_ZONE)
                 // let quarter = Math.trunc(date.hour() / 6) + 1

@@ -19,18 +19,12 @@ let m1first = null
 let m2first = null
 let m3first = null
 let log = []
-const gainLogs = {}
-const FAST_GROW = 2
-const STOP_LOSS = -2
 let algoStarted;
 let screener = {};
 const TARGET_GAIN = 1.2
-const MAX_SPREAD = .6
-const SATOSHI = 1e-8
 let first_change = 0;
 let sellReason;
 const tme_message_ids = {}
-const processStartTime = Date.now()
 let startTime
 const SELL_REASON = {
     STOP_LOSS: 'stop_loss',
@@ -52,9 +46,7 @@ function run(screener) {
         } else {
             Object.assign(last, screener[last.symbol])
             calculateGain()
-            // collectProfit()
-            // tryRestart()
-            if (last)
+             if (last)
                 if (last.symbol !== first.symbol && (sellReason = SELL_REASON.SWITCH_TO_FIRST)) {
                     sell(sellReason)
                 } else if (last.gain < -1 && (sellReason = SELL_REASON.STOP_LOSS)) {
@@ -63,7 +55,8 @@ function run(screener) {
                     publish(`m24:simulate`, {
                         strategy: strategyName,
                         symbol: last.symbol,
-                        open: last.close
+                        open: last.close,
+                        target:20
                     });
                 }
 
