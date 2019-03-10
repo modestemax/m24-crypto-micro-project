@@ -6,6 +6,10 @@ const QUOTE_ASSET_REGEX = /btc$/i;
 // const QUOTE_ASSET="USDT";
 const Promise = require('bluebird');
 const _ = require('lodash');
+const fs = require('fs');
+
+const moment = require('moment-timezone');
+const TIME_ZONE = 'Africa/Douala'
 const { getRedis, redisGet, publish } = require('common/redis');
 const redis = getRedis()
 const ONE_MIN = 1e3 * 60
@@ -49,11 +53,27 @@ const { priceChanged, interval, limit } = require('./algos/a_first');
         }
         saveLogs()
         console.log('END')
-    })(symbols, +new Date('2019-02-01'), +new Date('2019-02-02'))
+    })(symbols, +new Date('2019-03-06'), +new Date('2019-03-07'))
 })()
 
 
 function saveLogs() {
-    tradesLog;
+    const firstTrade = _.first(tradesLog)
+    if (firstTrade) {
+        let logs = _.map(tradesLog, t => ({
+            startTime: moment(t.time).tz(TIME_ZONE).format('DD MMM HH:mm'),
+            closeTime: moment(t.closeTime).tz(TIME_ZONE).format('DD MMM HH:mm'),
+            inChange: t.inChange,
+            inTime: moment(t.inTime).tz(TIME_ZONE).format('DD MMM HH:mm'),
+            open: t.open,
+            close: t.close,
+            high: t.high,
+            low: t.low,
+            min: t.min,
+            max_lost: t.max_lost,
+        }));
+        let txt = _.map(logs,  log=> _.values(log).join('\t')).join('\n')
+        fs.writeFileSync(`~/tmp/m24-logs/${moment(firstTrade.inTime).format('DD MMM')}.tsv`, txt)
+    }
     debugger
 }

@@ -59,7 +59,9 @@ function run(screener) {
                         open: last.close,
                         target: 200,
                         unique: true,
-                        closeTime: last.closeTime
+                        time: last.closeTime,
+                        inTime: last.startTime,
+                        inChange: last.change
                     });
                 }
 

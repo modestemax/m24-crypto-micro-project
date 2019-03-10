@@ -24,7 +24,8 @@ process.nextTick(() => {
         if (unique && tradesByIds[id].length) {
             let currentTrade = _.last(tradesByIds[id])
             if (currentTrade.symbol !== symbol) {
-              global.tradesLog.push(currentTrade)
+                currentTrade.closeTime = Date.now()
+                global.tradesLog.push(currentTrade)
                 delete trades[currentTrade.symbol][id]
             }
         }
@@ -37,7 +38,7 @@ process.nextTick(() => {
         return id;
     }
 
-    subscribe('m24:simulate', ({ symbol, strategy, open, stop, limit, target, unique, closeTime }) => {
+    subscribe('m24:simulate', ({ symbol, strategy, open, stop, limit, target, unique, time, inTime, inChange }) => {
         trades[symbol] = trades[symbol] || {}
         let id = getId(strategy, symbol, unique)
         if (!trades[symbol][id]) {
@@ -48,8 +49,8 @@ process.nextTick(() => {
             publish(`m24:algo:simulate`, { id, text });
             console.log(text)
             let trade = trades[symbol][id] = {
-                id, open, stop, limit, symbol, strategy, time: closeTime || Date.now(),
-                target: target || TARGET,
+                id, open, stop, limit, symbol, strategy, time: time || Date.now(),
+                target: target || TARGET, inChange, inTime
             }
             tradesByIds[id].push(trade)
         }
