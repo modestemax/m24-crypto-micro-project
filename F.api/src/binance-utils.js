@@ -233,7 +233,7 @@ function publishPerf({ allSymbolsCandles, symbols, periods = DEFAULT_PERIODS, pr
                 : { symbol, period, change: -1000 }
             ))
 
-        priceChanged && priceChanged(symbol, symbols, allSymbolsCandles, perfs)
+        priceChanged && priceChanged(symbol, symbols, allSymbolsCandles/*, perfs*/)
 
         publish.throttle('prevPerf', Object.values(perfs))
         // publish.throttle2('ALL_SYMBOLS_CANDLES', allSymbolsCandles)
