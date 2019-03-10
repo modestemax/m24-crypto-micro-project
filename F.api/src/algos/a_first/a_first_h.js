@@ -1,5 +1,6 @@
 const _ = require('lodash');
-const sorted = require('is-sorted')
+const moment = require('moment-timezone');
+const TIME_ZONE = 'Africa/Douala'
 const { publish, subscribe } = require('common/redis');
 
 // const algo = require('..');
@@ -15,9 +16,6 @@ let stop;
 let last = null;
 let first = null;
 let second = null;
-let m1first = null
-let m2first = null
-let m3first = null
 let log = []
 let algoStarted;
 let screener = {};
@@ -26,10 +24,13 @@ let first_change = 0;
 let sellReason;
 const tme_message_ids = {}
 let startTime
+let originTime
 const SELL_REASON = {
     STOP_LOSS: 'stop_loss',
     SWITCH_TO_FIRST: 'switch_to_first'
 }
+const TOP_GAIN = 5
+const FIRST_SECOND_DELTA = 2
 
 const orderScreener = (screener) => _.orderBy(screener, perf => perf ? perf.change : 0, 'desc')
 const getFirst = (screener) => _.first(orderScreener(screener))
@@ -46,17 +47,21 @@ function run(screener) {
         } else {
             Object.assign(last, screener[last.symbol])
             calculateGain()
-             if (last)
+            if (last)
                 if (last.symbol !== first.symbol && (sellReason = SELL_REASON.SWITCH_TO_FIRST)) {
                     sell(sellReason)
                 } else if (last.gain < -1 && (sellReason = SELL_REASON.STOP_LOSS)) {
                     sell(sellReason)
-                } else if (last.gain > 5 && first.change - second.change > 2) {
+                } else if (last.gain > TOP_GAIN && first.change - second.change > FIRST_SECOND_DELTA) {
                     publish(`m24:simulate`, {
                         strategy: strategyName,
                         symbol: last.symbol,
                         open: last.close,
-                        target:20
+                        target: 200,
+                        unique: true,
+                        time: last.closeTime,
+                        inTime: last.startTime,
+                        inChange: last.change
                     });
                 }
 
@@ -80,8 +85,12 @@ function resetInOut() {
 
 function getStartTime() {
     if (!startTime) {
-        const now = Date.now() //- DURATION.HOUR_6;
-        startTime = now - now % DURATION.HOUR_24
+        if (originTime) {
+            startTime = originTime
+        } else {
+            let now = Date.now() //- DURATION.HOUR_6;
+            startTime = now - now % DURATION.HOUR_24
+        }
         console.log('startTime', new Date(startTime))
         // startTime =  timeframeStartAt(DURATION.HOUR_1)()
 
@@ -96,34 +105,23 @@ function getStartTime() {
     return startTime
 }
 
-function buyCondition() {
-    const changes = [m1first.change, m2first.change, m3first.change]
-    if (_.min(changes) > 0) {
-        if (sorted(changes)) {
-            if (first.change - _.max(changes) > 1) {
-                return true
-            }
-        }
-    }
-}
 
 function buy() {
-    if (true || buyCondition()) {
-        last = first;
-        let change = (first.change - second.change) % 5
-        last.close = (last.close * (1 - change / 100)).toFixed(8)
-        last.change -= change
+    last = first;
+    let change = (first.change - second.change) % 5
+    last.close = +(last.close * (1 - change / 100)).toFixed(8)
+    last.change -= change
 
-        log.push(last);
-        last.openPrice = last.close;
-        const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
-        publish(`m24:algo:tracking`, {
-            max: true,
-            strategyName,
-            text
-        });
-        console.log(text)
-    }
+    log.push(last);
+    last.openPrice = last.close;
+    const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
+    publish(`m24:algo:tracking`, {
+        max: true,
+        strategyName,
+        text
+    });
+    console.log(text)
+
 }
 
 function sell(sellReason) {
@@ -163,7 +161,8 @@ function calculateGain() {
         const text = `#${log.length}gain 
 ${last.symbol}  ${last.gain.toFixed(2)}% 
 Max gain ${last.maxGain.toFixed(2)}%
------------------------------------
+time ${moment(last.closeTime).tz(TIME_ZONE).format('DD MMM HH:mm')}
+------------
 first ${first.symbol} ${first.change.toFixed(2)}%
 second ${second.symbol} ${second.change.toFixed(2)}%
 diff ${(first.change - second.change).toFixed(2)}%
@@ -256,36 +255,26 @@ function logLoading(count, symbols) {
 }
 
 module.exports = {
-    priceChanged(symbol, symbols, allSymbolsCandles) {
+    priceChanged(symbol, symbols, allSymbolsCandles, fromTime, nowTime) {
+        originTime = fromTime
         DEFAULT_PERIODS.ALGO = getStartTime
-        screener = getSymbolsChanges({ allSymbolsCandles, period: getStartTime, timeframeName: 'algo' })
+        screener = getSymbolsChanges({ allSymbolsCandles, period: getStartTime, nowTime, timeframeName: 'algo' })
         const orderedScreener = orderScreener(screener)
         first = getFirst(screener)
-        second = _.nth(orderedScreener, 1) || {}
+        second = _.nth(orderedScreener, 1)
 
         // init()
         // algoStarted=true
         if (!algoStarted) {
-            if (!first) return
+            if (!(first && second)) return
             let count = _.values(screener).filter(v => v).length
             logLoading(count, symbols)
             // if (first.change > in_ - Math.abs(-STOP_LOSS)) {
-            if (first.change > out) {
-                startTime += DURATION.MIN_15
-                if (startTime > Date.now() - DURATION.MIN_15) {
-                    startTime = timeframeStartAt(DURATION.MIN_1)()
-                }
-            } else {
-                algoStarted = count === symbols.length
-                algoStarted && console.log('algoStarted ')
-            }
-        } else {
-            [m1first, m2first, m3first] = ['m1', 'm2', 'm3',].map(period => getChangeFrom({
-                candles: allSymbolsCandles[first.symbol],
-                symbol: first.symbol,
-                period: DEFAULT_PERIODS[period]
-            }))
 
+            algoStarted = count === symbols.length
+            algoStarted && console.log('algoStarted ')
+
+        } else {
             run(screener)
         }
 
