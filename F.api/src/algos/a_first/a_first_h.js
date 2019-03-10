@@ -1,5 +1,6 @@
 const _ = require('lodash');
-const sorted = require('is-sorted')
+const moment = require('moment-timezone');
+const TIME_ZONE = 'Africa/Douala'
 const { publish, subscribe } = require('common/redis');
 
 // const algo = require('..');
@@ -54,7 +55,9 @@ function run(screener) {
                         strategy: strategyName,
                         symbol: last.symbol,
                         open: last.close,
-                        target: 20
+                        target: 200,
+                        unique: true,
+                        closeTime: last.closeTime
                     });
                 }
 
@@ -98,27 +101,23 @@ function getStartTime() {
     return startTime
 }
 
-function buyCondition() {
-
-}
 
 function buy() {
-    if (true || buyCondition()) {
-        last = first;
-        let change = (first.change - second.change) % 5
-        last.close = (last.close * (1 - change / 100)).toFixed(8)
-        last.change -= change
+    last = first;
+    let change = (first.change - second.change) % 5
+    last.close = +(last.close * (1 - change / 100)).toFixed(8)
+    last.change -= change
 
-        log.push(last);
-        last.openPrice = last.close;
-        const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
-        publish(`m24:algo:tracking`, {
-            max: true,
-            strategyName,
-            text
-        });
-        console.log(text)
-    }
+    log.push(last);
+    last.openPrice = last.close;
+    const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
+    publish(`m24:algo:tracking`, {
+        max: true,
+        strategyName,
+        text
+    });
+    console.log(text)
+
 }
 
 function sell(sellReason) {
@@ -158,7 +157,8 @@ function calculateGain() {
         const text = `#${log.length}gain 
 ${last.symbol}  ${last.gain.toFixed(2)}% 
 Max gain ${last.maxGain.toFixed(2)}%
------------------------------------
+time ${moment(last.closeTime).tz(TIME_ZONE).format('DD MMM HH:mm')}
+------------
 first ${first.symbol} ${first.change.toFixed(2)}%
 second ${second.symbol} ${second.change.toFixed(2)}%
 diff ${(first.change - second.change).toFixed(2)}%
@@ -257,12 +257,12 @@ module.exports = {
         screener = getSymbolsChanges({ allSymbolsCandles, period: getStartTime, nowTime, timeframeName: 'algo' })
         const orderedScreener = orderScreener(screener)
         first = getFirst(screener)
-        second = _.nth(orderedScreener, 1) || {}
+        second = _.nth(orderedScreener, 1)
 
         // init()
         // algoStarted=true
         if (!algoStarted) {
-            if (!first) return
+            if (!(first && second)) return
             let count = _.values(screener).filter(v => v).length
             logLoading(count, symbols)
             // if (first.change > in_ - Math.abs(-STOP_LOSS)) {

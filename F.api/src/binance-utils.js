@@ -184,8 +184,9 @@ function getChangeFrom({ candles, symbol, period, nowTime, from, timeframeName }
                 change,
                 openChange: prevChange.openChange || change,
                 highChange: _.max([prevChange.highChange, change]),
-                lowChange: _.min([prevChange.minChange, change])
-                // time:lastCandle.time,
+                lowChange: _.min([prevChange.minChange, change]),
+                startTime: startCandle.startTime,
+                closeTime: lastCandle.closeTime,
                 // openTime:lastCandle.openTime,
                 // closeTime:lastCandle.closeTime
             }
