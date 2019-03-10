@@ -24,7 +24,6 @@ process.nextTick(() => {
         if (unique && tradesByIds[id].length) {
             let currentTrade = _.last(tradesByIds[id])
             if (currentTrade.symbol !== symbol) {
-                currentTrade.closeTime = Date.now()
                 global.tradesLog.push(currentTrade)
                 delete trades[currentTrade.symbol][id]
             }
@@ -86,13 +85,14 @@ ${limit ? `limit  ${limit.toFixed(8)}` : ''}`
         return
     }
 
-    subscribe('price', ({ symbol, close }) => {
+    subscribe('price', ({ symbol, close, closeTime }) => {
         _.values(trades[symbol]).forEach((trade) => {
             if (!trade.open) {
                 return stop_limit_buy(trade, close, symbol);
             }
             trade.open = trade.open || close
             trade.close = close
+            trade.closeTime = closeTime || Date.now()
             trade.oldHigh = trade.high
             trade.high = _.max([trade.high, close])
             trade.min = trade.high > trade.oldHigh ? trade.low : trade.min
@@ -100,10 +100,10 @@ ${limit ? `limit  ${limit.toFixed(8)}` : ''}`
             trade.low = _.min([trade.low, close])
             trade.oldChange = isNaN(trade.change) ? -Infinity : trade.change
             trade.change = changePercent(trade.open, trade.close)
+            let highChange = trade.highChange = changePercent(trade.open, trade.high)
+            let lowChange = trade.lowChange = changePercent(trade.open, trade.low)
 
             if (trade.change.toFixed(1) !== trade.oldChange.toFixed(1)) {
-                let highChange = trade.highChange = changePercent(trade.open, trade.high)
-                let lowChange = trade.lowChange = changePercent(trade.open, trade.low)
 
                 const lost = trade.lost = lowChange <= LOSS
                 const win = trade.win = highChange >= trade.target

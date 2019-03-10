@@ -15,65 +15,79 @@ const redis = getRedis()
 const ONE_MIN = 1e3 * 60
 const ONE_DAY = ONE_MIN * 60 * 24
 global.tradesLog = []
-
+const allSymbolsCandles = {};
 const { publishPerf, loadCandles, listenToPriceChange, changePercent } = require('./binance-utils')
 const loadPrevious = require('./load_previous_data')
 require('./progress/viewProgess')
-// const { priceChanged ,interval,limit} = require('./algos/a_topten')
 const { priceChanged, interval, limit } = require('./algos/a_first');
-//startup
 
+module.exports = { startSimulation, simulate }
 
-(async () => {
+async function startSimulation(startTime, closeTime) {
     const symbols = await redisGet('symbols')
-    const allSymbolsCandles = {}
+    await simulate(symbols, startTime, closeTime)
+}
 
-
-        // publishPerf({ allSymbolsCandles, symbols, priceChanged });
-
-    ;(async function start(symbols, startTime, closeTime) {
-        for (let date = startTime; date < closeTime; date += ONE_MIN) {
-            await Promise.mapSeries(symbols, async function loadLocal(symbol) {
-                let data = await redis.hmgetAsync(symbol, +date)
-                if (data && (_.isArray(data) ? data[0] : true)) {
-                    try {
-                        let candle = JSON.parse(data)
-                        allSymbolsCandles[symbol] = allSymbolsCandles[symbol] || {}
-                        allSymbolsCandles[symbol][+date] = candle
-                        publish('price', { symbol, close: candle.close });
-                    } catch (e) {
-                        console.log(e)
-                    }
-                } else {
-                    await loadPrevious([symbol], date)
-                    await loadLocal(symbol)
+async function simulate(symbols, startTime, closeTime) {
+    for (let date = startTime; date < closeTime; date += ONE_MIN) {
+        await Promise.mapSeries(symbols, async function loadLocal(symbol) {
+            let data = await redis.hmgetAsync(symbol, +date)
+            if (data && (_.isArray(data) ? data[0] : true)) {
+                try {
+                    let candle = JSON.parse(data)
+                    allSymbolsCandles[symbol] = allSymbolsCandles[symbol] || {}
+                    allSymbolsCandles[symbol][+date] = candle
+                    publish('price', { symbol, close: candle.close, closeTime: candle.closeTime });
+                } catch (e) {
+                    console.log(e)
                 }
-            })
-            priceChanged(null, symbols, allSymbolsCandles, startTime, date);
-        }
-        saveLogs()
-        console.log('END')
-    })(symbols, +new Date('2019-03-06'), +new Date('2019-03-07'))
-})()
-
+            } else {
+                await loadPrevious([symbol], date)
+                await loadLocal(symbol)
+            }
+        })
+        priceChanged(null, symbols, allSymbolsCandles, startTime, date);
+    }
+    saveLogs()
+    console.log('END')
+}
 
 function saveLogs() {
-    const firstTrade = _.first(tradesLog)
+    let firstTrade = _.first(tradesLog)
     if (firstTrade) {
         let logs = _.map(tradesLog, t => ({
+            symbol: t.symbol,
             startTime: moment(t.time).tz(TIME_ZONE).format('DD MMM HH:mm'),
             closeTime: moment(t.closeTime).tz(TIME_ZONE).format('DD MMM HH:mm'),
-            inChange: t.inChange,
-            inTime: moment(t.inTime).tz(TIME_ZONE).format('DD MMM HH:mm'),
-            open: t.open,
-            close: t.close,
-            high: t.high,
-            low: t.low,
-            min: t.min,
-            max_lost: t.max_lost,
+            inChange: t.inChange.toFixed(2),
+            // inTime: moment(t.inTime).tz(TIME_ZONE).format('DD MMM HH:mm'),
+            open: (+t.open).toFixed(8),
+            close: (+t.close).toFixed(8),
+            high: (+t.high).toFixed(8),
+            low: (+t.low).toFixed(8),
+            min: (+t.min).toFixed(8),
+            max_lost: t.max_lost.toFixed(2),
+            change: t.change.toFixed(2),
+            highChange: t.highChange.toFixed(2),
+            lowChange: t.lowChange.toFixed(2),
+            minEndChange: (t.minEndChange || 0).toFixed(2),
         }));
-        let txt = _.map(logs,  log=> _.values(log).join('\t')).join('\n')
-        fs.writeFileSync(`~/tmp/m24-logs/${moment(firstTrade.inTime).format('DD MMM')}.tsv`, txt)
+        logs = [_.mapValues(_.first(logs), (v, k) => k)].concat(logs)
+        let txt = _.map(logs, log => _.values(log).join('\t')).join('\n')
+        fs.writeFileSync(`${process.env.HOME}/tmp/m24-logs/${moment(firstTrade.inTime).format('DD MMM')}.tsv`, txt)
     }
-    debugger
+
+}
+
+
+const { FROM_DATE, TO_DATE } = process.env;
+
+const ONE_MIN = 1e3 * 60
+const ONE_DAY = ONE_MIN * 60 * 24;
+
+const startTime = /^\d\d\d\d-\d\d-\d\d$/.test(FROM_DATE) && +new Date(FROM_DATE)
+const closeTime = /^\d\d\d\d-\d\d-\d\d$/.test(FROM_DATE) && +new Date(TO_DATE);
+
+if (startTime && closeTime) {
+    startSimulation(startTime, closeTime)
 }

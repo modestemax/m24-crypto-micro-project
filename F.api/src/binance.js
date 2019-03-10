@@ -10,7 +10,7 @@ const { publishPerf, loadCandles, listenToPriceChange, changePercent } = require
 const binance = require('./init-binance')
 require('./progress/viewProgess')
 // const { priceChanged ,interval,limit} = require('./algos/a_topten')
-const { priceChanged ,interval,limit} = require('./algos/a_first')
+// const { priceChanged ,interval,limit} = require('./algos/a_first')
 //startup
 binance.exchangeInfo(async function ex_info(error, data) {
 
