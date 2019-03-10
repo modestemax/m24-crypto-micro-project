@@ -10,12 +10,16 @@ const { getRedis, redisGet, publish } = require('common/redis');
 const redis = getRedis()
 const ONE_MIN = 1e3 * 60
 const ONE_DAY = ONE_MIN * 60 * 24
+global.tradesLog = []
+
 const { publishPerf, loadCandles, listenToPriceChange, changePercent } = require('./binance-utils')
 const loadPrevious = require('./load_previous_data')
 require('./progress/viewProgess')
 // const { priceChanged ,interval,limit} = require('./algos/a_topten')
 const { priceChanged, interval, limit } = require('./algos/a_first');
 //startup
+
+
 (async () => {
     const symbols = await redisGet('symbols')
     const allSymbolsCandles = {}
@@ -43,7 +47,13 @@ const { priceChanged, interval, limit } = require('./algos/a_first');
             })
             priceChanged(null, symbols, allSymbolsCandles, startTime, date);
         }
+        saveLogs()
         console.log('END')
-    })(symbols, +new Date('2019/03/1'), +new Date('2019/03/2'))
+    })(symbols, +new Date('2019-02-01'), +new Date('2019-02-02'))
 })()
 
+
+function saveLogs() {
+    tradesLog;
+    debugger
+}

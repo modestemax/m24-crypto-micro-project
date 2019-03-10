@@ -29,6 +29,8 @@ const SELL_REASON = {
     STOP_LOSS: 'stop_loss',
     SWITCH_TO_FIRST: 'switch_to_first'
 }
+const TOP_GAIN = 5
+const FIRST_SECOND_DELTA = 2
 
 const orderScreener = (screener) => _.orderBy(screener, perf => perf ? perf.change : 0, 'desc')
 const getFirst = (screener) => _.first(orderScreener(screener))
@@ -50,7 +52,7 @@ function run(screener) {
                     sell(sellReason)
                 } else if (last.gain < -1 && (sellReason = SELL_REASON.STOP_LOSS)) {
                     sell(sellReason)
-                } else if (last.gain > 5 && first.change - second.change > 2) {
+                } else if (last.gain > TOP_GAIN && first.change - second.change > FIRST_SECOND_DELTA) {
                     publish(`m24:simulate`, {
                         strategy: strategyName,
                         symbol: last.symbol,

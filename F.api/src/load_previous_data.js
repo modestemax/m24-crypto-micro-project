@@ -5,13 +5,21 @@ const QUOTE_ASSET_REGEX = /btc$/i;
 // const QUOTE_ASSET_REGEX = /bnb$/i;
 // const QUOTE_ASSET="USDT";
 const _ = require('lodash');
+const moment = require('moment-timezone');
 const { getRedis, redisSet } = require('common/redis');
 const redis = getRedis()
 const { publishPerf, loadCandles, listenToPriceChange, changePercent } = require('./binance-utils')
 
 const binance = require('./init-binance');
-//startup
-(process.env.SYMBOLS || process.env.ALL_SYMBOLS) && binance.exchangeInfo(async function ex_info(error, data) {
+const { SYMBOLS, ALL_SYMBOLS, FROM_DATE, TO_DATE } = process.env;
+
+const ONE_MIN = 1e3 * 60
+const ONE_DAY = ONE_MIN * 60 * 24;
+
+const startTime = /^\d\d\d\d-\d\d-\d\d$/.test(FROM_DATE) && +new Date(FROM_DATE)
+const closeTime = /^\d\d\d\d-\d\d-\d\d$/.test(FROM_DATE) && +new Date(TO_DATE);
+
+(SYMBOLS || ALL_SYMBOLS) && startTime && closeTime && binance.exchangeInfo(async function ex_info(error, data) {
 
     if (error) {
         console.log(error);
@@ -26,8 +34,8 @@ const binance = require('./init-binance');
             .filter(s => QUOTE_ASSET_REGEX.test(s.quoteAsset))
             .map(s => s.symbol);
 
-        if (process.env.SYMBOLS) {
-            symbols = process.env.SYMBOLS.split(/;|:|\s+/)
+        if (SYMBOLS) {
+            symbols = SYMBOLS.split(/;|:|\s+/)
         } else {
 
             symbols = await new Promise((resolve, reject) => {
@@ -44,10 +52,11 @@ const binance = require('./init-binance');
             });
         }
 
+
         await (async () => {
-            for (let j = 5; j > 4; j--) {
+            for (let date = startTime; date < closeTime; date += ONE_DAY) {
                 // await (loadPrevious(symbols, `2019/03/${j}`, allSymbolsCandles))
-                await (loadPrevious(symbols, `2019/03/1`, allSymbolsCandles))
+                await (loadPrevious(symbols, date, allSymbolsCandles))
             }
         })()
 

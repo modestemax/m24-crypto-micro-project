@@ -10,7 +10,6 @@ const LOSS = -5
 const change = (open, close) => (close - open) / open;
 const changePercent = (open, close) => change(open, close) * 100;
 const tme_message_ids = {}
-const tradesLogs = []
 
 subscribe('tme_message_id', ({ id, message_id }) => {
         id && (tme_message_ids[id] = message_id)
@@ -19,14 +18,13 @@ subscribe('tme_message_id', ({ id, message_id }) => {
 
 process.nextTick(() => {
 
-
     function getId(strategy, symbol, unique) {
         let id = unique ? strategy : strategy + symbol
         tradesByIds[id] = tradesByIds[id] || []
         if (unique && tradesByIds[id].length) {
             let currentTrade = _.last(tradesByIds[id])
             if (currentTrade.symbol !== symbol) {
-                tradesLogs.push(tradesByIds[id][0])
+              global.tradesLog.push(currentTrade)
                 delete trades[currentTrade.symbol][id]
             }
         }
