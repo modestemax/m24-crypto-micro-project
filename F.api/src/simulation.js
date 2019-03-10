@@ -82,9 +82,6 @@ function saveLogs() {
 
 const { FROM_DATE, TO_DATE } = process.env;
 
-const ONE_MIN = 1e3 * 60
-const ONE_DAY = ONE_MIN * 60 * 24;
-
 const startTime = /^\d\d\d\d-\d\d-\d\d$/.test(FROM_DATE) && +new Date(FROM_DATE)
 const closeTime = /^\d\d\d\d-\d\d-\d\d$/.test(FROM_DATE) && +new Date(TO_DATE);
 
