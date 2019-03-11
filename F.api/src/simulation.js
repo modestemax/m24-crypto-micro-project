@@ -19,7 +19,7 @@ const allSymbolsCandles = {};
 const { publishPerf, loadCandles, listenToPriceChange, changePercent } = require('./binance-utils')
 const loadPrevious = require('./load_previous_data')
 require('./progress/viewProgess')
-const { priceChanged, interval, limit } = require('./algos/a_first');
+require('./algos/a_first');
 
 module.exports = { startSimulation, simulate }
 
@@ -29,6 +29,7 @@ async function startSimulation(startTime, closeTime) {
 }
 
 async function simulate(symbols, startTime, closeTime) {
+    publishPerf({ allSymbolsCandles, fromTime: startTime, symbols, periods: null });
     for (let date = startTime; date < closeTime; date += ONE_MIN) {
         await Promise.mapSeries(symbols, async function loadLocal(symbol) {
             let data = await redis.hmgetAsync(symbol, +date)
@@ -37,16 +38,22 @@ async function simulate(symbols, startTime, closeTime) {
                     let candle = JSON.parse(data)
                     allSymbolsCandles[symbol] = allSymbolsCandles[symbol] || {}
                     allSymbolsCandles[symbol][+date] = candle
-                    publish('price', { symbol, close: candle.close, closeTime: candle.closeTime });
+                    console.log('tick',symbol,date)
+
+                   publish('price', { symbol, close: candle.close, startTime: candle.startTime, closeTime: candle.closeTime });
                 } catch (e) {
                     console.log(e)
                 }
             } else {
-                await loadPrevious([symbol], date)
-                await loadLocal(symbol)
+                // await loadPrevious([symbol], date)
+                // await loadLocal(symbol)
+                /*await*/
+                loadPrevious([symbol], date).then(()=> loadLocal(symbol))
+                /*await*/
+
             }
         })
-        priceChanged(null, symbols, allSymbolsCandles, startTime, date);
+        // priceChanged(null, symbols, allSymbolsCandles, startTime, date);
     }
     saveLogs()
     console.log('END')
@@ -56,6 +63,7 @@ function saveLogs() {
     let firstTrade = _.first(tradesLog)
     if (firstTrade) {
         let logs = _.map(tradesLog, t => ({
+            strategy: t.strategy,
             symbol: t.symbol,
             startTime: moment(t.time).tz(TIME_ZONE).format('DD MMM HH:mm'),
             closeTime: moment(t.closeTime).tz(TIME_ZONE).format('DD MMM HH:mm'),

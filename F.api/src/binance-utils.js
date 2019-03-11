@@ -138,7 +138,7 @@ function listenToPriceChange({ candles, symbol, interval }) {
             }
         })
 
-        publish('price', { symbol, close });
+        publish('price', { symbol, close, startTime, closeTime });
 
         if (isFinal) {
             console.log.throttle(symbol + ' final');
@@ -193,8 +193,8 @@ function getChangeFrom({ candles, symbol, period, nowTime, from, timeframeName }
             prevChanges.set(period, { ...prevChangeSymbols, [symbol]: prevChange })
             return prevChange
         }
-        //     !startCandle && console.log(`${symbol} startCandle not found at [${startTime}] ${new Date(startTime)}`)
-        //     !lastCandle && console.log(`${symbol} lastCandle not found at [${now_0}] ${new Date(now_0)}`)
+        !startCandle && console.log(`${symbol} startCandle not found at [${startTime}] ${new Date(startTime)}`)
+        !lastCandle && console.log(`${symbol} lastCandle not found at [${now_0}] ${new Date(now_0)}`)
     }
 }
 
@@ -225,24 +225,30 @@ function getPeriodsChanges({ candles, symbol, periods }) {
 }
 
 
-function publishPerf({ allSymbolsCandles, symbols, periods = DEFAULT_PERIODS, priceChanged }) {
+function publishPerf({ allSymbolsCandles, symbols, fromTime, periods = DEFAULT_PERIODS }) {
     const perfs = {}
-    subscribe('price', ({ symbol }) => {
+    subscribe('price', ({ symbol, startTime, closeTime }) => {
+        const symbolPerfs = periods && getPeriodsChanges({ candles: allSymbolsCandles[symbol], symbol, periods });
 
+        // perfs[symbol] = _.mapValues(symbolPerfs, (perf, period) =>
+        //     perf || (perfs[symbol] && perfs[symbol][period] ? { isDirty: true, ...perfs[symbol][period] }
+        //         : { symbol, period, change: -1000 }
+        //     ))
 
-        const symbolPerfs = getPeriodsChanges({ candles: allSymbolsCandles[symbol], symbol, periods });
-
-        perfs[symbol] = _.mapValues(symbolPerfs, (perf, period) =>
-            perf || (perfs[symbol] && perfs[symbol][period] ? { isDirty: true, ...perfs[symbol][period] }
-                : { symbol, period, change: -1000 }
-            ))
-
-        priceChanged && priceChanged(symbol, symbols, allSymbolsCandles, perfs)
+        allSymbolsCandles[symbol] && publish('priceChanged', {
+            symbol, symbols, startTime,
+            fromTime, nowTime: startTime,
+            candle: allSymbolsCandles[symbol][startTime]
+        })
 
         publish.throttle('prevPerf', Object.values(perfs))
         // publish.throttle2('ALL_SYMBOLS_CANDLES', allSymbolsCandles)
         // publish('prevPerf', Object.values(perfs))
         // publish('ALL_SYMBOLS_CANDLES', allSymbolsCandles)
+    })
+
+    subscribe('get-candles', ({ symbol, id }) => {
+        publish('candles', { id, symbol, candles: allSymbolsCandles[symbol] })
     })
 }
 
