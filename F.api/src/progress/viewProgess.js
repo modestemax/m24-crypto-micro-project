@@ -85,7 +85,7 @@ ${limit ? `limit  ${limit.toFixed(8)}` : ''}`
         return
     }
 
-    subscribe('price', ({ symbol, close, closeTime }) => {
+    subscribe('price', ({ symbol, close, closeTime, fromTime }) => {
         _.values(trades[symbol]).forEach((trade) => {
             if (!trade.open) {
                 return stop_limit_buy(trade, close, symbol);
@@ -102,8 +102,8 @@ ${limit ? `limit  ${limit.toFixed(8)}` : ''}`
             trade.change = changePercent(trade.open, trade.close)
             let highChange = trade.highChange = changePercent(trade.open, trade.high)
             let lowChange = trade.lowChange = changePercent(trade.open, trade.low)
-
-            if (trade.change.toFixed(1) !== trade.oldChange.toFixed(1)) {
+            let fd = 0
+            if (trade.change.toFixed(fd) !== trade.oldChange.toFixed(fd)) {
 
                 const lost = trade.lost = lowChange <= LOSS
                 const win = trade.win = highChange >= trade.target
@@ -114,7 +114,7 @@ ${limit ? `limit  ${limit.toFixed(8)}` : ''}`
                 let state2 = win ? `win` : highChange > 2 ? '' : 'lost'
                 let state = win ? `${state2} [${winDuration}] [${minEndChange.toFixed(2)}%]` : state2
 
-                let date = moment().tz(TIME_ZONE)
+                let date = moment(fromTime || undefined).tz(TIME_ZONE)
                 // let quarter = Math.trunc(date.hour() / 6) + 1
                 let quarter = Math.trunc(date.format('H') / 6) + 1
                 let day = `${date.format('DDMMM')}`
@@ -125,7 +125,7 @@ ${limit ? `limit  ${limit.toFixed(8)}` : ''}`
 change ${trade.change.toFixed(2)}%
 max ${highChange.toFixed(2)}%
 min ${lowChange.toFixed(2)}%
-duration  ${moment(trade.time).fromNow()} [${moment(trade.time).tz(TIME_ZONE).format('H\\h:mm')}]
+duration  ${moment(trade.time).from(date)} [${moment(trade.time).tz(TIME_ZONE).format('H\\h:mm')}]
 state #${state} #${state2}_${dayCode}
 open ${trade.open}
 close ${trade.close}
@@ -136,7 +136,7 @@ ${win || lost ? '#closed' : ''}
                     message_id: tme_message_ids[trade.id],
                     text
                 });
-                console.log(text)
+                console.log('\n', text)
             }
 
         })

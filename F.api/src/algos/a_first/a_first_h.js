@@ -156,8 +156,8 @@ function calculateGain() {
     last.prevGain = last.gain || 0
     last.gain = changePercent(last.openPrice, last.close)
     last.maxGain = _.max([last.gain, last.maxGain])
-
-    if (last.prevGain.toFixed(1) != last.gain.toFixed(1)) {
+    let fd = 0
+    if (last.prevGain.toFixed(fd) != last.gain.toFixed(fd)) {
         const text = `#${log.length}gain 
 ${last.symbol}  ${last.gain.toFixed(2)}% 
 Max gain ${last.maxGain.toFixed(2)}%
@@ -255,7 +255,10 @@ function logLoading(count, symbols) {
 }
 
 module.exports = {
-    priceChanged(symbol, symbols, allSymbolsCandles, fromTime, nowTime) {
+
+    priceChanged({ symbols, allSymbolsCandles, fromTime, nowTime }) {
+
+        // console.log('got new price', symbol)
         originTime = fromTime
         DEFAULT_PERIODS.ALGO = getStartTime
         screener = getSymbolsChanges({ allSymbolsCandles, period: getStartTime, nowTime, timeframeName: 'algo' })

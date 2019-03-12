@@ -161,8 +161,8 @@ function calculateGain() {
     last.prevGain = last.gain || 0
     last.gain = changePercent(last.openPrice, last.close)
     last.maxGain = _.max([last.gain, last.maxGain])
-
-    if (last.prevGain.toFixed(1) != last.gain.toFixed(1)) {
+    let fd = 0
+    if (last.prevGain.toFixed(fd) != last.gain.toFixed(fd)) {
         const text = `#${log.length}gain 
 ${last.symbol}  ${last.gain.toFixed(2)}% 
 Max gain ${last.maxGain.toFixed(2)}%
@@ -259,51 +259,35 @@ function logLoading(count, symbols) {
     }
 }
 
+module.exports = {
 
-const allSymbolsCandles = {}
+    priceChanged({ symbols, allSymbolsCandles, fromTime, nowTime }) {
 
-async function getCandles(symbol) {
-    let id = Date.now()
-    return new Promise((resolve) => {
-        let unsubscribe = subscribe('candles', ({ symbol: _symbol, candles, id: _id }) => {
-            if (_symbol === symbol && _id === id && candles) {
-                resolve(candles)
-                unsubscribe()
-            }
-        })
-        publish('get-candles', { symbol, id })
-    })
+        // console.log('got new price', symbol)
+        originTime = fromTime
+        DEFAULT_PERIODS.ALGO = getStartTime
+        screener = getSymbolsChanges({ allSymbolsCandles, period: getStartTime, nowTime, timeframeName: 'algo' })
+        const orderedScreener = orderScreener(screener)
+        first = getFirst(screener)
+        second = _.nth(orderedScreener, 1)
 
-}
+        let count = _.values(screener).filter(v => v).length
+        logLoading(count, symbols)
 
-subscribe('priceChanged', async ({ symbol, symbols, startTime, candle, fromTime, nowTime }) => {
-    allSymbolsCandles[symbol] = allSymbolsCandles[symbol] || await getCandles(symbol)
-    startTime && candle && (allSymbolsCandles[symbol][startTime] = candle)
-    // console.log('got new price', symbol)
-    originTime = fromTime
-    DEFAULT_PERIODS.ALGO = getStartTime
-    screener = getSymbolsChanges({ allSymbolsCandles, period: getStartTime, nowTime, timeframeName: 'algo' })
-    const orderedScreener = orderScreener(screener)
-    first = getFirst(screener)
-    second = _.nth(orderedScreener, 1)
+        if (!(first && second && first.change > 0 && second.change > 0)) return
+        // init()
+        // algoStarted = true
+        if (!algoStarted) {
+            algoStarted = count > symbols.length - 5
+            algoStarted && console.log('algoStarted ')
 
-    let count = _.values(screener).filter(v => v).length
-    logLoading(count, symbols)
+        } else {
+            run(screener)
+        }
 
-    if (!(first && second && first.change > 0 && second.change > 0)) return
-    // init()
-    // algoStarted = true
-    if (!algoStarted) {
-        algoStarted = count === symbols.length - 5
-        algoStarted && console.log('algoStarted ')
-
-    } else {
-        run(screener)
     }
 
-})
-
-
+}
 subscribe('tme_message_id', ({ id, message_id }) => {
     id && (tme_message_ids[id] = message_id)
 })

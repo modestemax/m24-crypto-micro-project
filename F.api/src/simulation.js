@@ -19,18 +19,19 @@ const allSymbolsCandles = {};
 const { publishPerf, loadCandles, listenToPriceChange, changePercent } = require('./binance-utils')
 const loadPrevious = require('./load_previous_data')
 require('./progress/viewProgess')
-require('./algos/a_first');
+const { priceChanged } = require(`./algos/a_first/${process.env.ALGO || 'a_first_i'}`);
 
 module.exports = { startSimulation, simulate }
 
 async function startSimulation(startTime, closeTime) {
     const symbols = await redisGet('symbols')
     await simulate(symbols, startTime, closeTime)
+    process.exit(0)
 }
 
 async function simulate(symbols, startTime, closeTime) {
-    publishPerf({ allSymbolsCandles, fromTime: startTime, symbols, periods: null });
     for (let date = startTime; date < closeTime; date += ONE_MIN) {
+        console.log('tick', moment(date).tz(TIME_ZONE).format('HH:mm'))
         await Promise.mapSeries(symbols, async function loadLocal(symbol) {
             let data = await redis.hmgetAsync(symbol, +date)
             if (data && (_.isArray(data) ? data[0] : true)) {
@@ -38,22 +39,24 @@ async function simulate(symbols, startTime, closeTime) {
                     let candle = JSON.parse(data)
                     allSymbolsCandles[symbol] = allSymbolsCandles[symbol] || {}
                     allSymbolsCandles[symbol][+date] = candle
-                    console.log('tick',symbol,date)
-
-                   publish('price', { symbol, close: candle.close, startTime: candle.startTime, closeTime: candle.closeTime });
+                    // console.log('tick', symbol, moment(date).tz(TIME_ZONE).format('HH:mm'))
+                    publish('price', { symbol, fromTime: startTime, ...candle })
                 } catch (e) {
                     console.log(e)
                 }
             } else {
                 // await loadPrevious([symbol], date)
                 // await loadLocal(symbol)
-                /*await*/
-                loadPrevious([symbol], date).then(()=> loadLocal(symbol))
-                /*await*/
-
+                // loadPrevious([symbol], date).then(() => loadLocal(symbol)).catch(_.noop)
+                let index = symbols.indexOf(symbol)
+                ~index && symbols.splice(index, 1)
             }
+        });
+        priceChanged({
+            symbols,
+            fromTime: startTime, nowTime: date,
+            allSymbolsCandles
         })
-        // priceChanged(null, symbols, allSymbolsCandles, startTime, date);
     }
     saveLogs()
     console.log('END')
@@ -63,7 +66,7 @@ function saveLogs() {
     let firstTrade = _.first(tradesLog)
     if (firstTrade) {
         let logs = _.map(tradesLog, t => ({
-            strategy: t.strategy,
+            // strategy: t.strategy,
             symbol: t.symbol,
             startTime: moment(t.time).tz(TIME_ZONE).format('DD MMM HH:mm'),
             closeTime: moment(t.closeTime).tz(TIME_ZONE).format('DD MMM HH:mm'),
@@ -78,11 +81,11 @@ function saveLogs() {
             change: t.change.toFixed(2),
             highChange: t.highChange.toFixed(2),
             lowChange: t.lowChange.toFixed(2),
-            minEndChange: (t.minEndChange || 0).toFixed(2),
+            min_to_high: (t.minEndChange || NaN).toFixed(2),
         }));
         logs = [_.mapValues(_.first(logs), (v, k) => k)].concat(logs)
         let txt = _.map(logs, log => _.values(log).join('\t')).join('\n')
-        fs.writeFileSync(`${process.env.HOME}/tmp/m24-logs/${moment(firstTrade.inTime).format('DD MMM')}.tsv`, txt)
+        fs.writeFileSync(`${process.env.HOME}/tmp/m24-logs/${firstTrade.strategy}_${moment(firstTrade.inTime).format('DD MMM')}.tsv`, txt)
     }
 
 }
@@ -91,8 +94,10 @@ function saveLogs() {
 const { FROM_DATE, TO_DATE } = process.env;
 
 const startTime = /^\d\d\d\d-\d\d-\d\d$/.test(FROM_DATE) && +new Date(FROM_DATE)
-const closeTime = /^\d\d\d\d-\d\d-\d\d$/.test(FROM_DATE) && +new Date(TO_DATE);
+let closeTime = /^\d\d\d\d-\d\d-\d\d$/.test(FROM_DATE) && +new Date(TO_DATE);
 
-if (startTime && closeTime) {
+if (startTime) {
+    closeTime = closeTime || +moment(startTime).endOf('day').toDate()
+    console.log('simulating', FROM_DATE, ' - ', TO_DATE)
     startSimulation(startTime, closeTime)
 }
