@@ -24,7 +24,7 @@ process.nextTick(() => {
         if (unique && tradesByIds[id].length) {
             let currentTrade = _.last(tradesByIds[id])
             if (currentTrade.symbol !== symbol) {
-                global.tradesLog.push(currentTrade)
+
                 delete trades[currentTrade.symbol][id]
             }
         }
@@ -52,6 +52,7 @@ process.nextTick(() => {
                 target: target || TARGET, inChange, inTime
             }
             tradesByIds[id].push(trade)
+            global.tradesLog.push(trade)
         }
     })
 

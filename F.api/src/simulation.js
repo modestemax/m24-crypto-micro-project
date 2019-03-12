@@ -19,7 +19,8 @@ const allSymbolsCandles = {};
 const { publishPerf, loadCandles, listenToPriceChange, changePercent } = require('./binance-utils')
 const loadPrevious = require('./load_previous_data')
 require('./progress/viewProgess')
-const { priceChanged } = require(`./algos/a_first/${process.env.ALGO || 'a_first_i'}`);
+const ALGO = process.env.ALGO || 'a_first_i'
+const { priceChanged } = require(`./algos/a_first/${ALGO}`);
 
 module.exports = { startSimulation, simulate }
 
@@ -58,6 +59,7 @@ async function simulate(symbols, startTime, closeTime) {
             allSymbolsCandles
         })
     }
+
     saveLogs()
     console.log('END')
 }
