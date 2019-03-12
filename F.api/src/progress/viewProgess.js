@@ -96,7 +96,7 @@ ${limit ? `limit  ${limit.toFixed(8)}` : ''}`
             trade.closeTime = closeTime || Date.now()
             trade.oldHigh = trade.high
             trade.high = _.max([trade.high, close])
-            trade.min = trade.high > trade.oldHigh ? trade.low : trade.min
+            trade.minToHigh = trade.high > trade.oldHigh ? trade.low : trade.minToHigh
             trade.max_lost = _.max([trade.high - trade.close, trade.max_lost])
             trade.low = _.min([trade.low, close])
             trade.oldChange = isNaN(trade.change) ? -Infinity : trade.change
@@ -109,11 +109,11 @@ ${limit ? `limit  ${limit.toFixed(8)}` : ''}`
                 const lost = trade.lost = lowChange <= LOSS
                 const win = trade.win = highChange >= trade.target
                 trade.timeEnd = trade.timeEnd || (win && Date.now()) || void 0
-                trade.minEnd = trade.minEnd || (win && trade.low) || void 0
+                trade.minToHigh = trade.minToHigh || (win && trade.low) || void 0
                 let winDuration = win && moment.duration(moment(trade.timeEnd).diff(moment(trade.time))).humanize()
-                let minEndChange = changePercent(trade.open, trade.minEnd)
+                let minToHighChange = changePercent(trade.open, trade.minToHigh)
                 let state2 = win ? `win` : highChange > 2 ? '' : 'lost'
-                let state = win ? `${state2} [${winDuration}] [${minEndChange.toFixed(2)}%]` : state2
+                let state = win ? `${state2} [${winDuration}] [${minToHighChange.toFixed(2)}%]` : state2
 
                 let date = moment(fromTime || undefined).tz(TIME_ZONE)
                 // let quarter = Math.trunc(date.hour() / 6) + 1

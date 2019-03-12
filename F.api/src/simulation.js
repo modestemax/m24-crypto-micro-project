@@ -83,7 +83,7 @@ function saveLogs() {
             change: t.change.toFixed(2),
             highChange: t.highChange.toFixed(2),
             lowChange: t.lowChange.toFixed(2),
-            min_to_high: (t.minEndChange || NaN).toFixed(2),
+            minToHighChange: (t.minToHighChange || NaN).toFixed(2),
         }));
         logs = [_.mapValues(_.first(logs), (v, k) => k)].concat(logs)
         let txt = _.map(logs, log => _.values(log).join('\t')).join('\n')
