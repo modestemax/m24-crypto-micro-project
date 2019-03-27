@@ -24,7 +24,7 @@ process.nextTick(() => {
         if (unique && tradesByIds[id].length) {
             let currentTrade = _.last(tradesByIds[id])
             if (currentTrade.symbol !== symbol) {
-                global.tradesLog.push(currentTrade)
+
                 delete trades[currentTrade.symbol][id]
             }
         }
@@ -52,6 +52,7 @@ process.nextTick(() => {
                 target: target || TARGET, inChange, inTime
             }
             tradesByIds[id].push(trade)
+            global.tradesLog.push(trade)
         }
     })
 
@@ -85,7 +86,7 @@ ${limit ? `limit  ${limit.toFixed(8)}` : ''}`
         return
     }
 
-    subscribe('price', ({ symbol, close, closeTime }) => {
+    subscribe('price', ({ symbol, close, closeTime, fromTime }) => {
         _.values(trades[symbol]).forEach((trade) => {
             if (!trade.open) {
                 return stop_limit_buy(trade, close, symbol);
@@ -95,26 +96,26 @@ ${limit ? `limit  ${limit.toFixed(8)}` : ''}`
             trade.closeTime = closeTime || Date.now()
             trade.oldHigh = trade.high
             trade.high = _.max([trade.high, close])
-            trade.min = trade.high > trade.oldHigh ? trade.low : trade.min
+            trade.minToHigh = trade.high > trade.oldHigh ? trade.low : trade.minToHigh
             trade.max_lost = _.max([trade.high - trade.close, trade.max_lost])
             trade.low = _.min([trade.low, close])
             trade.oldChange = isNaN(trade.change) ? -Infinity : trade.change
             trade.change = changePercent(trade.open, trade.close)
             let highChange = trade.highChange = changePercent(trade.open, trade.high)
             let lowChange = trade.lowChange = changePercent(trade.open, trade.low)
-
-            if (trade.change.toFixed(1) !== trade.oldChange.toFixed(1)) {
+            let fd = 0
+            if (trade.change.toFixed(fd) !== trade.oldChange.toFixed(fd)) {
 
                 const lost = trade.lost = lowChange <= LOSS
                 const win = trade.win = highChange >= trade.target
                 trade.timeEnd = trade.timeEnd || (win && Date.now()) || void 0
-                trade.minEnd = trade.minEnd || (win && trade.low) || void 0
+                trade.minToHigh = trade.minToHigh || (win && trade.low) || void 0
                 let winDuration = win && moment.duration(moment(trade.timeEnd).diff(moment(trade.time))).humanize()
-                let minEndChange = changePercent(trade.open, trade.minEnd)
+                let minToHighChange = changePercent(trade.open, trade.minToHigh)
                 let state2 = win ? `win` : highChange > 2 ? '' : 'lost'
-                let state = win ? `${state2} [${winDuration}] [${minEndChange.toFixed(2)}%]` : state2
+                let state = win ? `${state2} [${winDuration}] [${minToHighChange.toFixed(2)}%]` : state2
 
-                let date = moment().tz(TIME_ZONE)
+                let date = moment(fromTime || undefined).tz(TIME_ZONE)
                 // let quarter = Math.trunc(date.hour() / 6) + 1
                 let quarter = Math.trunc(date.format('H') / 6) + 1
                 let day = `${date.format('DDMMM')}`
@@ -125,7 +126,7 @@ ${limit ? `limit  ${limit.toFixed(8)}` : ''}`
 change ${trade.change.toFixed(2)}%
 max ${highChange.toFixed(2)}%
 min ${lowChange.toFixed(2)}%
-duration  ${moment(trade.time).fromNow()} [${moment(trade.time).tz(TIME_ZONE).format('H\\h:mm')}]
+duration  ${moment(trade.time).from(date)} [${moment(trade.time).tz(TIME_ZONE).format('H\\h:mm')}]
 state #${state} #${state2}_${dayCode}
 open ${trade.open}
 close ${trade.close}
@@ -136,7 +137,7 @@ ${win || lost ? '#closed' : ''}
                     message_id: tme_message_ids[trade.id],
                     text
                 });
-                console.log(text)
+                console.log('\n', text)
             }
 
         })

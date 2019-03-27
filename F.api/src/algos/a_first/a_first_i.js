@@ -8,7 +8,7 @@ const { getSymbolsChanges, getChangeFrom, changePercent, timeframeStartAt, DURAT
 // const prices = require('../../progress/prices');
 console.log.throttle = _.throttle(console.log, 1e3 * 60)
 // let timeRef = 'day';
-const strategyName = 'm24first_h'
+const strategyName = 'm24first_i'
 
 let in_;
 let out;
@@ -48,11 +48,12 @@ function run(screener) {
             Object.assign(last, screener[last.symbol])
             calculateGain()
             if (last)
-                if (last.symbol !== first.symbol && (sellReason = SELL_REASON.SWITCH_TO_FIRST)) {
+                if (last.symbol !== first.symbol && last.symbol !== second.symbol &&
+                    first.change - last.change > 3 && (sellReason = SELL_REASON.SWITCH_TO_FIRST)) {
                     sell(sellReason)
                 } else if (last.gain < -1 && (sellReason = SELL_REASON.STOP_LOSS)) {
                     sell(sellReason)
-                } else if (last.gain > TOP_GAIN && first.change - second.change > FIRST_SECOND_DELTA) {
+                } else if (last.gain > TOP_GAIN /*&& first.change - second.change > FIRST_SECOND_DELTA*/) {
                     publish(`m24:simulate`, {
                         strategy: strategyName,
                         symbol: last.symbol,
@@ -107,11 +108,15 @@ function getStartTime() {
 
 
 function buy() {
+    if (global.H24 && changePercent(first.close, global.H24 [first.symbol].highPrice) > 5) return
     last = first;
-    let change = (first.change - second.change) % 5
-    last.close = +(last.close * (1 - change / 100)).toFixed(8)
-    last.change -= change
-
+    let last_last = _.last(log) || { ...second, openChange: second.change }
+    if (first.change > last_last.openChange) {
+        let diffChange = (first.change - last_last.openChange)
+        last.close = +(last.close * (1 - diffChange / 100)).toFixed(8)
+        last.change -= diffChange
+    }
+    last.openChange = last.change
     log.push(last);
     last.openPrice = last.close;
     const text = `#${log.length}buy #buy #buy_${last.symbol} ${last.symbol} at ${last.close} [${last.change.toFixed(2)}%]`
@@ -266,15 +271,14 @@ module.exports = {
         first = getFirst(screener)
         second = _.nth(orderedScreener, 1)
 
-        // init()
-        // algoStarted=true
-        if (!algoStarted) {
-            if (!(first && second)) return
-            let count = _.values(screener).filter(v => v).length
-            logLoading(count, symbols)
-            // if (first.change > in_ - Math.abs(-STOP_LOSS)) {
+        let count = _.values(screener).filter(v => v).length
+        logLoading(count, symbols)
 
-            algoStarted = count === symbols.length
+        if (!(first && second && first.change > 0 && second.change > 0)) return
+        // init()
+        // algoStarted = true
+        if (!algoStarted) {
+            algoStarted = count > symbols.length - 5
             algoStarted && console.log('algoStarted ')
 
         } else {
@@ -282,8 +286,8 @@ module.exports = {
         }
 
     }
-}
 
+}
 subscribe('tme_message_id', ({ id, message_id }) => {
     id && (tme_message_ids[id] = message_id)
 })
