@@ -73,7 +73,8 @@ module.exports = class extends M24Base {
                                     {
                                         // if (this.outOfTop[current.symbolId])
                                         if (!this.hasTracking({ id: current.id, symbolId }))
-                                            return true;
+                                            // return true;
+                                            return false;
                                     }
     }
 
