@@ -11,14 +11,13 @@ module.exports = class extends Template {
         // const [currentX, lastX, prevX] = (await loadPoints({ symbolId, timeframe: this.options.timeframeX }));
         // const [candle, candle_1, candle_2, candle_3, candle_4] = (await loadPoints({ symbolId, timeframe: this.options.timeframe }));
         let current = signal.candle;
-        if (last && prev && current) {
+        if (last && current) {
 
 
-            if((prev.ema30 >= prev.ema10) && (last.ema30 < last.ema10) && (current.ema30 < current.ema10))
-  if((current.ema50 < current.bbu20) && (current.ema10 > current.ema20) && (last.ema10 > last.bbb20))
-    if((last.macd > 0) && (last.macd >= current.macd_signal))
-      //if((current.bbu20 > last.bbu20) && (current.bbl20 <= last.bbl20))
-        if((current.bbu20 / current.close >= 1.007) && (current.close > current.open)){
+            if ((current.close >= current.bbu20) && (current.open <= current.ema10))
+                if (((current.bbu20 / last.bbu20) - 1) * 100 > 5)
+                    if (((last.bbl20 / current.bbl20) - 1) * 100 > 5)
+                        if (((current.bbu20 / current.bbl20) - 1) * 100 > 5) {
                             return true;
                         }
         }
