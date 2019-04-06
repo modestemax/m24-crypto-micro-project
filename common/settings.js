@@ -372,7 +372,7 @@ module.exports = {
             // doTrade: true,
             timeInForce: 'GTC',
             selfStop: true,
-            timeframe: 60,
+            timeframe: 60*24,
             timeframeX: 60 * 4,
             takeProfit: .5,
             stopLoss: -1,
