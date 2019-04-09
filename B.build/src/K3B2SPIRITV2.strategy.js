@@ -10,21 +10,24 @@ module.exports = class extends Template {
     // const [candle, candle_1, candle_2, candle_3, candle_4] = (await loadPoints({ symbolId, timeframe: this.options.timeframe }));
     let current = signal.candle;
     if (last && current) {
-      if (current.close > current.ema10 && current.open < current.bbu20)
+      if (
+        current.close > current.ema10 &&
+        current.open < current.bbu20 &&
+        last.low <= last.ema10
+      )
         if (current.close > current.open && current.open < current.high)
           if (current.ema10 > current.ema20 && current.ema10 >= current.bbb20)
             if (
-              (current.ema200 > current.bbl20 &&
-                current.ema100 > current.bbl20) ||
-              (current.ema200 < current.bbb20 && current.ema100 < current.bbb20)
+              current.ema100 <= current.ema10 ||
+              current.ema100 > current.ema200
             )
               if (
-                (current.close / last.low - 1) * 100 > 5 ||
+                (current.close / last.open - 1) * 100 >= 5 ||
                 current.close >= current.bbu20
               )
-                if ((current.bbu20 / last.bbu20 - 1) * 100 > 0.15)
-                  if ((last.bbl20 / current.bbl20 - 1) * 100 > 0.15)
-                    if ((current.bbu20 / current.bbl20 - 1) * 100 > 6) {
+                if (current.bbu20 > last.bbu20)
+                  if (current.bbl20 < last.bbl20)
+                    if ((current.bbu20 / current.bbl20 - 1) * 100 > 8) {
                       return true;
                     }
     }
