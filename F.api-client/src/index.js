@@ -20,7 +20,7 @@ import {getMainDefinition} from 'apollo-utilities';
 
 
 // const HOST_NAME='142.44.246.201';
-const HOST_NAME = (/localhost|127./.test(window.location.host)) ? 'localhost' : '142.44.246.201';
+const HOST_NAME = (/localhost|127./.test(window.location.host)) ? 'localhost' : 'screener.neema.co.za';
 
 const wsLink = new WebSocketLink({
     uri: `ws://${HOST_NAME}:4000/graphql`,

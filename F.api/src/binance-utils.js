@@ -230,10 +230,10 @@ function publishPerf({ allSymbolsCandles, symbols, fromTime, periods = DEFAULT_P
     subscribe('price', ({ symbol, startTime, closeTime }) => {
         const symbolPerfs = periods && getPeriodsChanges({ candles: allSymbolsCandles[symbol], symbol, periods });
 
-        // perfs[symbol] = _.mapValues(symbolPerfs, (perf, period) =>
-        //     perf || (perfs[symbol] && perfs[symbol][period] ? { isDirty: true, ...perfs[symbol][period] }
-        //         : { symbol, period, change: -1000 }
-        //     ))
+        perfs[symbol] = _.mapValues(symbolPerfs, (perf, period) =>
+            perf || (perfs[symbol] && perfs[symbol][period] ? { isDirty: true, ...perfs[symbol][period] }
+                : { symbol, period, change: -1000 }
+            ))
 
         allSymbolsCandles[symbol] && publish('priceChanged', {
             symbol, symbols, startTime,
